@@ -53,7 +53,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-dvh">
-        <Script id="theme-init" strategy="beforeInteractive">{themeScript}</Script>
+        <Script id="theme-init" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: themeScript }} />
         <ThemeProvider>
           <CartProvider>{children}</CartProvider>
         </ThemeProvider>
