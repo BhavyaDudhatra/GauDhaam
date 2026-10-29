@@ -4,7 +4,7 @@ import type { Coupon, ProductInput, ServiceInput, User } from "@/lib/types";
 
 export const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@gaudham.in";
 export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "Gaudham@123";
-export const ADMIN_NAME = "Gaudham Admin";
+export const ADMIN_NAME = "GauDhaam Admin";
 
 export function buildSeedAdmin(): User {
   return {
@@ -119,7 +119,7 @@ export const seedProducts: ProductInput[] = [
     description:
       "This is the honey we keep on the breakfast table. Bees forage on the flowering trees around the farm — neem, jamun and the odd patch of mustard — which gives a mellow, buttery honey that is less intense than the forest harvest.\n\nWe extract it cold and let it settle for a week before bottling.",
     highlights: [
-      "From hives at the Gaudham farm",
+      "From hives at the GauDhaam farm",
       "Cold extracted and gravity settled",
       "Mild enough for children",
       "Every jar is dated by harvest",
@@ -302,7 +302,7 @@ export const seedServices: ServiceInput[] = [
     tagline:
       "A slow, unhurried conversation about food, sleep and everyday health.",
     description:
-      "A 45-minute online consultation with our consulting vaidya, focused on practical changes rather than a long list of supplements. We will talk through your routine, digestion, sleep and energy, and put together a simple plan you can actually follow.\n\nYou will receive a written summary within two days, including food suggestions and any Gaudham products that fit. This is complementary support, not a replacement for medical treatment.\n\nConsultations are available in English and Hindi.",
+      "A 45-minute online consultation with our consulting vaidya, focused on practical changes rather than a long list of supplements. We will talk through your routine, digestion, sleep and energy, and put together a simple plan you can actually follow.\n\nYou will receive a written summary within two days, including food suggestions and any GauDhaam products that fit. This is complementary support, not a replacement for medical treatment.\n\nConsultations are available in English and Hindi.",
     highlights: [
       "45-minute online session",
       "Written summary within two days",

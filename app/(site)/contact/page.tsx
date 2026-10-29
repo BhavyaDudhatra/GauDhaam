@@ -17,7 +17,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Contact",
   description:
-    "Questions about an order, bulk gifting or a farm visit? Write to the Gaudham team.",
+    "Questions about an order, bulk gifting or a farm visit? Write to the GauDhaam team.",
 };
 
 export default async function ContactPage({
@@ -53,7 +53,7 @@ export default async function ContactPage({
             <div className="relative aspect-[4/3] overflow-hidden rounded-banner border border-line">
               <Image
                 src="/assets/images/conus.jpg"
-                alt="The fields around the Gaudham farm"
+                alt="The fields around the GauDhaam farm"
                 fill
                 sizes="(max-width: 1024px) 100vw, 460px"
                 className="object-cover"

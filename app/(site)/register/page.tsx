@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Create an account",
   description:
-    "Create a Gaudham account to check out faster, follow your orders and keep your details in one place.",
+    "Create a GauDhaam account to check out faster, follow your orders and keep your details in one place.",
   robots: { index: false, follow: false },
 };
 
@@ -46,7 +46,7 @@ export default async function RegisterPage({
         <div className="relative hidden min-h-[640px] lg:block">
           <Image
             src="/assets/images/conus.jpg"
-            alt="Fields at the Gaudham farm"
+            alt="Fields at the GauDhaam farm"
             fill
             sizes="50vw"
             className="object-cover"

@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import { ShieldCheck, User } from "lucide-react";
 import { formatDateTime } from "@/lib/money";
+import { getSession } from "@/lib/auth";
 import { getStore } from "@/lib/store";
+import { DeleteUserButton } from "@/components/admin/delete-user-button";
 
 export const metadata: Metadata = { title: "Users · Admin" };
 export const dynamic = "force-dynamic";
 
 export default async function AdminUsersPage() {
   const store = await getStore();
+  const session = await getSession();
   const users = await store.users.list();
 
   return (
@@ -29,10 +32,13 @@ export default async function AdminUsersPage() {
                 <th className="px-4 py-3 font-semibold">Role</th>
                 <th className="px-4 py-3 font-semibold">Verified</th>
                 <th className="px-4 py-3 font-semibold">Joined</th>
+                <th className="px-4 py-3 text-right font-semibold">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
-              {users.map((user) => (
+              {users.map((user) => {
+                const canDelete = user.role !== "admin" && session?.id !== user.id;
+                return (
                 <tr key={user.id}>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2.5">
@@ -55,11 +61,14 @@ export default async function AdminUsersPage() {
                     {user.emailVerified ? "Yes" : "No"}
                   </td>
                   <td className="px-4 py-3 text-body">{formatDateTime(user.createdAt)}</td>
+                  <td className="px-4 py-3 text-right">
+                    <DeleteUserButton userId={user.id} userName={user.name} canDelete={canDelete} />
+                  </td>
                 </tr>
-              ))}
+              );})}
               {users.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-10 text-center text-body">
+                  <td colSpan={6} className="px-4 py-10 text-center text-body">
                     No users yet.
                   </td>
                 </tr>

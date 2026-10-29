@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     "herbal hair oil",
     "handmade soap",
     "organic products India",
-    "Gaudham",
+    "GauDhaam",
   ],
   openGraph: {
     title: `${site.name} — ${site.tagline}`,

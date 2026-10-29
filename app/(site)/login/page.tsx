@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Sign in",
-  description: "Sign in to your Gaudham account to track orders and manage your details.",
+  description: "Sign in to your GauDhaam account to track orders and manage your details.",
   robots: { index: false, follow: false },
 };
 
@@ -56,7 +56,7 @@ export default async function LoginPage({
         <div className="relative hidden min-h-[560px] lg:block">
           <Image
             src="/assets/images/aboutus.jpg"
-            alt="The Gaudham farm at golden hour"
+            alt="The GauDhaam farm at golden hour"
             fill
             sizes="50vw"
             className="object-cover"

@@ -58,7 +58,7 @@ export default function TermsPage() {
             <h2 className="mt-6 text-[17px]">Intellectual property</h2>
             <p>
               All content on this site — text, images, logo and design — belongs
-              to Gaudham and cannot be used without permission.
+              to GauDhaam and cannot be used without permission.
             </p>
 
             <h2 className="mt-6 text-[17px]">Limitation of liability</h2>

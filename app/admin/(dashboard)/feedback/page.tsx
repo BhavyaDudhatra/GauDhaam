@@ -65,7 +65,7 @@ export default async function AdminFeedbackPage() {
               <div className="mt-4 rounded-xl border border-line bg-cream/50 p-3.5">
                 <div className="flex items-center gap-1.5 text-[12px] font-semibold text-brand-dark">
                   <Reply size={13} />
-                  Reply from {item.repliedBy ?? "Gaudham"}
+                  Reply from {item.repliedBy ?? "GauDhaam"}
                 </div>
                 <p className="mt-1 text-[12.5px] leading-relaxed">{item.reply}</p>
                 {item.repliedAt && (

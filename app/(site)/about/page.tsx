@@ -13,7 +13,7 @@ import {
 export const metadata: Metadata = {
   title: "Our story",
   description:
-    "Gaudham is a small farm-run kitchen making ghee, honey, herbal care and soap in batches small enough to taste the difference.",
+    "GauDhaam is a small farm-run kitchen making ghee, honey, herbal care and soap in batches small enough to taste the difference.",
 };
 
 const values = [
@@ -66,7 +66,7 @@ export default function AboutPage() {
               A small farm, a slow kitchen, and a stubborn belief in doing less.
             </h1>
             <p className="mt-4 max-w-lg text-[14px] leading-relaxed">
-              Gaudham makes ghee, honey, herbal care and soap the way a household
+              GauDhaam makes ghee, honey, herbal care and soap the way a household
               would — in quantities we can see, smell and taste. No factory floor,
               no flavour lab, no shortcuts hidden behind a label.
             </p>
@@ -85,7 +85,7 @@ export default function AboutPage() {
             <div className="relative aspect-[4/3] overflow-hidden rounded-banner border border-line bg-white">
               <Image
                 src="/assets/images/aboutus.jpg"
-                alt="Fields and a farmhouse at the Gaudham farm"
+                alt="Fields and a farmhouse at the GauDhaam farm"
                 fill
                 priority
                 sizes="(max-width: 1024px) 100vw, 560px"
@@ -94,7 +94,7 @@ export default function AboutPage() {
             </div>
             <div className="absolute -bottom-5 left-4 rounded-card border border-line bg-cream/95 px-4 py-3 shadow-soft backdrop-blur sm:left-6">
               <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-brown">
-                Gaudham
+                GauDhaam
               </p>
               <p className="mt-1 text-[12.5px] font-semibold text-brand-dark">
                 Farm-run. Family-run.
@@ -144,7 +144,7 @@ export default function AboutPage() {
               steeped herbs in cold-pressed oil and waited.
             </p>
             <p>
-              Friends asked for a jar. Then another. Gaudham grew from those
+              Friends asked for a jar. Then another. GauDhaam grew from those
               requests — quietly, and only as fast as we could keep the quality
               where we wanted it.
             </p>

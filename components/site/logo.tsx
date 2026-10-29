@@ -6,7 +6,7 @@ export function Logo({ compact = false }: { compact?: boolean }) {
     <Link
       href="/"
       className="flex items-center gap-2.5 rounded-btn focus-visible:outline-2"
-      aria-label="Gaudham home"
+      aria-label="GauDhaam home"
     >
       <Image
         src="/assets/images/gaudhamlogo.png"
@@ -18,7 +18,7 @@ export function Logo({ compact = false }: { compact?: boolean }) {
       />
       <span className="flex flex-col leading-none">
         <span className="text-[21px] font-bold tracking-[-0.02em] text-brand-dark">
-          Gaudham
+          GauDhaam
         </span>
         {!compact && (
           <span className="mt-1 text-[9px] font-semibold uppercase tracking-[0.19em] text-brown">

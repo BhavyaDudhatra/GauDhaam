@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Products",
-  description: "Browse Gaudham cold-pressed oils, A2 ghee, raw honey, herbal powders and handmade soaps.",
+  description: "Browse GauDhaam cold-pressed oils, A2 ghee, raw honey, herbal powders and handmade soaps.",
 };
 
 export default async function ProductsPage({

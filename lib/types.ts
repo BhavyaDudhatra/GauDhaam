@@ -60,6 +60,19 @@ export type Service = {
 
 export type ServiceInput = Omit<Service, "id" | "createdAt" | "updatedAt">;
 
+export type Address = {
+  id: string;
+  label: string;
+  name: string;
+  phone: string;
+  line1: string;
+  line2?: string;
+  city: string;
+  state: string;
+  pincode: string;
+  isDefault: boolean;
+};
+
 export type User = {
   id: string;
   name: string;
@@ -69,6 +82,7 @@ export type User = {
   role: Role;
   emailVerified: boolean;
   createdAt: string;
+  addresses?: Address[];
 };
 
 import * as speakeasy from "speakeasy";
@@ -228,6 +242,8 @@ export type Subscription = {
   pausedIntervals: PausedInterval[];
   address: Address;
   createdAt: string;
+  requestedQty?: number | null;
+  requestedAt?: string | null;
 };
 
 export type DeliveryStatus = "scheduled" | "delivered" | "paused" | "skipped";
@@ -288,6 +304,7 @@ export type Store = {
     findByEmail: (email: string) => Promise<User | null>;
     create: (input: Omit<User, "id" | "createdAt">) => Promise<User>;
     update: (id: string, patch: Partial<Omit<User, "id" | "createdAt">>) => Promise<User | null>;
+    remove: (id: string) => Promise<void>;
   };
   orders: {
     create: (input: Omit<Order, "id" | "number" | "createdAt" | "updatedAt" | "stockRestored"> & { number?: string }) => Promise<Order>;

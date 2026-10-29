@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { BillSummary } from "@/components/subscriptions/bill-summary";
 import { DeliveryCalendar } from "@/components/subscriptions/delivery-calendar";
+import { requestQuantityChangeAction } from "@/lib/actions/subscriptions";
 import { getSession } from "@/lib/auth";
 import { getStore } from "@/lib/store";
 import {
@@ -181,6 +182,33 @@ export default async function SubscriptionDetailPage({
                 </div>
               )}
             </dl>
+          </div>
+
+          <div className="card p-5 text-[12.5px]">
+            <h3 className="text-[15px]">Quantity request</h3>
+            <p className="mt-2 text-[12px] text-body/70">
+              Current quantity: {subscription.quantity} unit{subscription.quantity === 1 ? "" : "s"}
+              {subscription.requestedQty ? (
+                <span className="ml-2 text-amber-700">
+                  · Pending change to {subscription.requestedQty} requested on {formatDate(subscription.requestedAt ?? "")}
+                </span>
+              ) : null}
+            </p>
+            {subscription.status !== "cancelled" && !subscription.requestedQty && (
+              <form action={requestQuantityChangeAction} className="mt-3 flex items-end gap-2">
+                <input type="hidden" name="id" value={subscription.id} />
+                <div>
+                  <label className="text-[10.5px] font-semibold uppercase tracking-[0.08em] text-body/60">New quantity</label>
+                  <input name="quantity" type="number" min="1" max="50" defaultValue={subscription.quantity} className="input mt-1 w-28" required />
+                </div>
+                <button type="submit" className="btn btn-primary btn-sm">Request change</button>
+              </form>
+            )}
+            {subscription.requestedQty && (
+              <p className="mt-3 text-[11.5px] text-amber-700">
+                Your request is pending admin approval.
+              </p>
+            )}
           </div>
         </div>
       </div>

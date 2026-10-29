@@ -75,7 +75,7 @@ export function Footer() {
 
         <div>
           <h2 className="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-dark">
-            Gaudham
+            GauDhaam
           </h2>
           <ul className="mt-4 space-y-2.5 text-[13.5px]">
             <li>
@@ -131,7 +131,7 @@ export function Footer() {
 
       <div className="border-t border-line">
         <div className="container-gd flex flex-col items-center justify-between gap-2 py-5 text-[12px] text-body/80 sm:flex-row">
-          <p>© {new Date().getFullYear()} Gaudham. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} GauDhaam. All rights reserved.</p>
           <p className="flex items-center gap-2">
             <span>Secure payments by Razorpay</span>
             <span className="h-1 w-1 rounded-full bg-line" />

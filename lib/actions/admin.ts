@@ -405,3 +405,20 @@ export async function deleteMessageAction(formData: FormData) {
   await store.messages.remove(id);
   revalidatePath("/admin/messages");
 }
+
+export async function deleteUser(formData: FormData) {
+  const session = await requireAdmin();
+  const id = clean(formData.get("id"), 80);
+  if (!id) return;
+
+  const store = await getStore();
+  const user = await store.users.get(id);
+  if (!user) return;
+
+  // Prevent deletion of admin users or self-deletion
+  if (user.role === "admin") return;
+  if (user.id === session.id) return;
+
+  await store.users.remove(id);
+  revalidatePath("/admin/users");
+}

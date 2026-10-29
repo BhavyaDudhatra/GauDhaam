@@ -4,7 +4,7 @@ import { ArrowRight, FileText, Scale, Shield, Truck } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Policies",
-  description: "Shipping, returns, privacy and terms for Gaudham.",
+  description: "Shipping, returns, privacy and terms for GauDhaam.",
 };
 
 const policies = [

@@ -215,3 +215,77 @@ export async function updateSubscriptionStatusAction(formData: FormData) {
 
   revalidateSubscription(id);
 }
+
+export async function requestQuantityChangeAction(
+  _previous: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const session = await getSession();
+  if (!session) {
+    return { error: "Please sign in to request a quantity change." };
+  }
+
+  const id = clean(formData.get("id"), 80);
+  const quantity = Math.min(50, Math.max(1, toInt(formData.get("quantity"), 0)));
+
+  if (!id) return { error: "Subscription not found." };
+  if (!quantity) return { error: "Enter a valid quantity between 1 and 50." };
+
+  const store = await getStore();
+  const subscription = await store.subscriptions.get(id);
+  if (!subscription || subscription.userId !== session.id) {
+    return { error: "Subscription not found." };
+  }
+  if (subscription.status === "cancelled") {
+    return { error: "Cannot change quantity for a cancelled subscription." };
+  }
+  if (quantity === subscription.quantity && !subscription.requestedQty) {
+    return { error: "Requested quantity is the same as current quantity." };
+  }
+
+  await store.subscriptions.update(id, {
+    requestedQty: quantity,
+    requestedAt: new Date().toISOString(),
+  });
+
+  revalidateSubscription(id);
+  return { success: "Quantity change request submitted for admin approval." };
+}
+
+export async function approveQuantityChangeAction(formData: FormData) {
+  await requireAdmin();
+
+  const id = clean(formData.get("id"), 80);
+  if (!id) return;
+
+  const store = await getStore();
+  const subscription = await store.subscriptions.get(id);
+  if (!subscription || !subscription.requestedQty) return;
+
+  await store.subscriptions.update(id, {
+    quantity: subscription.requestedQty,
+    requestedQty: null,
+    requestedAt: null,
+  });
+  await store.dailyDeliveries.generateForSubscription(id, currentMonthKey());
+
+  revalidateSubscription(id);
+}
+
+export async function rejectQuantityChangeAction(formData: FormData) {
+  await requireAdmin();
+
+  const id = clean(formData.get("id"), 80);
+  if (!id) return;
+
+  const store = await getStore();
+  const subscription = await store.subscriptions.get(id);
+  if (!subscription) return;
+
+  await store.subscriptions.update(id, {
+    requestedQty: null,
+    requestedAt: null,
+  });
+
+  revalidateSubscription(id);
+}

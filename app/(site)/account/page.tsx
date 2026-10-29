@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { ProfileForm } from "@/components/account/profile-form";
 import { PasswordForm } from "@/components/account/password-form";
+import { AddressManager } from "@/components/account/address-manager";
 import { OrderStatusBadge } from "@/components/ui/order-status";
 import { logoutAction } from "@/lib/actions/auth";
 import { getSession } from "@/lib/auth";
@@ -103,6 +104,13 @@ export default async function AccountPage() {
                 >
                   <Package size={16} className="text-brand" />
                   My orders
+                </a>
+                <a
+                  href="#addresses"
+                  className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-semibold text-brand-dark transition-colors hover:bg-light"
+                >
+                  <UserRound size={16} className="text-brand" />
+                  Addresses
                 </a>
                 <a
                   href="#profile"
@@ -202,6 +210,14 @@ export default async function AccountPage() {
                   ))}
                 </ul>
               )}
+            </section>
+
+            <section id="addresses" className="card scroll-mt-32 p-5 md:p-6">
+              <h2 className="text-[17px]">Addresses</h2>
+              <p className="mt-0.5 text-[11.5px] text-body/70">
+                Manage delivery addresses used at checkout.
+              </p>
+              <AddressManager addresses={user.addresses ?? []} />
             </section>
 
             <section id="profile" className="card scroll-mt-32 p-5 md:p-6">

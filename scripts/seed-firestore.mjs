@@ -24,7 +24,7 @@ const db = getFirestore(app);
 
 const ADMIN_EMAIL = get("ADMIN_EMAIL") || "admin@gaudham.in";
 const ADMIN_PASSWORD = get("ADMIN_PASSWORD") || "Gaudham@123";
-const ADMIN_NAME = "Gaudham Admin";
+const ADMIN_NAME = "GauDhaam Admin";
 
 function hashPassword(p) {
   const crypto = await import("crypto");
@@ -105,7 +105,7 @@ const seedProducts = [
     category: "Honey",
     shortDescription: "A mellow everyday honey from our own hives at the farm.",
     description: "Cold extracted and gravity settled. Mellow and buttery.",
-    highlights: ["From hives at the Gaudham farm", "Cold extracted and gravity settled", "Mild enough for children", "Every jar is dated by harvest"],
+    highlights: ["From hives at the GauDhaam farm", "Cold extracted and gravity settled", "Mild enough for children", "Every jar is dated by harvest"],
     ingredients: "100% raw multiflora honey.",
     howToUse: "Perfect for smoothies, baking and everyday breakfasts.",
     images: [image("Honey.jpg")],
@@ -238,3 +238,4 @@ async function seed() {
 }
 
 seed().catch(console.error);
+
