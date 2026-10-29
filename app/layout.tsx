@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
+import Head from "next/head";
 import "./globals.css";
 import { CartProvider } from "@/components/cart/cart-context";
 import { ThemeProvider, themeScript } from "@/components/theme-provider";
@@ -52,8 +52,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <Head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </Head>
       <body className="min-h-dvh">
-        <Script id="theme-init" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: themeScript }} />
         <ThemeProvider>
           <CartProvider>{children}</CartProvider>
         </ThemeProvider>
