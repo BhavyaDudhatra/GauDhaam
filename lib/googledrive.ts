@@ -1,6 +1,7 @@
 import { Readable } from "stream";
 import { google } from "googleapis";
 import fs from "fs";
+import { driveFileId } from "./drive-utils";
 
 const SCOPES = ["https://www.googleapis.com/auth/drive"];
 
@@ -34,34 +35,6 @@ function getAuth() {
   return new google.auth.JWT({ email, key, scopes: SCOPES });
 }
 
-export function driveFileId(link: string) {
-  const patterns = [
-    /\/d\/([a-zA-Z0-9_-]+)/,
-    /[?&]id=([a-zA-Z0-9_-]+)/,
-    /^([a-zA-Z0-9_-]{20,})$/,
-  ];
-  for (const pattern of patterns) {
-    const match = link.match(pattern);
-    if (match) return match[1];
-  }
-  return null;
-}
-
-/**
- * Google Drive "view" links are HTML pages, not images, so they break in
- * <img> tags. Convert any Drive link into the direct thumbnail endpoint.
- */
-export function normalizeDriveLink(link: string) {
-  const trimmed = link.trim();
-  if (!trimmed) return "";
-  const id = driveFileId(trimmed);
-  if (!id) return trimmed;
-  if (trimmed.includes("lh3.googleusercontent.com") || trimmed.includes("drive.google.com/thumbnail")) {
-    return trimmed;
-  }
-  return `https://lh3.googleusercontent.com/d/${id}`;
-}
-
 export async function uploadToGoogleDrive(
   file: Buffer,
   fileName: string,
@@ -81,6 +54,7 @@ export async function uploadToGoogleDrive(
       body: Readable.from(file),
     },
     fields: "id",
+    supportsAllDrives: true,
   });
 
   const fileId = response.data.id;
@@ -90,6 +64,7 @@ export async function uploadToGoogleDrive(
   await drive.permissions.create({
     fileId,
     requestBody: { role: "reader", type: "anyone" },
+    supportsAllDrives: true,
   });
 
   return `https://lh3.googleusercontent.com/d/${fileId}`;

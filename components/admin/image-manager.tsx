@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import Image from "next/image";
 import { ArrowDown, ArrowUp, ImagePlus, Link2, Loader2, Trash2 } from "lucide-react";
-import { normalizeDriveLink } from "@/lib/googledrive";
+import { normalizeDriveLink } from "@/lib/drive-utils";
 
 export function ImageManager({
   value,
