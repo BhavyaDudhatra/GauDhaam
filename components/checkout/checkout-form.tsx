@@ -16,6 +16,7 @@ import {
 import { lineKey, useCart } from "@/components/cart/cart-context";
 import { formatINR, shippingFor } from "@/lib/money";
 import { indianStates, site } from "@/lib/site";
+import type { Address } from "@/lib/types";
 
 declare global {
   interface Window {
@@ -55,19 +56,25 @@ function loadRazorpay() {
 export function CheckoutForm({
   defaults,
   paymentMode,
+  addresses = [],
 }: {
   defaults: { name: string; email: string; phone: string };
   paymentMode: "live" | "simulate" | "unavailable";
+  addresses?: Address[];
 }) {
   const router = useRouter();
   const { lines, hydrated, subtotal, clear } = useCart();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [session, setSession] = useState<PaymentSession | null>(null);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
+    addresses?.find(a => a.isDefault)?.id ?? addresses?.[0]?.id ?? null
+  );
 
   const shipping = shippingFor(subtotal, site.freeShippingAbove, site.shippingFee);
   const total = subtotal + shipping;
   const canPay = paymentMode !== "unavailable" && lines.length > 0;
+  const selectedAddress = addresses?.find(a => a.id === selectedAddressId) ?? null;
 
   function finish(orderId: string) {
     clear();
@@ -340,6 +347,29 @@ export function CheckoutForm({
 
             <div className="card p-5 md:p-6">
               <h2 className="text-[16px]">Delivery address</h2>
+              {addresses && addresses.length > 0 && (
+                <div className="mt-3 space-y-2">
+                  <p className="text-[12px] text-body/70">Use a saved address</p>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {addresses.map(addr => (
+                      <label key={addr.id} className="flex cursor-pointer items-start gap-2 rounded-xl border border-line bg-cream/50 px-3 py-2 text-[12.5px]">
+                        <input
+                          type="radio"
+                          name="savedAddress"
+                          value={addr.id}
+                          checked={selectedAddressId === addr.id}
+                          onChange={() => setSelectedAddressId(addr.id)}
+                        />
+                        <div>
+                          <p className="font-semibold">{addr.label}{addr.isDefault ? " • Default" : ""}</p>
+                          <p className="text-body/70">{addr.name}, {addr.phone}</p>
+                          <p className="text-body/70">{addr.line1}, {addr.city}, {addr.state} {addr.pincode}</p>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
               <div className="mt-4 grid gap-3.5 sm:grid-cols-2">
                 <label className="field sm:col-span-2">
                   <span className="label">Address line 1</span>
@@ -349,6 +379,7 @@ export function CheckoutForm({
                     autoComplete="address-line1"
                     className="input"
                     placeholder="House / flat, street"
+                    defaultValue={selectedAddress?.line1 ?? ""}
                   />
                 </label>
                 <label className="field sm:col-span-2">
@@ -358,6 +389,7 @@ export function CheckoutForm({
                     autoComplete="address-line2"
                     className="input"
                     placeholder="Landmark, area"
+                    defaultValue={selectedAddress?.line2 ?? ""}
                   />
                 </label>
                 <label className="field">
@@ -368,6 +400,7 @@ export function CheckoutForm({
                     autoComplete="address-level2"
                     className="input"
                     placeholder="City"
+                    defaultValue={selectedAddress?.city ?? ""}
                   />
                 </label>
                 <label className="field">
@@ -381,6 +414,7 @@ export function CheckoutForm({
                     autoComplete="postal-code"
                     className="input"
                     placeholder="6-digit PIN"
+                    defaultValue={selectedAddress?.pincode ?? ""}
                   />
                 </label>
                 <label className="field sm:col-span-2">
@@ -388,7 +422,7 @@ export function CheckoutForm({
                   <select
                     name="state"
                     required
-                    defaultValue="Madhya Pradesh"
+                    defaultValue={selectedAddress?.state ?? "Madhya Pradesh"}
                     autoComplete="address-level1"
                     className="select"
                   >
