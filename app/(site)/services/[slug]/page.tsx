@@ -52,7 +52,7 @@ export default async function ServicePage({ params }: PageProps) {
           <div className="relative order-2 lg:order-1">
             <span className="eyebrow">
               <Leaf size={13} />
-              Gaudham service
+              GauDhaam service
             </span>
             <h1 className="mt-3 text-[27px] leading-tight md:text-[30px]">
               {service.name}

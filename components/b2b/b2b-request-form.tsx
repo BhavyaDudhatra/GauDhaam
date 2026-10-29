@@ -42,7 +42,7 @@ export function B2BRequestForm({
           <Link href="/shop" className="btn btn-outline btn-sm">
             Browse products
           </Link>
-          <Link href="/contact" className="btn btn-ghost btn-sm">
+          <Link href="/b2b/contact" className="btn btn-ghost btn-sm">
             Contact the team
           </Link>
         </div>

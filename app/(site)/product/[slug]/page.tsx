@@ -64,7 +64,7 @@ export default async function ProductPage({ params }: PageProps) {
     image: product.images,
     description: product.shortDescription,
     category: product.category,
-    brand: { "@type": "Brand", name: "Gaudham" },
+    brand: { "@type": "Brand", name: "GauDhaam" },
   };
 
   return (

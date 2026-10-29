@@ -8,9 +8,9 @@ import { getStore } from "@/lib/store";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Gaudham | Pure Organic Products",
+  title: "GauDhaam | Pure Organic Products",
   description:
-    "Cold-pressed oils, A2 ghee, raw honey, herbal powders and handmade soaps from Gaudham.",
+    "Cold-pressed oils, A2 ghee, raw honey, herbal powders and handmade soaps from GauDhaam.",
 };
 
 export default async function HomePage() {
@@ -34,7 +34,7 @@ export default async function HomePage() {
         <div className="absolute inset-0">
           <Image
             src="/assets/images/banner.jpg"
-            alt="Gaudham organic farm"
+            alt="GauDhaam organic farm"
             fill
             priority
             className="object-cover"
@@ -107,7 +107,7 @@ export default async function HomePage() {
           <div className="container-gd">
             <div className="flex items-end justify-between gap-4">
               <div>
-                <span className="eyebrow">Gaudham services</span>
+                <span className="eyebrow">GauDhaam services</span>
                 <h2 className="mt-2">More ways to care</h2>
               </div>
               <Link href="/services" className="btn btn-outline btn-sm">

@@ -106,7 +106,7 @@ export function CheckoutForm({
       key: payment.keyId,
       amount: payment.amount,
       currency: "INR",
-      name: "Gaudham",
+      name: "GauDhaam",
       description: `Order ${payment.orderNumber}`,
       order_id: payment.razorpayOrderId,
       image: `${window.location.origin}/assets/images/gaudhamlogo.png`,

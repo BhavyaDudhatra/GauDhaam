@@ -293,6 +293,9 @@ export async function createFirestoreStore(): Promise<Store> {
         await ref.update(next);
         return (await ref.get()).data() as User;
       },
+      async remove(id) {
+        await usersCol.doc(id).delete();
+      },
     },
 
     orders: {

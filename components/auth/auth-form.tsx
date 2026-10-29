@@ -204,7 +204,7 @@ export function AuthForm({
       <p className="border-t border-line pt-3.5 text-center text-[12.5px] text-body">
         {mode === "login" ? (
           <>
-            New to Gaudham?{" "}
+            New to GauDhaam?{" "}
             <Link href={next ? `/register?next=${encodeURIComponent(next)}` : "/register"} className="link-underline">
               Create an account
             </Link>

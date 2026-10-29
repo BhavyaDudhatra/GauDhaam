@@ -110,6 +110,10 @@ export function createFallbackStore(): Store {
         users[idx] = { ...users[idx], ...patch };
         return users[idx];
       },
+      remove: async (id: string) => {
+        const idx = users.findIndex((u) => u.id === id);
+        if (idx >= 0) users.splice(idx, 1);
+      },
     },
     orders: {
       create: async (input: any) => {

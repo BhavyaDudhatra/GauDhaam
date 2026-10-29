@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Services",
   description:
-    "Gaudham subscriptions, corporate gifting, Ayurvedic wellness consultations and farm visits.",
+    "GauDhaam subscriptions, corporate gifting, Ayurvedic wellness consultations and farm visits.",
 };
 
 export default async function ServicesPage() {

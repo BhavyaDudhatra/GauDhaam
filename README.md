@@ -1,4 +1,4 @@
-# Gaudham - E-commerce & Services Web Application
+# GauDhaam - E-commerce & Services Web Application
 
 A fully functional, production-ready e-commerce & services web application built with Next.js, Tailwind CSS, and Firebase.
 

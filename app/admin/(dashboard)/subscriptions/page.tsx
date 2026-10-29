@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { CalendarClock } from "lucide-react";
-import { updateSubscriptionStatusAction } from "@/lib/actions/subscriptions";
+import {
+  approveQuantityChangeAction,
+  rejectQuantityChangeAction,
+  updateSubscriptionStatusAction,
+} from "@/lib/actions/subscriptions";
 import { formatDate } from "@/lib/money";
 import { getStore } from "@/lib/store";
 
@@ -49,6 +53,7 @@ export default async function AdminSubscriptionsPage() {
                 <th className="px-4 py-3 font-semibold">Plan</th>
                 <th className="px-4 py-3 font-semibold">Started</th>
                 <th className="px-4 py-3 font-semibold">Status</th>
+                <th className="px-4 py-3 font-semibold">Quantity request</th>
                 <th className="px-4 py-3 text-right font-semibold">Update</th>
               </tr>
             </thead>
@@ -98,6 +103,30 @@ export default async function AdminSubscriptionsPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3">
+                      {subscription.requestedQty ? (
+                        <div className="text-body">
+                          <p className="font-semibold">
+                            {subscription.quantity} → {subscription.requestedQty}
+                          </p>
+                          <p className="text-[11px] text-body/70">
+                            requested {formatDate(subscription.requestedAt ?? "")}
+                          </p>
+                          <div className="mt-1 flex gap-2">
+                            <form action={approveQuantityChangeAction}>
+                              <input type="hidden" name="id" value={subscription.id} />
+                              <button type="submit" className="text-[11px] font-semibold text-green-700 hover:underline">Approve</button>
+                            </form>
+                            <form action={rejectQuantityChangeAction}>
+                              <input type="hidden" name="id" value={subscription.id} />
+                              <button type="submit" className="text-[11px] font-semibold text-red-700 hover:underline">Reject</button>
+                            </form>
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-body/60">—</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
                       <form
                         action={updateSubscriptionStatusAction}
                         className="flex items-center justify-end gap-2"
@@ -125,7 +154,7 @@ export default async function AdminSubscriptionsPage() {
               })}
               {subscriptions.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-12 text-center text-body">
+                  <td colSpan={7} className="px-4 py-12 text-center text-body">
                     <CalendarClock
                       size={24}
                       className="mx-auto text-body/40"
