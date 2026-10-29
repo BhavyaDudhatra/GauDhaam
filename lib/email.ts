@@ -65,7 +65,7 @@ export async function sendOtpEmail(email: string, code: string): Promise<void> {
         <div style="max-width:520px;margin:0 auto;background:#ffffff;border:1px solid #E9DFD0;border-radius:18px;overflow:hidden;">
           <div style="background:#496B45;padding:22px 28px;">
             <p style="margin:0;font-size:20px;font-weight:700;color:#ffffff;letter-spacing:-0.02em;">GauDhaam</p>
-            <p style="margin:4px 0 0;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#DCE8D8;">Pure by nature</p>
+            <p style="margin:4px 0 0;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#DCE8D8;">From farm to Your place</p>
           </div>
           <div style="padding:28px;">
             <h1 style="margin:0;font-size:20px;color:#2F4930;">Verify your email</h1>
