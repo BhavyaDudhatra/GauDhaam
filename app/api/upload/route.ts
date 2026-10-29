@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
-import { uploadToGoogleDrive } from "@/lib/googledrive";
+import { uploadImageToDrive } from "@/lib/google-drive-oauth";
 
 export async function POST(request: Request) {
   const session = await getSession();
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
 
     const buffer = Buffer.from(await file.arrayBuffer());
     const fileName = `gaudhaam-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
-    const url = await uploadToGoogleDrive(buffer, fileName, file.type);
+    const url = await uploadImageToDrive(buffer, fileName, file.type);
 
     return NextResponse.json({ url });
   } catch (error) {
