@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import Image from "next/image";
 import { ArrowDown, ArrowUp, ImagePlus, Link2, Loader2, Trash2 } from "lucide-react";
+import { normalizeDriveLink } from "@/lib/googledrive";
 
 export function ImageManager({
   value,
@@ -82,7 +83,7 @@ export function ImageManager({
             onClick={() => {
               const trimmed = url.trim();
               if (!trimmed) return;
-              onChange([...value, trimmed]);
+              onChange([...value, normalizeDriveLink(trimmed)]);
               setUrl("");
             }}
           >
@@ -107,7 +108,7 @@ export function ImageManager({
             >
               <div className="relative aspect-square bg-light">
                 <Image
-                  src={src}
+                  src={normalizeDriveLink(src)}
                   alt={`Image ${index + 1}`}
                   fill
                   sizes="160px"
