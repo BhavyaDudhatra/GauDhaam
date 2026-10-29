@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const fileName = `gaudham-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
+    const fileName = `gaudhaam-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
     const url = await uploadToGoogleDrive(buffer, fileName, file.type);
 
     return NextResponse.json({ url });
