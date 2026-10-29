@@ -30,6 +30,7 @@ export default async function CheckoutPage() {
         email: user?.email ?? session?.email ?? "",
         phone: user?.phone ?? "",
       }}
+      addresses={user?.addresses ?? []}
     />
   );
 }
