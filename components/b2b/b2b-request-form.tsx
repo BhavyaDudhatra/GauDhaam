@@ -125,7 +125,8 @@ export function B2BRequestForm({
         </label>
         <label className="field">
           <span className="label">Delivery frequency</span>
-          <select name="frequency" className="input" defaultValue="weekly">
+          <select name="frequency" className="input" defaultValue="once">
+            <option value="once">Once</option>
             <option value="daily">Daily</option>
             <option value="weekly">Weekly</option>
             <option value="monthly">Monthly</option>

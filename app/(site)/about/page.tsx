@@ -9,6 +9,7 @@ import {
   Package,
   Sprout,
 } from "lucide-react";
+import { GalleryGrid } from "@/components/about/gallery-grid";
 
 export const metadata: Metadata = {
   title: "Our story",
@@ -264,6 +265,15 @@ export default function AboutPage() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Gallery */}
+      <section className="section">
+        <div className="container-gd">
+          <span className="eyebrow">Gallery</span>
+          <h2 className="mt-2">Photographs from the farm and kitchen</h2>
+          <GalleryGrid />
         </div>
       </section>
     </>

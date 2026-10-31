@@ -32,11 +32,11 @@ A fully functional, production-ready e-commerce & services web application built
 npm install
 ```
 
-### 2. Environment Variables
-Copy `.env.example` to `.env.local` and fill in your credentials:
+<!-- ### 2. Environment Variables -->
+<!-- Copy `.env.example` to `.env.local` and fill in your credentials: -->
 
 ```bash
-cp .env.example .env.local
+# cp .env.example .env.local
 ```
 
 ### 3. Firebase Setup

@@ -422,3 +422,38 @@ export async function deleteUser(formData: FormData) {
   await store.users.remove(id);
   revalidatePath("/admin/users");
 }
+
+export async function createGalleryItemAction(formData: FormData) {
+  await requireAdmin();
+  const title = clean(formData.get("title"), 200);
+  const image = clean(formData.get("image"), 1000);
+  if (!title || !image) return;
+  const store = await getStore();
+  await store.gallery.create({ title, image });
+  revalidatePath("/admin/gallery");
+  revalidatePath("/about");
+}
+
+export async function deleteGalleryItemAction(formData: FormData) {
+  await requireAdmin();
+  const id = clean(formData.get("id"), 80);
+  if (!id) return;
+  const store = await getStore();
+  await store.gallery.remove(id);
+  revalidatePath("/admin/gallery");
+  revalidatePath("/about");
+}
+
+export async function createEventAction(formData: FormData) {
+  await requireAdmin();
+  const title = clean(formData.get("title"), 200);
+  const description = clean(formData.get("description"), 2000);
+  const date = clean(formData.get("date"), 50);
+  const imagesRaw = clean(formData.get("images"), 5000);
+  const images = imagesRaw.split(",").map(s=>s.trim()).filter(Boolean);
+  if (!title || !date) return;
+  const store = await getStore();
+  await store.events.create({ title, description, date, images });
+  revalidatePath("/admin/events");
+  revalidatePath("/events");
+}
