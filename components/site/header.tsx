@@ -15,6 +15,7 @@ const headerNavLinks = [
   { label: "Services", href: "/services" },
   { label: "Subscriptions", href: "/subscriptions" },
   { label: "B2B", href: "/b2b" },
+  { label: "Events", href: "/events" },
   { label: "Contact", href: "/contact" },
   { label: "About Us", href: "/about" },
 ];

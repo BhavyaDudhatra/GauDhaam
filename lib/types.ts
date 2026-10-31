@@ -1,5 +1,38 @@
 export type Role = "user" | "admin";
 
+export type GalleryItem = {
+  id: string;
+  title: string;
+  image: string;
+  createdAt: string;
+};
+
+export type Event = {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  images: string[];
+  createdAt: string;
+};
+
+export type MessageThread = {
+  id: string;
+  userId: string;
+  subject: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type Message = {
+  id: string;
+  threadId: string;
+  senderId: string;
+  senderRole: "user" | "admin";
+  body: string;
+  createdAt: string;
+};
+
 export type OfferType = "percentage" | "fixed";
 
 export type Offer = {
@@ -224,6 +257,8 @@ export type SessionUser = {
 
 export type SubscriptionFrequency = "daily" | "weekly" | "monthly";
 
+export type B2BFrequency = "once" | "daily" | "weekly" | "monthly";
+
 export type SubscriptionStatus = "active" | "paused" | "cancelled";
 
 export type PausedInterval = {
@@ -272,7 +307,7 @@ export type B2BOrder = {
   productId: string;
   productName?: string;
   quantity: number;
-  frequency: SubscriptionFrequency;
+  frequency: B2BFrequency;
   packagingDetails?: string;
   customNotes?: string;
   priceQuoted?: number;
@@ -341,6 +376,12 @@ export type Store = {
     markRead: (id: string) => Promise<void>;
     remove: (id: string) => Promise<void>;
   };
+  userMessages: {
+    listThreads: (userId?: string) => Promise<MessageThread[]>;
+    getThread: (id: string) => Promise<{ thread: MessageThread; messages: Message[] } | null>;
+    createThread: (input: { userId: string; subject: string; body: string }) => Promise<MessageThread>;
+    sendMessage: (input: { threadId: string; senderId: string; senderRole: "user" | "admin"; body: string }) => Promise<Message>;
+  };
   subscriptions: {
     list: (options?: { userId?: string }) => Promise<Subscription[]>;
     get: (id: string) => Promise<Subscription | null>;
@@ -367,6 +408,18 @@ export type Store = {
       input: Omit<B2BOrder, "id" | "createdAt" | "status" | "priceQuoted">,
     ) => Promise<B2BOrder>;
     update: (id: string, patch: Partial<B2BOrder>) => Promise<B2BOrder | null>;
+  };
+  gallery: {
+    list: () => Promise<GalleryItem[]>;
+    create: (input: Omit<GalleryItem, "id" | "createdAt">) => Promise<GalleryItem>;
+    update: (id: string, patch: Partial<GalleryItem>) => Promise<GalleryItem | null>;
+    remove: (id: string) => Promise<void>;
+  };
+  events: {
+    list: () => Promise<Event[]>;
+    create: (input: Omit<Event, "id" | "createdAt">) => Promise<Event>;
+    update: (id: string, patch: Partial<Event>) => Promise<Event | null>;
+    remove: (id: string) => Promise<void>;
   };
   ready: () => Promise<void>;
 };
