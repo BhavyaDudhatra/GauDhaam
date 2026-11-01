@@ -457,3 +457,13 @@ export async function createEventAction(formData: FormData) {
   revalidatePath("/admin/events");
   revalidatePath("/events");
 }
+
+export async function deleteEventAction(formData: FormData) {
+  await requireAdmin();
+  const id = clean(formData.get("id"), 80);
+  if (!id) return;
+  const store = await getStore();
+  await store.events.remove(id);
+  revalidatePath("/admin/events");
+  revalidatePath("/events");
+}
