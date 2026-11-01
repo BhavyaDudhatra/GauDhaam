@@ -283,6 +283,7 @@ export default async function ProductPage({ params }: PageProps) {
       </section>
 
       {related.length > 0 && (
+        <section className="section border-t border-line bg-white/45 pt-12">
           <div className="container-gd">
             <div className="flex items-end justify-between gap-4">
               <div>
