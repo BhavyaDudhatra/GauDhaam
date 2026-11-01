@@ -177,7 +177,6 @@ export default async function OrderPage({
 
             {session?.id === order.userId && order.status === "delivered" && (
               <div className="card p-5 space-y-4">
-                <h2 className="text-[16px]">Reviews & Ratings</h2>
                 {order.items.map(item => (
                   <div key={item.productId} className="border-t pt-4 first:border-t-0">
                     <p className="font-semibold text-[14px]">{item.name}</p>
@@ -201,19 +200,24 @@ export default async function OrderPage({
                     <form action={submitFeedbackAction} className="mt-3 grid gap-2 sm:grid-cols-2">
                       <input type="hidden" name="productId" value={item.productId} />
                       <input type="hidden" name="productName" value={item.name} />
-                      <label className="field">
+                      <div className="field">
                         <span className="label">Rating</span>
-                        <select name="rating" required className="input">
-                          {[5,4,3,2,1].map(n => <option key={n} value={n}>{n} stars</option>)}
-                        </select>
-                      </label>
+                        <div className="flex gap-1 pt-1">
+                          {[5,4,3,2,1].map(n => (
+                            <label key={n} className="cursor-pointer">
+                              <input type="radio" name="rating" value={n} required className="sr-only peer" />
+                              <span className="text-[22px] leading-none text-body/30 peer-checked:text-amber-500">★</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
                       <label className="field">
                         <span className="label">Title</span>
                         <input name="title" required className="input" placeholder="Short headline" />
                       </label>
                       <label className="field sm:col-span-2">
                         <span className="label">Comment</span>
-                        <textarea name="comment" rows={2} required className="textarea" placeholder="Your experience" />
+                        <textarea name="comment" rows={2} className="textarea" placeholder="Your experience (optional)" />
                       </label>
                       <button className="btn btn-primary btn-sm sm:col-span-2">Submit review</button>
                     </form>
