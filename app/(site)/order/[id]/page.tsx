@@ -150,6 +150,11 @@ export default async function OrderPage({
                       <p className="mt-0.5 text-[11.5px] text-body/70">
                         {item.variantLabel} · Qty {item.qty}
                       </p>
+                      {session?.id === order.userId && order.status === "delivered" && (
+                        <Link href={`/product/${item.slug}#reviews`} className="mt-2 inline-block text-[12px] text-brand hover:underline">
+                          Leave a review
+                        </Link>
+                      )}
                     </div>
                     <span className="text-[13.5px] font-semibold text-brand-dark">
                       {formatINR(item.price * item.qty)}
