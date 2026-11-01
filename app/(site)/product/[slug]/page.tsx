@@ -48,7 +48,7 @@ export default async function ProductPage({ params }: PageProps) {
     store.feedback.list({ productId: product.id, approved: true }),
   ]);
   const user = session ? await store.users.get(session.id) : null;
-  const userOrders = session ? await store.orders.listByUser(session.id) : [];
+  const userOrders = session ? await store.orders.list({ userId: session.id }) : [];
   const hasPurchasedDelivered = session
     ? userOrders.some(o => o.status === "delivered" && o.items?.some(i => i.productId === product.id))
     : false;

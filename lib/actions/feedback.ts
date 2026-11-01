@@ -32,7 +32,7 @@ export async function submitFeedbackAction(
   
   // Verify purchase for product feedback
   if (productId) {
-    const orders = await store.orders.listByUser(session.id);
+    const orders = await store.orders.list({ userId: session.id });
     const hasDelivered = orders.some(o => o.status === "delivered" && o.items?.some(i => i.productId === productId));
     if (!hasDelivered) {
       return { error: "You can only review products you have purchased and received." };
