@@ -271,21 +271,20 @@ export default async function ProductPage({ params }: PageProps) {
             <form action={submitFeedbackAction} className="mt-4 card p-4 space-y-3">
               <input type="hidden" name="productId" value={product.id} />
               <input type="hidden" name="productName" value={product.name} />
-              <div className="grid gap-3 sm:grid-cols-2">
-                <label className="field">
-                  <span className="label">Rating</span>
-                  <select name="rating" required className="input">
-                    {[5,4,3,2,1].map(n => <option key={n} value={n}>{n} stars</option>)}
-                  </select>
-                </label>
-                <label className="field">
-                  <span className="label">Title</span>
-                  <input name="title" required className="input" placeholder="Short headline" />
-                </label>
+              <div className="field">
+                <span className="label">Rating</span>
+                <div className="flex gap-1 pt-1">
+                  {[5,4,3,2,1].map(n => (
+                    <label key={n} className="cursor-pointer">
+                      <input type="radio" name="rating" value={n} required className="sr-only peer" />
+                      <span className="text-[22px] leading-none text-body/30 peer-checked:text-amber-500">★</span>
+                    </label>
+                  ))}
+                </div>
               </div>
               <label className="field">
                 <span className="label">Comment</span>
-                <textarea name="comment" rows={3} required className="textarea" placeholder="Tell us about your experience" />
+                <textarea name="comment" rows={3} className="textarea" placeholder="Your experience (optional)" />
               </label>
               <button className="btn btn-primary btn-sm">Submit review</button>
             </form>

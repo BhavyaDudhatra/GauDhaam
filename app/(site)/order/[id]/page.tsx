@@ -211,10 +211,6 @@ export default async function OrderPage({
                           ))}
                         </div>
                       </div>
-                      <label className="field">
-                        <span className="label">Title</span>
-                        <input name="title" required className="input" placeholder="Short headline" />
-                      </label>
                       <label className="field sm:col-span-2">
                         <span className="label">Comment</span>
                         <textarea name="comment" rows={2} className="textarea" placeholder="Your experience (optional)" />
