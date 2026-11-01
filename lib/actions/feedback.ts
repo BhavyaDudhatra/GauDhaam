@@ -6,10 +6,7 @@ import { getStore } from "@/lib/store";
 import { clean, toBool, toInt } from "@/lib/validate";
 import type { FormState } from "./state";
 
-export async function submitFeedbackAction(
-  _previous: FormState,
-  formData: FormData,
-): Promise<FormState> {
+export async function submitFeedbackAction(formData: FormData): Promise<FormState> {
   const session = await getSession();
   if (!session) {
     return { error: "Please sign in to share your feedback." };
