@@ -2,8 +2,8 @@ import { redirect, notFound } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { getStore } from "@/lib/store";
 import { formatDateTime } from "@/lib/money";
-import { sendMessageAction } from "@/lib/actions/messages";
 import Link from "next/link";
+import { ReplyForm } from "@/components/account/reply-form";
 
 export default async function MessageThreadPage({ params }: { params: { id: string } }) {
   const session = await getSession();
@@ -34,11 +34,7 @@ export default async function MessageThreadPage({ params }: { params: { id: stri
         ))}
       </div>
 
-      <form action={sendMessageAction} className="card p-5 space-y-3">
-        <input type="hidden" name="threadId" value={thread.id} />
-        <textarea name="body" placeholder="Reply..." rows={4} required className="textarea" />
-        <button className="btn btn-primary">Send</button>
-      </form>
+      <ReplyForm threadId={thread.id} />
     </div>
   );
 }
