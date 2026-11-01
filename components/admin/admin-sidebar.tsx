@@ -27,6 +27,8 @@ const navItems = [
   { href: "/admin/feedback", label: "Feedback", icon: MessageSquare },
   { href: "/admin/messages", label: "Messages", icon: Mail },
   { href: "/admin/users", label: "Users", icon: Users },
+  { href: "/admin/events", label: "Events", icon: CalendarClock },
+  { href: "/admin/gallery", label: "Gallery", icon: Sparkles },
 ];
 
 export function AdminSidebar() {
