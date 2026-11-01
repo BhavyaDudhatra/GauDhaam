@@ -17,6 +17,8 @@ export async function submitFeedbackAction(
 
   const productId = clean(formData.get("productId"), 80);
   const productName = clean(formData.get("productName"), 160);
+  const serviceId = clean(formData.get("serviceId"), 80);
+  const serviceName = clean(formData.get("serviceName"), 160);
   const title = clean(formData.get("title"), 120);
   const comment = clean(formData.get("comment"), 1500);
   const rating = Math.min(5, Math.max(1, toInt(formData.get("rating"), 5)));
@@ -27,11 +29,23 @@ export async function submitFeedbackAction(
   }
 
   const store = await getStore();
+  
+  // Verify purchase for product feedback
+  if (productId) {
+    const orders = await store.orders.listByUser(session.id);
+    const hasDelivered = orders.some(o => o.status === "delivered" && o.items?.some(i => i.productId === productId));
+    if (!hasDelivered) {
+      return { error: "You can only review products you have purchased and received." };
+    }
+  }
+
   await store.feedback.create({
     userId: session.id,
     userName: session.name,
     productId: productId || undefined,
     productName: productName || undefined,
+    serviceId: serviceId || undefined,
+    serviceName: serviceName || undefined,
     title,
     comment,
     rating,
