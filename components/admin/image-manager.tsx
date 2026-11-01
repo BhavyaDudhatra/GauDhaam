@@ -9,9 +9,10 @@ export function ImageManager({
   value,
   onChange,
 }: {
-  value: string[];
+  value?: string[];
   onChange: (images: string[]) => void;
 }) {
+  const safeValue = Array.isArray(value) ? value : [];
   const fileRef = useRef<HTMLInputElement>(null);
   const [url, setUrl] = useState("");
   const [busy, setBusy] = useState(false);
@@ -30,7 +31,7 @@ export function ImageManager({
         if (!response.ok || !data.url) {
           throw new Error(data.error || "Upload failed.");
         }
-        onChange([...value, data.url]);
+        onChange([...safeValue, data.url]);
       }
     } catch (uploadError) {
       setError(
@@ -43,7 +44,7 @@ export function ImageManager({
   }
 
   function move(index: number, direction: -1 | 1) {
-    const next = [...value];
+    const next = [...safeValue];
     const target = index + direction;
     if (target < 0 || target >= next.length) return;
     [next[index], next[target]] = [next[target], next[index]];
@@ -83,7 +84,7 @@ export function ImageManager({
             onClick={() => {
               const trimmed = url.trim();
               if (!trimmed) return;
-              onChange([...value, normalizeDriveLink(trimmed)]);
+              onChange([...safeValue, normalizeDriveLink(trimmed)]);
               setUrl("");
             }}
           >
@@ -95,13 +96,13 @@ export function ImageManager({
 
       {error && <p className="text-[12px] text-[#8A3E2C]">{error}</p>}
 
-      {value.length === 0 ? (
+      {safeValue.length === 0 ? (
         <div className="rounded-xl border border-dashed border-line bg-cream/50 px-4 py-6 text-center text-[12.5px] text-body/70">
           No images yet. Upload one or paste a Google Drive link.
         </div>
       ) : (
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {value.map((src, index) => (
+          {safeValue.map((src, index) => (
             <li
               key={`${src}-${index}`}
               className="overflow-hidden rounded-xl border border-line bg-white"
@@ -143,7 +144,7 @@ export function ImageManager({
                 <button
                   type="button"
                   aria-label="Remove image"
-                  onClick={() => onChange(value.filter((_, i) => i !== index))}
+                  onClick={() => onChange(safeValue.filter((_, i) => i !== index))}
                   className="grid h-7 w-7 place-items-center rounded-md text-brown hover:bg-light"
                 >
                   <Trash2 size={13} />
@@ -154,7 +155,7 @@ export function ImageManager({
         </ul>
       )}
 
-      <input type="hidden" name="images" value={JSON.stringify(value)} />
+      <input type="hidden" name="images" value={JSON.stringify(safeValue)} />
     </div>
   );
 }

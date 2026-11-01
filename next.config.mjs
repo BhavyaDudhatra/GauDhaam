@@ -13,6 +13,18 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'drive.google.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'www.google.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'google.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'upload.wikimedia.org',
+      },
     ],
   },
 };

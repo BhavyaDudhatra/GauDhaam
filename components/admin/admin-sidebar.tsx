@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Logo } from "@/components/site/logo";
 
 const navItems = [
@@ -32,7 +33,9 @@ const navItems = [
 ];
 
 export function AdminSidebar() {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   return (
     <aside className="fixed left-0 top-0 z-40 flex h-screen w-64 flex-col border-r border-line bg-cream">
@@ -42,10 +45,11 @@ export function AdminSidebar() {
       <nav className="flex-1 space-y-1 overflow-y-auto p-4">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const active =
+          const active = mounted && (
             item.href === "/admin"
               ? pathname === "/admin"
-              : pathname === item.href || pathname.startsWith(`${item.href}/`);
+              : pathname === item.href || pathname.startsWith(`${item.href}/`)
+          );
           return (
             <Link
               key={item.href}
