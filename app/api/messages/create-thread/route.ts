@@ -14,11 +14,6 @@ export async function POST(req: NextRequest) {
   if (existing) {
     return Response.json({ id: existing.id });
   }
-  const id = randomUUID();
-  const now = new Date().toISOString();
-  // create thread directly in store
-  const thread = { id, userId: session.id, subject: subject || "Support", createdAt: now, updatedAt: now };
-  // we need access to internal collections: use store method
-  await store.userMessages.createThread({ userId: session.id, subject: thread.subject, body: body || "" });
-  return Response.json({ id });
+  const thread = await store.userMessages.createThread({ userId: session.id, subject: subject || "Support", body: body || "" });
+  return Response.json({ id: thread.id });
 }
