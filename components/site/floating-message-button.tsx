@@ -46,9 +46,16 @@ export function FloatingMessageButton() {
 
   async function send() {
     if (!threadId || !text.trim()) return;
-    await fetch("/api/messages/send", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ threadId, body: text }) });
+    const payload = text;
     setText("");
-    fetch(`/api/messages/thread/${threadId}`).then(r => r.json()).then(d => setMessages(d.messages));
+    const res = await fetch("/api/messages/send", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ threadId, body: payload }) });
+    if (!res.ok) {
+      setText(payload);
+      return;
+    }
+    const threadRes = await fetch(`/api/messages/thread/${threadId}`);
+    const data = await threadRes.json();
+    setMessages(data.messages);
   }
 
   if (pathname.startsWith("/admin")) return null;
@@ -76,8 +83,8 @@ export function FloatingMessageButton() {
                 {!threadId && <div className="text-center text-gray-500 text-sm">Loading...</div>}
               </div>
               <div className="p-2 border-t flex gap-2">
-                <input value={text} onChange={e=>setText(e.target.value)} placeholder="Type a message..." className="flex-1 input" onKeyDown={e=> e.key==='Enter' && send()} />
-                <button onClick={send} className="btn btn-primary btn-sm"><Send size={16}/></button>
+                <input value={text} onChange={e=>setText(e.target.value)} placeholder="Type a message..." className="flex-1 input" onKeyDown={e=> e.key==='Enter' && send()} disabled={!threadId} />
+                <button onClick={send} className="btn btn-primary btn-sm" disabled={!threadId || !text.trim()}><Send size={16}/></button>
               </div>
             </div>
           </div>
