@@ -19,6 +19,7 @@ import { formatDate, formatINR } from "@/lib/money";
 import { getSession } from "@/lib/auth";
 import { getStore } from "@/lib/store";
 import { site } from "@/lib/site";
+import { submitFeedbackAction } from "@/lib/actions/feedback";
 
 export const dynamic = "force-dynamic";
 
@@ -59,6 +60,16 @@ export default async function OrderPage({
   const session = await getSession();
   const current = stepIndex(order.status);
   const paid = order.payment.status === "paid";
+
+  const feedbackByProduct: Record<string, any[]> = {};
+  if (session && order.status === "delivered") {
+    await Promise.all(
+      order.items.map(async (item) => {
+        const fb = await store.feedback.list({ productId: item.productId, approved: true });
+        feedbackByProduct[item.productId] = fb;
+      })
+    );
+  }
 
   return (
     <>
@@ -163,6 +174,53 @@ export default async function OrderPage({
                 ))}
               </ul>
             </div>
+
+            {session?.id === order.userId && order.status === "delivered" && (
+              <div className="card p-5 space-y-4">
+                <h2 className="text-[16px]">Reviews & Ratings</h2>
+                {order.items.map(item => (
+                  <div key={item.productId} className="border-t pt-4 first:border-t-0">
+                    <p className="font-semibold text-[14px]">{item.name}</p>
+                    {(feedbackByProduct[item.productId] || []).length > 0 ? (
+                      <ul className="mt-2 space-y-2">
+                        {(feedbackByProduct[item.productId] || []).map(fb => (
+                          <li key={fb.id} className="text-[12.5px] bg-light/60 rounded p-3">
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold">{fb.userName}</span>
+                              <span className="text-[11px] text-body/60">· {new Date(fb.createdAt).toLocaleDateString()}</span>
+                              <span className="ml-auto">{"★".repeat(fb.rating)}{"☆".repeat(5-fb.rating)}</span>
+                            </div>
+                            <p className="font-medium mt-1">{fb.title}</p>
+                            <p className="text-body/80">{fb.comment}</p>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-[12px] text-body/70 mt-1">No reviews yet.</p>
+                    )}
+                    <form action={submitFeedbackAction} className="mt-3 grid gap-2 sm:grid-cols-2">
+                      <input type="hidden" name="productId" value={item.productId} />
+                      <input type="hidden" name="productName" value={item.name} />
+                      <label className="field">
+                        <span className="label">Rating</span>
+                        <select name="rating" required className="input">
+                          {[5,4,3,2,1].map(n => <option key={n} value={n}>{n} stars</option>)}
+                        </select>
+                      </label>
+                      <label className="field">
+                        <span className="label">Title</span>
+                        <input name="title" required className="input" placeholder="Short headline" />
+                      </label>
+                      <label className="field sm:col-span-2">
+                        <span className="label">Comment</span>
+                        <textarea name="comment" rows={2} required className="textarea" placeholder="Your experience" />
+                      </label>
+                      <button className="btn btn-primary btn-sm sm:col-span-2">Submit review</button>
+                    </form>
+                  </div>
+                ))}
+              </div>
+            )}
 
             <div className="card p-5">
               <h2 className="text-[16px]">Delivery details</h2>
