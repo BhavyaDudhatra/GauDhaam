@@ -8,6 +8,7 @@ import { ProductCard } from "@/components/product/product-card";
 import { SubscribeButton } from "@/components/product/subscribe-button";
 import { getSession } from "@/lib/auth";
 import { getStore } from "@/lib/store";
+import { submitFeedbackAction } from "@/lib/actions/feedback";
 
 export const dynamic = "force-dynamic";
 
@@ -47,6 +48,10 @@ export default async function ProductPage({ params }: PageProps) {
     store.feedback.list({ productId: product.id, approved: true }),
   ]);
   const user = session ? await store.users.get(session.id) : null;
+  const userOrders = session ? await store.orders.listByUser(session.id) : [];
+  const hasPurchasedDelivered = session
+    ? userOrders.some(o => o.status === "delivered" && o.items?.some(i => i.productId === product.id))
+    : false;
   const related = [
     ...all.filter(
       (item) => item.available && item.category === product.category && item.id !== product.id,
@@ -262,6 +267,29 @@ export default async function ProductPage({ params }: PageProps) {
       <section className="section pt-10">
         <div className="container-gd">
           <h2 className="text-[18px] font-semibold">Reviews</h2>
+          {session && hasPurchasedDelivered && (
+            <form action={submitFeedbackAction} className="mt-4 card p-4 space-y-3">
+              <input type="hidden" name="productId" value={product.id} />
+              <input type="hidden" name="productName" value={product.name} />
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label className="field">
+                  <span className="label">Rating</span>
+                  <select name="rating" required className="input">
+                    {[5,4,3,2,1].map(n => <option key={n} value={n}>{n} stars</option>)}
+                  </select>
+                </label>
+                <label className="field">
+                  <span className="label">Title</span>
+                  <input name="title" required className="input" placeholder="Short headline" />
+                </label>
+              </div>
+              <label className="field">
+                <span className="label">Comment</span>
+                <textarea name="comment" rows={3} required className="textarea" placeholder="Tell us about your experience" />
+              </label>
+              <button className="btn btn-primary btn-sm">Submit review</button>
+            </form>
+          )}
           {feedbacks.length === 0 ? (
             <p className="mt-4 text-[13px] text-body/70">No reviews yet. Be the first to share your experience.</p>
           ) : (
