@@ -19,12 +19,11 @@ export async function submitFeedbackAction(
   const productName = clean(formData.get("productName"), 160);
   const serviceId = clean(formData.get("serviceId"), 80);
   const serviceName = clean(formData.get("serviceName"), 160);
-  const title = clean(formData.get("title"), 120);
+  const title = clean(formData.get("title"), 120) || "";
   const comment = clean(formData.get("comment"), 1500);
   const rating = Math.min(5, Math.max(1, toInt(formData.get("rating"), 5)));
 
-  if (title.length < 3) return { error: "Add a short headline for your review." };
-  // comment is optional
+  // comment is optional, title optional
   const store = await getStore();
   
   // Verify purchase for product feedback
