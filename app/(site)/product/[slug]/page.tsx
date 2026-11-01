@@ -41,9 +41,10 @@ export default async function ProductPage({ params }: PageProps) {
 
   if (!product || !product.available) notFound();
 
-  const [all, session] = await Promise.all([
+  const [all, session, feedbacks] = await Promise.all([
     store.products.list(),
     getSession(),
+    store.feedback.list({ productId: product.id, approved: true }),
   ]);
   const user = session ? await store.users.get(session.id) : null;
   const related = [
@@ -243,8 +244,45 @@ export default async function ProductPage({ params }: PageProps) {
         </div>
       </section>
 
+      {product.galleryImages && product.galleryImages.length > 0 && (
+        <section className="section pt-10">
+          <div className="container-gd">
+            <h2 className="text-[18px] font-semibold">Gallery</h2>
+            <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
+              {product.galleryImages.map((src, idx) => (
+                <div key={src + idx} className="relative aspect-square overflow-hidden rounded-2xl border border-line bg-light">
+                  <Image src={src} alt={`Gallery ${idx+1}`} fill className="object-cover" unoptimized />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      <section className="section pt-10">
+        <div className="container-gd">
+          <h2 className="text-[18px] font-semibold">Reviews</h2>
+          {feedbacks.length === 0 ? (
+            <p className="mt-4 text-[13px] text-body/70">No reviews yet. Be the first to share your experience.</p>
+          ) : (
+            <div className="mt-4 space-y-4">
+              {feedbacks.map(f => (
+                <div key={f.id} className="card p-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[13px] font-semibold">{f.userName}</span>
+                    <span className="text-[11px] text-body/60">· {new Date(f.createdAt).toLocaleDateString()}</span>
+                    <span className="ml-auto text-[12px]">{"★".repeat(f.rating)}{"☆".repeat(5-f.rating)}</span>
+                  </div>
+                  <p className="mt-1 text-[13px] font-semibold">{f.title}</p>
+                  <p className="mt-1 text-[13px] text-body/80">{f.comment}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
       {related.length > 0 && (
-        <section className="section border-t border-line bg-white/45 pt-12">
           <div className="container-gd">
             <div className="flex items-end justify-between gap-4">
               <div>

@@ -67,6 +67,7 @@ export type Product = {
   ingredients?: string;
   howToUse?: string;
   images: string[];
+  galleryImages?: string[];
   variants: ProductVariant[];
   offer: Offer | null;
   featured: boolean;
@@ -85,6 +86,7 @@ export type Service = {
   description: string;
   highlights: string[];
   images: string[];
+  galleryImages?: string[];
   priceNote: string;
   active: boolean;
   sort: number;
@@ -200,6 +202,8 @@ export type Feedback = {
   userName: string;
   productId?: string;
   productName?: string;
+  serviceId?: string;
+  serviceName?: string;
   rating: number;
   title: string;
   comment: string;
@@ -214,6 +218,8 @@ export type Feedback = {
 export type FeedbackInput = {
   productId?: string;
   productName?: string;
+  serviceId?: string;
+  serviceName?: string;
   rating: number;
   title: string;
   comment: string;
