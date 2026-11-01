@@ -20,6 +20,7 @@ import { getSession } from "@/lib/auth";
 import { getStore } from "@/lib/store";
 import { site } from "@/lib/site";
 import { submitFeedbackAction } from "@/lib/actions/feedback";
+import { StarRating } from "@/components/ui/star-rating";
 
 export const dynamic = "force-dynamic";
 
@@ -202,13 +203,8 @@ export default async function OrderPage({
                       <input type="hidden" name="productName" value={item.name} />
                       <div className="field">
                         <span className="label">Rating</span>
-                        <div className="flex gap-1 pt-1">
-                          {[5,4,3,2,1].map(n => (
-                            <label key={n} className="cursor-pointer">
-                              <input type="radio" name="rating" value={n} required className="sr-only peer" />
-                              <span className="text-[22px] leading-none text-body/30 peer-checked:text-amber-500">★</span>
-                            </label>
-                          ))}
+                        <div className="pt-1">
+                          <StarRating name="rating" />
                         </div>
                       </div>
                       <label className="field sm:col-span-2">
