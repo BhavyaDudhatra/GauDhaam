@@ -70,6 +70,9 @@ export function ProductForm({ product }: { product?: Product }) {
   const [images, setImages] = useState<string[]>(
     product?.images?.length ? product.images : ["/assets/images/Ghee.jpg"],
   );
+  const [galleryImages, setGalleryImages] = useState<string[]>(
+    product?.galleryImages?.length ? product.galleryImages : [],
+  );
   const [variants, setVariants] = useState<VariantDraft[]>(() => toDrafts(product));
 
   function patchVariant(index: number, patch: Partial<VariantDraft>) {
@@ -90,6 +93,8 @@ export function ProductForm({ product }: { product?: Product }) {
     <form action={formAction} className="space-y-5">
       {product && <input type="hidden" name="id" value={product.id} />}
       <input type="hidden" name="variants" value={serialise(variants)} />
+      <input type="hidden" name="images" value={JSON.stringify(images)} />
+      <input type="hidden" name="galleryImages" value={JSON.stringify(galleryImages)} />
 
       <div className="card p-5">
         <h2 className="text-[16px]">Basics</h2>
@@ -210,6 +215,20 @@ export function ProductForm({ product }: { product?: Product }) {
         </div>
         <div className="mt-4">
           <ImageManager value={images} onChange={setImages} />
+        </div>
+      </div>
+
+      <div className="card p-5">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h2 className="text-[16px]">Gallery / Reference images</h2>
+            <p className="mt-0.5 text-[12px] text-body/75">
+              Additional images shown on product page for reference.
+            </p>
+          </div>
+        </div>
+        <div className="mt-4">
+          <ImageManager value={galleryImages} onChange={setGalleryImages} />
         </div>
       </div>
 

@@ -16,10 +16,15 @@ export function ServiceForm({ service }: { service?: Service }) {
   const [images, setImages] = useState<string[]>(
     service?.images?.length ? service.images : ["/assets/images/banner.jpg"],
   );
+  const [galleryImages, setGalleryImages] = useState<string[]>(
+    service?.galleryImages?.length ? service.galleryImages : [],
+  );
 
   return (
     <form action={formAction} className="space-y-5">
       {service && <input type="hidden" name="id" value={service.id} />}
+      <input type="hidden" name="images" value={JSON.stringify(images)} />
+      <input type="hidden" name="galleryImages" value={JSON.stringify(galleryImages)} />
 
       <div className="card p-5">
         <h2 className="text-[16px]">Service details</h2>
@@ -108,6 +113,13 @@ export function ServiceForm({ service }: { service?: Service }) {
         <h2 className="text-[16px]">Images</h2>
         <div className="mt-4">
           <ImageManager value={images} onChange={setImages} />
+        </div>
+      </div>
+
+      <div className="card p-5">
+        <h2 className="text-[16px]">Gallery / Reference images</h2>
+        <div className="mt-4">
+          <ImageManager value={galleryImages} onChange={setGalleryImages} />
         </div>
       </div>
 

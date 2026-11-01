@@ -128,6 +128,7 @@ export async function saveProductAction(
   const slug = slugify(requestedSlug || name);
   const variants = parseVariants(formData.get("variants"));
   const images = parseImages(formData.get("images"), "/assets/images/Ghee.jpg");
+  const galleryImages = parseImages(formData.get("galleryImages"), "");
   const offer = cleanOffer(
     formData.get("offerType"),
     formData.get("offerValue"),
@@ -167,6 +168,7 @@ export async function saveProductAction(
     ingredients: ingredients || undefined,
     howToUse: howToUse || undefined,
     images,
+    galleryImages: galleryImages.length ? galleryImages : undefined,
     variants,
     offer,
     featured,
@@ -225,6 +227,7 @@ export async function saveServiceAction(
   const requestedSlug = clean(formData.get("slug"), 100);
   const slug = slugify(requestedSlug || name);
   const images = parseImages(formData.get("images"), "/assets/images/banner.jpg");
+  const galleryImages = parseImages(formData.get("galleryImages"), "");
 
   if (name.length < 2) return { error: "Give the service a name." };
   if (!tagline) return { error: "Add a one-line tagline." };
@@ -238,6 +241,7 @@ export async function saveServiceAction(
     description,
     highlights,
     images,
+    galleryImages: galleryImages.length ? galleryImages : undefined,
     priceNote,
     active,
     sort,
