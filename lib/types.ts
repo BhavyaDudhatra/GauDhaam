@@ -13,6 +13,7 @@ export type Event = {
   description: string;
   date: string;
   images: string[];
+  category?: string;
   createdAt: string;
 };
 

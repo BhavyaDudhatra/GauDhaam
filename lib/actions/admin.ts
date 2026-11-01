@@ -451,9 +451,10 @@ export async function createEventAction(formData: FormData) {
   const date = clean(formData.get("date"), 50);
   const imagesRaw = clean(formData.get("images"), 5000);
   const images = imagesRaw.split(",").map(s=>s.trim()).filter(Boolean);
+  const category = clean(formData.get("category"), 100);
   if (!title || !date) return;
   const store = await getStore();
-  await store.events.create({ title, description, date, images });
+  await store.events.create({ title, description, date, images, category: category || undefined });
   revalidatePath("/admin/events");
   revalidatePath("/events");
 }
