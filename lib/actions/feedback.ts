@@ -24,10 +24,7 @@ export async function submitFeedbackAction(
   const rating = Math.min(5, Math.max(1, toInt(formData.get("rating"), 5)));
 
   if (title.length < 3) return { error: "Add a short headline for your review." };
-  if (comment.length < 10) {
-    return { error: "Tell us a little more — at least a sentence or two." };
-  }
-
+  // comment is optional
   const store = await getStore();
   
   // Verify purchase for product feedback
