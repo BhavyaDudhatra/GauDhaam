@@ -8,9 +8,11 @@ const globalForStore = globalThis as unknown as {
 export function getStore(): Promise<Store> {
   if (!globalForStore.__gaudhamStore) {
     globalForStore.__gaudhamStore = (async () => {
-      // Firestore is wired up but disabled until the project credentials are
-      // fixed. Both stores implement the same contract, so switching is a
-      // one-line change here.
+      const { isFirebaseConfigured } = await import("@/lib/firebase");
+      if (isFirebaseConfigured()) {
+        const { createFirestoreStore } = await import("./firestore");
+        return createFirestoreStore();
+      }
       const { createFallbackStore } = await import("./fallback");
       return createFallbackStore();
     })().catch((error) => {

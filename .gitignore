@@ -24,3 +24,5 @@ next-env.d.ts
 *.pem
 npm-debug.log*
 *.tsbuildinfo
+
+serviceAccount.json
