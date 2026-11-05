@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { hashPassword } from "@/lib/password";
 import type { Coupon, ProductInput, ServiceInput, User } from "@/lib/types";
 
-export const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@gaudham.in";
+export const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@gaudhaam.in";
 export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "Gaudham@123";
 export const ADMIN_NAME = "GauDhaam Admin";
 

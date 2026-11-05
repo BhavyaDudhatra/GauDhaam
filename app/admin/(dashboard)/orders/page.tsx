@@ -11,11 +11,14 @@ export const dynamic = "force-dynamic";
 export default async function AdminOrdersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ updated?: string }>;
+  searchParams: Promise<{ updated?: string; paid?: string }>;
 }) {
-  const { updated } = await searchParams;
+  const { updated, paid } = await searchParams;
   const store = await getStore();
-  const orders = await store.orders.list();
+  let orders = await store.orders.list();
+  if (paid === 'true') {
+    orders = orders.filter(o => o.payment.status === 'paid');
+  }
 
   return (
     <div className="space-y-5">

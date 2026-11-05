@@ -20,7 +20,7 @@ type ThemeContextValue = {
   toggle: () => void;
 };
 
-const STORAGE_KEY = "gaudham-theme";
+const STORAGE_KEY = "gaudhaam-theme";
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 

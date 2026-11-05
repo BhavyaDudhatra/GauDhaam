@@ -43,7 +43,7 @@ type CartContextValue = {
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
-const STORAGE_KEY = "gaudham-cart-v2";
+const STORAGE_KEY = "gaudhaam-cart-v2";
 
 export function lineKey(line: Pick<CartLine, "productId" | "variantId">) {
   return `${line.productId}:${line.variantId}`;

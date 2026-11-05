@@ -21,7 +21,7 @@ export default function AdminLoginPage() {
               required
               autoComplete="email"
               className="input"
-              placeholder="admin@gaudham.in"
+              placeholder="admin@gaudhaam.in"
             />
           </label>
           <label className="field">

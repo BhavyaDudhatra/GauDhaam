@@ -11,7 +11,7 @@ type TokenPayload = SessionUser & { exp: number };
 function secret() {
   return (
     process.env.AUTH_SECRET ||
-    "gaudham-development-secret-change-this-in-production"
+    "gaudhaam-development-secret-change-this-in-production"
   );
 }
 

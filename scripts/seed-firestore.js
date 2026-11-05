@@ -23,8 +23,8 @@ const app = initializeApp({
 
 const db = getFirestore(app);
 
-const ADMIN_EMAIL = get("ADMIN_EMAIL") || "admin@gaudham.in";
-const ADMIN_PASSWORD = get("ADMIN_PASSWORD") || "Gaudham@123";
+const ADMIN_EMAIL = get("ADMIN_EMAIL") || "admin@gaudhaam.in";
+const ADMIN_PASSWORD = get("ADMIN_PASSWORD") || "gaudhaam@123";
 const ADMIN_NAME = "GauDhaam Admin";
 
 function hash(p) {
@@ -55,7 +55,7 @@ const seedServices = [
 
 const seedCoupons = [
   { code: "WELCOME10", description: "10% off your first order, up to ₹150.", type: "percentage", value: 10, minOrderValue: 499, maxDiscount: 150, usageLimit: null, active: true },
-  { code: "GAUDHAM200", description: "₹200 off orders above ₹1,499.", type: "fixed", value: 200, minOrderValue: 1499, maxDiscount: null, usageLimit: null, active: true },
+  { code: "gaudhaam200", description: "₹200 off orders above ₹1,499.", type: "fixed", value: 200, minOrderValue: 1499, maxDiscount: null, usageLimit: null, active: true },
 ];
 
 async function seed() {

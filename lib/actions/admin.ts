@@ -145,11 +145,11 @@ export async function saveProductAction(
   }
   for (const variant of variants) {
     if (variant.price <= 0) {
-      return { error: `Set a selling price for “${variant.label}”.` };
+      return { error: `Set a selling price for “${variant.label}�.` };
     }
     if (variant.mrp !== null && variant.mrp < variant.price) {
       return {
-        error: `MRP for “${variant.label}” cannot be lower than the selling price.`,
+        error: `MRP for “${variant.label}� cannot be lower than the selling price.`,
       };
     }
   }

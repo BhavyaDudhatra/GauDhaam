@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight, Leaf, ShieldCheck, Sparkles, Truck } from "lucide-react";
 import { ProductCard } from "@/components/product/product-card";
 import { getStore } from "@/lib/store";
+import { getDb } from "@/lib/firebase";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +16,12 @@ export const metadata: Metadata = {
 
 export default async function HomePage() {
   const store = await getStore();
+  const db = await getDb();
+  let slides = [];
+  if (db) {
+    const snap = await db.collection('slides').orderBy('order','asc').get();
+    slides = snap.docs.map(d=>({id:d.id,...d.data()}));
+  }
   const [products, services] = await Promise.all([
     store.products.list(),
     store.services.list(),
@@ -82,6 +89,26 @@ export default async function HomePage() {
           </ul>
         </div>
       </section>
+      <section className="section">
+        <div className="container-gd">
+          {slides.length > 0 && (
+            <div className="relative overflow-hidden rounded-banner border border-line">
+              <div className="flex overflow-x-auto gap-4 py-4">
+                {slides.map(s => (
+                  <div key={s.id} className="min-w-[320px] shrink-0">
+                    <img src={s.imageUrl} alt={s.title} className="h-48 w-full object-cover rounded-card"/>
+                    <div className="mt-2 p-3 bg-white rounded-card border border-line">
+                      <h3 className="text-[16px] font-semibold">{s.title}</h3>
+                      <p className="text-[13px] text-body/80">{s.subtitle}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
 
       <section className="section">
         <div className="container-gd">

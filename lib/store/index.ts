@@ -2,12 +2,12 @@ import type { Store } from "@/lib/types";
 import { isFirebaseConfigured } from "@/lib/firebase";
 
 const globalForStore = globalThis as unknown as {
-  __gaudhamStore?: Promise<Store>;
+  __gaudhaamStore?: Promise<Store>;
 };
 
 export function getStore(): Promise<Store> {
-  if (!globalForStore.__gaudhamStore) {
-    globalForStore.__gaudhamStore = (async () => {
+  if (!globalForStore.__gaudhaamStore) {
+    globalForStore.__gaudhaamStore = (async () => {
       const { isFirebaseConfigured } = await import("@/lib/firebase");
       if (isFirebaseConfigured()) {
         const { createFirestoreStore } = await import("./firestore");
@@ -16,12 +16,12 @@ export function getStore(): Promise<Store> {
       const { createFallbackStore } = await import("./fallback");
       return createFallbackStore();
     })().catch((error) => {
-      globalForStore.__gaudhamStore = undefined;
+      globalForStore.__gaudhaamStore = undefined;
       throw error;
     });
   }
 
-  return globalForStore.__gaudhamStore;
+  return globalForStore.__gaudhaamStore;
 }
 
 export function storageMode() {

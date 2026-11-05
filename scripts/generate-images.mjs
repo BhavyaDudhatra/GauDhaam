@@ -591,7 +591,7 @@ const jobs = [
     svg: `<svg width="1200" height="1200" viewBox="0 0 1200 1200" xmlns="http://www.w3.org/2000/svg">${frame({ arch: "#EDF3E7", inner: soapBar() })}</svg>`,
   },
   {
-    name: "gaudhamlogo.png",
+    name: "gaudhaamlogo.png",
     w: 512,
     h: 512,
     svg: logoMark(512),
