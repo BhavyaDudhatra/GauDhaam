@@ -480,6 +480,8 @@ export async function addComplementaryGiftAction(_prev: FormState, formData: For
   const type = clean(formData.get("type"), 20);
   const itemId = clean(formData.get("itemId"), 120);
   const notes = clean(formData.get("notes"), 500);
+  const qtyRaw = clean(formData.get("quantity"), 10);
+  const quantity = parseInt(qtyRaw || "1", 10) || 1;
   if (!name || !itemId || !type) {
     return { error: "Name and item are required." };
   }
@@ -491,8 +493,20 @@ export async function addComplementaryGiftAction(_prev: FormState, formData: For
     type,
     itemId,
     notes,
+    quantity,
     createdAt: new Date().toISOString()
   });
   revalidatePath("/admin/complementary");
   return { success: "Complementary gift added." };
+}
+
+export async function deleteComplementaryGiftAction(formData: FormData) {
+  await requireAdmin();
+  const id = clean(formData.get("id"), 80);
+  if (!id) return;
+  const { getDb } = await import("@/lib/firebase");
+  const db = await getDb();
+  if (!db) return;
+  await db.collection("complementary_gifts").doc(id).delete();
+  revalidatePath("/admin/complementary");
 }
