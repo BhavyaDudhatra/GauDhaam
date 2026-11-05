@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth";
 import { shippingFor } from "@/lib/money";
 import { site } from "@/lib/site";
 import { getStore } from "@/lib/store";
+import { getDb } from "@/lib/firebase";
 import {
   clean,
   isEmail,
@@ -132,7 +133,36 @@ export async function POST(request: Request) {
   }
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.qty, 0);
-  const shipping = fulfillment === "self" ? 0 : shippingFor(subtotal, site.freeShippingAbove, site.shippingFee);
+  // compute delivery charge based on pincode and zones
+  let deliveryCharge = 0;
+  if (fulfillment === "delivery") {
+    const storeDb = await getDb().catch(()=>null);
+    if (storeDb) {
+      const snap = await storeDb.collection('delivery_zones').get();
+      let bestMatch: any = null;
+      let bestLen = -1;
+      snap.forEach(doc=>{
+        const data = doc.data();
+        const prefix = String(data.pincodePrefix||'');
+        if (pincode.startsWith(prefix) && prefix.length > bestLen) {
+          bestLen = prefix.length;
+          bestMatch = data;
+        }
+      });
+      if (bestMatch && typeof bestMatch.charge === 'number') {
+        deliveryCharge = bestMatch.charge;
+      } else {
+        if (pincode.startsWith('380')) deliveryCharge = 100;
+        else if (pincode.startsWith('36') || pincode.startsWith('39')) deliveryCharge = 200;
+        else deliveryCharge = 400;
+      }
+    } else {
+      if (pincode.startsWith('380')) deliveryCharge = 100;
+      else if (pincode.startsWith('36') || pincode.startsWith('39')) deliveryCharge = 200;
+      else deliveryCharge = 400;
+    }
+  }
+  const shipping = deliveryCharge;
   const total = subtotal + shipping;
 
   const session = await getSession();

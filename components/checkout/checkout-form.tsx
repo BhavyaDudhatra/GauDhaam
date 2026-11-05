@@ -71,11 +71,36 @@ export function CheckoutForm({
     addresses?.find(a => a.isDefault)?.id ?? addresses?.[0]?.id ?? null
   );
   const [fulfillment, setFulfillment] = useState<"delivery" | "self">("delivery");
+  const [deliveryCharge, setDeliveryCharge] = useState<number>(0);
+  const [pincode, setPincode] = useState<string>(selectedAddress?.pincode ?? "");
 
-  const shipping = fulfillment === "self" ? 0 : shippingFor(subtotal, site.freeShippingAbove, site.shippingFee);
+  const shipping = fulfillment === "self" ? 0 : deliveryCharge;
   const total = subtotal + shipping;
   const canPay = paymentMode !== "unavailable" && lines.length > 0;
   const selectedAddress = addresses?.find(a => a.id === selectedAddressId) ?? null;
+
+  useEffect(()=>{
+    if (selectedAddress?.pincode) setPincode(selectedAddress.pincode);
+  }, [selectedAddress?.pincode]);
+
+  useEffect(() => {
+    if (fulfillment === "self") {
+      setDeliveryCharge(0);
+      return;
+    }
+    if (!pincode || pincode.length < 4) {
+      setDeliveryCharge(0);
+      return;
+    }
+    let cancelled = false;
+    fetch(`/api/delivery/charge?pincode=${pincode}`)
+      .then(r=>r.json())
+      .then(data=>{
+        if (!cancelled) setDeliveryCharge(Number(data.charge)||0);
+      })
+      .catch(()=>{ if (!cancelled) setDeliveryCharge(0); });
+    return ()=>{ cancelled = true; };
+  }, [fulfillment, pincode]);
 
   function finish(orderId: string) {
     clear();
@@ -437,7 +462,8 @@ export function CheckoutForm({
                     autoComplete="postal-code"
                     className="input"
                     placeholder="6-digit PIN"
-                    defaultValue={selectedAddress?.pincode ?? ""}
+                    value={pincode}
+                    onChange={e=>setPincode(e.target.value.replace(/\D/g,''))}
                   />
                 </label>
                 <label className="field sm:col-span-2">
