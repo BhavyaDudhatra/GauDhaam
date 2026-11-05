@@ -474,8 +474,8 @@ export async function deleteEventAction(formData: FormData) {
 }
 
 
-export async function export async function addComplementaryGiftAction(_prev, formData):
-  await requireAdmin()
+export async function addComplementaryGiftAction(_prev: FormState, formData: FormData): Promise<FormState> {
+  await requireAdmin();
   const name = clean(formData.get("name"), 120);
   const type = clean(formData.get("type"), 20);
   const itemId = clean(formData.get("itemId"), 120);
