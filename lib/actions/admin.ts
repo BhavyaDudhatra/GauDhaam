@@ -145,11 +145,11 @@ export async function saveProductAction(
   }
   for (const variant of variants) {
     if (variant.price <= 0) {
-      return { error: `Set a selling price for “${variant.label}�.` };
+      return { error: `Set a selling price for Ã¢â‚¬Å“${variant.label}Ã¢â‚¬.` };
     }
     if (variant.mrp !== null && variant.mrp < variant.price) {
       return {
-        error: `MRP for “${variant.label}� cannot be lower than the selling price.`,
+        error: `MRP for Ã¢â‚¬Å“${variant.label}Ã¢â‚¬ cannot be lower than the selling price.`,
       };
     }
   }
@@ -304,7 +304,7 @@ export async function saveCouponAction(
   const endDate = clean(formData.get("endDate"), 30);
 
   if (!/^[A-Z0-9_-]{3,30}$/.test(code)) {
-    return { error: "Use 3–30 letters, numbers, dashes or underscores for the code." };
+    return { error: "Use 3Ã¢â‚¬"30 letters, numbers, dashes or underscores for the code." };
   }
   if (value <= 0) return { error: "Set a discount value." };
   if (type === "percentage" && value > 100) {
