@@ -26,7 +26,7 @@ export default async function AdminDashboardPage() {
   ).length;
 
   const cards = [
-    { label: "Revenue (paid)", value: formatINR(revenue), icon: ShoppingCart, href: "/admin/orders?paid=true" },
+    { label: "Revenue (paid)", value: formatINR(revenue), icon: ShoppingCart, href: "/admin/revenue" },
     { label: "Products", value: products.length, href: "/admin/products", icon: Box },
     { label: "Services", value: services.length, href: "/admin/services", icon: Package },
     { label: "Orders", value: orders.length, href: "/admin/orders", icon: ShoppingCart, note: `${pendingOrders} awaiting payment` },

@@ -70,8 +70,9 @@ export function CheckoutForm({
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
     addresses?.find(a => a.isDefault)?.id ?? addresses?.[0]?.id ?? null
   );
+  const [fulfillment, setFulfillment] = useState<"delivery" | "self">("delivery");
 
-  const shipping = shippingFor(subtotal, site.freeShippingAbove, site.shippingFee);
+  const shipping = fulfillment === "self" ? 0 : shippingFor(subtotal, site.freeShippingAbove, site.shippingFee);
   const total = subtotal + shipping;
   const canPay = paymentMode !== "unavailable" && lines.length > 0;
   const selectedAddress = addresses?.find(a => a.id === selectedAddressId) ?? null;
@@ -186,6 +187,7 @@ export function CheckoutForm({
       state: String(formData.get("state") ?? ""),
       pincode: String(formData.get("pincode") ?? ""),
       notes: String(formData.get("notes") ?? ""),
+      fulfillment: String(formData.get("fulfillment") ?? "delivery"),
     };
 
     try {
@@ -343,6 +345,27 @@ export function CheckoutForm({
                   />
                 </label>
               </div>
+            </div>
+
+            <div className="card p-5 md:p-6">
+              <h2 className="text-[16px]">Fulfillment option</h2>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                <label className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3 ${fulfillment === 'delivery' ? 'border-brand bg-light/60' : 'border-line'}`}>
+                  <input type="radio" name="fulfillment" value="delivery" checked={fulfillment === 'delivery'} onChange={() => setFulfillment('delivery')} />
+                  <div>
+                    <p className="text-[13px] font-semibold">Delivery to address</p>
+                    <p className="text-[11.5px] text-body/70">We will deliver to your location. Delivery charges apply.</p>
+                  </div>
+                </label>
+                <label className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3 ${fulfillment === 'self' ? 'border-brand bg-light/60' : 'border-line'}`}>
+                  <input type="radio" name="fulfillment" value="self" checked={fulfillment === 'self'} onChange={() => setFulfillment('self')} />
+                  <div>
+                    <p className="text-[13px] font-semibold">Self service pickup</p>
+                    <p className="text-[11.5px] text-body/70">Come to our place to pick up. Delivery charges ₹0.</p>
+                  </div>
+                </label>
+              </div>
+              <input type="hidden" name="fulfillment" value={fulfillment} />
             </div>
 
             <div className="card p-5 md:p-6">

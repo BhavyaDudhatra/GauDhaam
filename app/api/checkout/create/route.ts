@@ -54,6 +54,7 @@ export async function POST(request: Request) {
   const state = clean(payload.state, 120);
   const pincode = clean(payload.pincode, 10);
   const notes = clean(payload.notes, 600);
+  const fulfillment = clean(String(payload.fulfillment ?? "delivery"), 20) === "self" ? "self" : "delivery";
 
   if (name.length < 2) {
     return NextResponse.json({ error: "Please enter your full name." }, { status: 400 });
@@ -131,7 +132,7 @@ export async function POST(request: Request) {
   }
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.qty, 0);
-  const shipping = shippingFor(subtotal, site.freeShippingAbove, site.shippingFee);
+  const shipping = fulfillment === "self" ? 0 : shippingFor(subtotal, site.freeShippingAbove, site.shippingFee);
   const total = subtotal + shipping;
 
   const session = await getSession();
@@ -165,7 +166,24 @@ export async function POST(request: Request) {
       razorpayPaymentId: null,
     },
     notes,
+    fulfillment,
   } as never);
+
+  // Persist address to user profile if logged in
+  if (session?.role === "user") {
+    try {
+      const user = await store.users.get(session.id);
+      if (user) {
+        const addresses = user.addresses ?? [];
+        const exists = addresses.some(a => a.line1 === line1 && a.city === city && a.pincode === pincode && a.phone === normalisePhone(phoneRaw));
+        if (!exists) {
+          const addrId = `addr-${Date.now()}-${Math.random().toString(36).slice(2,7)}`;
+          const newAddr = { id: addrId, label: "Order address", name, phone: normalisePhone(phoneRaw), line1, line2, city, state, pincode, isDefault: addresses.length === 0 };
+          await store.users.update(session.id, { addresses: [newAddr, ...addresses] });
+        }
+      }
+    } catch {}
+  }
 
   if (!isRazorpayConfigured()) {
     if (isPaymentSimulationAllowed()) {
