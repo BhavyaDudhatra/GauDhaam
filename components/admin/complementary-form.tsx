@@ -24,21 +24,13 @@ export function ComplementaryForm({ products, services, gifts }: { products: Ite
             {items.map(i=> <option key={i.id} value={i.slug}>{i.name} ({i.slug})</option>)}
           </select>
         </label>
-        {type === "product" && (
-          <label className="field"><span className="label">Delivery Mode</span>
-            <select name="deliveryMode" className="input" defaultValue="delivery">
-              <option value="onsite">On site / Face to face</option>
-              <option value="delivery">Delivery to address</option>
-            </select>
-          </label>
-        )}
         <label className="field"><span className="label">Notes</span><textarea name="notes" className="textarea"/></label>
         <button className="btn btn-primary btn-sm">Add</button>
       </form>
       <div className="card p-4">
         <ul className="space-y-2">
           {gifts.map(g=>(
-            <li key={g.id} className="border-b border-line py-2 text-[13px]">{g.name} - {g.type} - {g.itemId} {g.deliveryMode && `· ${g.deliveryMode}`}</li>
+            <li key={g.id} className="border-b border-line py-2 text-[13px]">{g.name} - {g.type} - {g.itemId}</li>
           ))}
         </ul>
       </div>
