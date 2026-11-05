@@ -145,11 +145,11 @@ export async function saveProductAction(
   }
   for (const variant of variants) {
     if (variant.price <= 0) {
-      return { error: `Set a selling price for â€œ${variant.label}â€.` };
+      return { error: `Set a selling price for Ã¢â‚¬Å“${variant.label}Ã¢â‚¬.` };
     }
     if (variant.mrp !== null && variant.mrp < variant.price) {
       return {
-        error: `MRP for â€œ${variant.label}â€ cannot be lower than the selling price.`,
+        error: `MRP for Ã¢â‚¬Å“${variant.label}Ã¢â‚¬ cannot be lower than the selling price.`,
       };
     }
   }
@@ -304,7 +304,7 @@ export async function saveCouponAction(
   const endDate = clean(formData.get("endDate"), 30);
 
   if (!/^[A-Z0-9_-]{3,30}$/.test(code)) {
-    return { error: "Use 3â€“30 letters, numbers, dashes or underscores for the code." };
+    return { error: "Use 3Ã¢â‚¬â€œ30 letters, numbers, dashes or underscores for the code." };
   }
   if (value <= 0) return { error: "Set a discount value." };
   if (type === "percentage" && value > 100) {
@@ -474,26 +474,25 @@ export async function deleteEventAction(formData: FormData) {
 }
 
 
-export async function addComplementaryGiftAction(_prev: FormState, formData: FormData): Promise<FormState> {
-  await requireAdmin();
-  const name = clean(formData.get(" name\), 120);
- const type = clean(formData.get(\type\), 20);
- const itemId = clean(formData.get(\itemId\), 120);
- const notes = clean(formData.get(\notes\), 500);
- if (!name || !itemId || !type) {
- return { error: \Name and item are required.\ };
- }
- const { getDb } = await import(\@/lib/firebase\);
- const db = await getDb();
- if (!db) return { error: \Database not configured.\ };
- await db.collection(\complementary_gifts\).add({
- name,
- type,
- itemId,
- notes,
- createdAt: new Date().toISOString()
- });
- revalidatePath(\/admin/complementary\);
- return { success: \Complementary gift added.\ };
+export async function export async function addComplementaryGiftAction(_prev, formData):
+  await requireAdmin()
+  const name = clean(formData.get("name"), 120);
+  const type = clean(formData.get("type"), 20);
+  const itemId = clean(formData.get("itemId"), 120);
+  const notes = clean(formData.get("notes"), 500);
+  if (!name || !itemId || !type) {
+    return { error: "Name and item are required." };
+  }
+  const { getDb } = await import("@/lib/firebase");
+  const db = await getDb();
+  if (!db) return { error: "Database not configured." };
+  await db.collection("complementary_gifts").add({
+    name,
+    type,
+    itemId,
+    notes,
+    createdAt: new Date().toISOString()
+  });
+  revalidatePath("/admin/complementary");
+  return { success: "Complementary gift added." };
 }
-
