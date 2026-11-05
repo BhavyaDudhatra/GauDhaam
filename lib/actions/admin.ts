@@ -472,3 +472,28 @@ export async function deleteEventAction(formData: FormData) {
   revalidatePath("/admin/events");
   revalidatePath("/events");
 }
+
+
+export async function addComplementaryGiftAction(_prev: FormState, formData: FormData): Promise<FormState> {
+  await requireAdmin();
+  const name = clean(formData.get(" name\), 120);
+ const type = clean(formData.get(\type\), 20);
+ const itemId = clean(formData.get(\itemId\), 120);
+ const notes = clean(formData.get(\notes\), 500);
+ if (!name || !itemId || !type) {
+ return { error: \Name and item are required.\ };
+ }
+ const { getDb } = await import(\@/lib/firebase\);
+ const db = await getDb();
+ if (!db) return { error: \Database not configured.\ };
+ await db.collection(\complementary_gifts\).add({
+ name,
+ type,
+ itemId,
+ notes,
+ createdAt: new Date().toISOString()
+ });
+ revalidatePath(\/admin/complementary\);
+ return { success: \Complementary gift added.\ };
+}
+

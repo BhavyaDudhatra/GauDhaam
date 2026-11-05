@@ -1,17 +1,20 @@
 "use client";
 import { useState, useMemo } from "react";
 import { useActionState } from "react";
+import { addComplementaryGiftAction } from "@/lib/actions/admin";
+import type { FormState } from "@/lib/actions/state";
 
 type Item = { id: string; slug: string; name: string };
 
 export function ComplementaryForm({ products, services, gifts }: { products: Item[]; services: Item[]; gifts: any[] }) {
   const [type, setType] = useState<"product" | "service">("product");
   const items = useMemo(() => type === "product" ? products : services, [type, products, services]);
+  const [state, action, pending] = useActionState<FormState, FormData>(addComplementaryGiftAction, null);
 
   return (
     <div className="space-y-6">
       <h1 className="text-[22px]">Complementary Gifts / Services</h1>
-      <form action="/api/admin/complementary" method="post" className="card p-4 space-y-3">
+      <form action={action} className="card p-4 space-y-3">
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="field"><span className="label">Name</span><input name="name" required className="input"/></label>
           <label className="field"><span className="label">Type</span>
@@ -25,7 +28,9 @@ export function ComplementaryForm({ products, services, gifts }: { products: Ite
           </select>
         </label>
         <label className="field"><span className="label">Notes</span><textarea name="notes" className="textarea"/></label>
-        <button className="btn btn-primary btn-sm">Add</button>
+        {state?.error && <p className="text-red-600 text-[12px]">{state.error}</p>}
+        {state?.success && <p className="text-green-700 text-[12px]">{state.success}</p>}
+        <button disabled={pending} className="btn btn-primary btn-sm">Add</button>
       </form>
       <div className="card p-4">
         <ul className="space-y-2">
