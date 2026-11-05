@@ -172,7 +172,7 @@ export default async function ProductPage({ params }: PageProps) {
             <ul className="mt-6 grid gap-2.5 rounded-card border border-line bg-white/70 p-4 text-[12.5px] sm:grid-cols-3 sm:gap-3">
               <li className="flex items-center gap-2">
                 <Truck size={16} className="shrink-0 text-brand" />
-                <span>Free delivery over ₹999</span>
+                <span>Free delivery over â‚¹999</span>
               </li>
               <li className="flex items-center gap-2">
                 <ShieldCheck size={16} className="shrink-0 text-brand" />
@@ -180,7 +180,7 @@ export default async function ProductPage({ params }: PageProps) {
               </li>
               <li className="flex items-center gap-2">
                 <Package size={16} className="shrink-0 text-brand" />
-                <span>Dispatched in 1–2 days</span>
+                <span>Dispatched in 1â€“2 days</span>
               </li>
             </ul>
           </div>
@@ -255,7 +255,7 @@ export default async function ProductPage({ params }: PageProps) {
           <div className="container-gd">
             <h2 className="text-[18px] font-semibold">Gallery</h2>
             <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
-              {product.galleryImages.map((src, idx) => (
+              {product.galleryImages.filter(Boolean).map((src, idx) => (
                 <div key={src + idx} className="relative aspect-square overflow-hidden rounded-2xl border border-line bg-light">
                   <Image src={src} alt={`Gallery ${idx+1}`} fill className="object-cover" unoptimized />
                 </div>
@@ -293,8 +293,8 @@ export default async function ProductPage({ params }: PageProps) {
                 <div key={f.id} className="card p-4">
                   <div className="flex items-center gap-2">
                     <span className="text-[13px] font-semibold">{f.userName}</span>
-                    <span className="text-[11px] text-body/60">· {new Date(f.createdAt).toLocaleDateString()}</span>
-                    <span className="ml-auto text-[12px]">{"★".repeat(f.rating)}{"☆".repeat(5-f.rating)}</span>
+                    <span className="text-[11px] text-body/60">Â· {new Date(f.createdAt).toLocaleDateString()}</span>
+                    <span className="ml-auto text-[12px]">{"â˜…".repeat(f.rating)}{"â˜†".repeat(5-f.rating)}</span>
                   </div>
                   <p className="mt-1 text-[13px] font-semibold">{f.title}</p>
                   <p className="mt-1 text-[13px] text-body/80">{f.comment}</p>
