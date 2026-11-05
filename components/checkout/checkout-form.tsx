@@ -70,6 +70,7 @@ export function CheckoutForm({
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
     addresses?.find(a => a.isDefault)?.id ?? addresses?.[0]?.id ?? null
   );
+  const selectedAddress = addresses?.find(a => a.id === selectedAddressId) ?? null;
   const [fulfillment, setFulfillment] = useState<"delivery" | "self">("delivery");
   const [deliveryCharge, setDeliveryCharge] = useState<number>(0);
   const [pincode, setPincode] = useState<string>(selectedAddress?.pincode ?? "");
@@ -77,7 +78,6 @@ export function CheckoutForm({
   const shipping = fulfillment === "self" ? 0 : deliveryCharge;
   const total = subtotal + shipping;
   const canPay = paymentMode !== "unavailable" && lines.length > 0;
-  const selectedAddress = addresses?.find(a => a.id === selectedAddressId) ?? null;
 
   useEffect(()=>{
     if (selectedAddress?.pincode) setPincode(selectedAddress.pincode);
