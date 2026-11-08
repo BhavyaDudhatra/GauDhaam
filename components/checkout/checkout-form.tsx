@@ -88,19 +88,24 @@ export function CheckoutForm({
       setDeliveryCharge(0);
       return;
     }
-    if (!pincode || pincode.length < 4) {
+    if (!selectedAddress) {
+      setDeliveryCharge(0);
+      return;
+    }
+    const addressStr = `${selectedAddress.line1||''} ${selectedAddress.line2||''} ${selectedAddress.city||''} ${selectedAddress.state||''} ${selectedAddress.pincode||''}`.trim();
+    if (!addressStr) {
       setDeliveryCharge(0);
       return;
     }
     let cancelled = false;
-    fetch(`/api/delivery/charge?pincode=${pincode}`)
+    fetch(`/api/delivery/charge?address=${encodeURIComponent(addressStr)}`)
       .then(r=>r.json())
       .then(data=>{
         if (!cancelled) setDeliveryCharge(Number(data.charge)||0);
       })
       .catch(()=>{ if (!cancelled) setDeliveryCharge(0); });
     return ()=>{ cancelled = true; };
-  }, [fulfillment, pincode]);
+  }, [fulfillment, selectedAddress]);
 
   function finish(orderId: string) {
     clear();

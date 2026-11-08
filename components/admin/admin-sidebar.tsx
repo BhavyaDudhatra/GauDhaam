@@ -30,8 +30,8 @@ const navItems = [
   { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/events", label: "Events", icon: CalendarClock },
   { href: "/admin/gallery", label: "Gallery", icon: Sparkles },
-  { href: "/admin/delivery-charges", label: "Delivery Charges", icon: Package },
-  { href: "/admin/complementary", label: "Complementary", icon: Gift },
+  { href: "/admin/branches", label: "Branches", icon: Package },
+  { href: "/admin/delivery-config", label: "Delivery Config", icon: Package },
 ];
 
 export function AdminSidebar() {
