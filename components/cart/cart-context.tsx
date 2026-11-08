@@ -43,15 +43,18 @@ type CartContextValue = {
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
-const STORAGE_KEY = "gaudhaam-cart-v2";
 
 export function lineKey(line: Pick<CartLine, "productId" | "variantId">) {
   return `${line.productId}:${line.variantId}`;
 }
 
-function readStored(): CartLine[] {
+function storageKeyFor(userId?: string | null) {
+  return userId ? `gaudhaam-cart-${userId}` : `gaudhaam-cart-guest`;
+}
+
+function readStored(key: string): CartLine[] {
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const raw = window.localStorage.getItem(key);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as CartLine[];
     if (!Array.isArray(parsed)) return [];
@@ -80,16 +83,47 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>([]);
   const [hydrated, setHydrated] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [userId, setUserId] = useState<string | null | undefined>(undefined);
 
+  // Load current user to determine storage key
   useEffect(() => {
-    setLines(readStored());
-    setHydrated(true);
+    let mounted = true;
+    fetch('/api/auth/me')
+      .then(r => r.json())
+      .then(data => {
+        if (!mounted) return;
+        setUserId(data.user?.id ?? null);
+      })
+      .catch(() => {
+        if (mounted) setUserId(null);
+      });
+    return () => { mounted = false; };
   }, []);
 
+  // Load cart when user id is known
   useEffect(() => {
-    if (!hydrated) return;
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(lines));
-  }, [lines, hydrated]);
+    if (userId === undefined) return;
+    const key = storageKeyFor(userId);
+    if (!userId) {
+      // Logged out: clear cart
+      setLines([]);
+      window.localStorage.removeItem(storageKeyFor(null));
+    } else {
+      setLines(readStored(key));
+    }
+    setHydrated(true);
+  }, [userId]);
+
+  // Persist cart when lines or user changes
+  useEffect(() => {
+    if (!hydrated || userId === undefined) return;
+    const key = storageKeyFor(userId);
+    window.localStorage.setItem(key, JSON.stringify(lines));
+    // Clear guest cart on login to avoid bleed
+    if (userId) {
+      window.localStorage.removeItem(storageKeyFor(null));
+    }
+  }, [lines, hydrated, userId]);
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
