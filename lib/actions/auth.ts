@@ -357,5 +357,6 @@ export async function verifyForgotPasswordAction(
   if (!user) return { error: "Account not found." };
   await store.users.update(user.id, { passwordHash: hashPassword(newPassword) });
   await ref.delete();
-  return { success: "Password updated. You can now sign in." };
+  revalidatePath("/", "layout");
+  redirect("/login");
 }

@@ -56,11 +56,11 @@ export function AuthForgotForm() {
           </label>
           <label className="field">
             <span className="label">New password</span>
-            <input name="newPassword" type="password" required minLength={8} className="input" placeholder="At least 8 characters" />
+            <input name="newPassword" type="password" required minLength={8} autoComplete="new-password" className="input" placeholder="At least 8 characters" />
           </label>
           <label className="field">
             <span className="label">Confirm password</span>
-            <input name="confirm" type="password" required minLength={8} className="input" placeholder="Repeat password" />
+            <input name="confirm" type="password" required minLength={8} autoComplete="new-password" className="input" placeholder="Repeat password" />
           </label>
           <button disabled={verifyPending} className="btn btn-primary btn-block">
             {verifyPending ? <><Loader2 size={16} className="animate-spin"/> Updating...</> : "Reset password"}
