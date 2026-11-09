@@ -40,26 +40,34 @@ export function verifyTotpCode(secret: string, token: string) {
 }
 
 export async function sendOtpEmail(email: string, code: string): Promise<void> {
-  const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.EMAIL_FROM || "GauDhaam <onboarding@resend.dev>";
+  const host = process.env.SMTP_HOST;
+  const port = Number(process.env.SMTP_PORT || 587);
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+  const from = process.env.SMTP_FROM || process.env.EMAIL_FROM || "GauDhaam <gaudhaamorganic@gmail.com>";
 
-  if (!apiKey) {
+  if (!host || !user || !pass) {
     if (process.env.NODE_ENV === "production") {
       throw new Error(
-        "Email verification is not configured (RESEND_API_KEY is missing).",
+        "Email verification is not configured (SMTP env vars missing).",
       );
     }
     console.log(`[dev] Verification code for ${email}: ${code}`);
     return;
   }
 
-  const { Resend } = await import("resend");
-  const resend = new Resend(apiKey);
+  const { default: nodemailer } = await import("nodemailer");
+  const transporter = nodemailer.createTransport({
+    host,
+    port,
+    secure: port === 465,
+    auth: { user, pass },
+  });
 
-  const { error } = await resend.emails.send({
+  const info = await transporter.sendMail({
     from,
     to: email,
-    subject: `${code} is your GauDhaam verification code`,
+    subject: `Your GauDhaam verification code`,
     html: `
       <div style="margin:0;padding:32px 16px;background:#FFF8EF;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#655B54;">
         <div style="max-width:520px;margin:0 auto;background:#ffffff;border:1px solid #E9DFD0;border-radius:18px;overflow:hidden;">
@@ -83,12 +91,10 @@ export async function sendOtpEmail(email: string, code: string): Promise<void> {
     `,
   });
 
-  if (error) {
-    console.error("Resend error", error);
+  if (!info || info.accepted.length === 0) {
+    console.error("SMTP send failed", info);
     if (process.env.NODE_ENV === "production") {
       throw new Error("We could not send the verification email. Please try again.");
     }
-    console.log(`[dev] Skipping email send for ${email} due to Resend error. Code: ${code}`);
-    return;
   }
 }
