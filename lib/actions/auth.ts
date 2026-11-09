@@ -10,6 +10,9 @@ import {
 } from "@/lib/auth";
 import { hashPassword, verifyPassword } from "@/lib/password";
 import { getStore } from "@/lib/store";
+import { getDb } from "@/lib/firebase";
+import { sendOtpEmail } from "@/lib/email";
+import { generateOtp } from "@/lib/email";
 import { clean, isEmail, isPhone, normalisePhone } from "@/lib/validate";
 import type { FormState } from "./state";
 
@@ -223,4 +226,136 @@ export async function changePasswordAction(
 
   await store.users.update(user.id, { passwordHash: hashPassword(next) });
   return { success: "Your password has been changed." };
+}
+
+export async function requestLoginOtpAction(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const email = clean(formData.get("email"), 200).toLowerCase();
+  if (!isEmail(email)) return { error: "Enter a valid email address." };
+  const store = await getStore();
+  const user = await store.users.findByEmail(email);
+  if (!user) return { error: "No account found for this email." };
+  const db = await getDb();
+  if (!db) return { error: "Database not configured." };
+  const code = generateOtp();
+  const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
+  await db.collection("login_otps").doc(email).set({
+    email,
+    code,
+    expiresAt,
+    attempts: 0,
+    createdAt: new Date().toISOString(),
+  });
+  await sendOtpEmail(email, code);
+  return {
+    step: "otp",
+    email,
+    success: `We sent a login code to ${email}.`,
+    expiresAt: Date.now() + 5 * 60 * 1000,
+  };
+}
+
+export async function verifyLoginOtpAction(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const email = clean(formData.get("email"), 200).toLowerCase();
+  const code = clean(formData.get("code"), 10).replace(/\D/g, "");
+  if (!isEmail(email)) return { error: "Invalid email." };
+  if (code.length !== 6) return { error: "Enter the 6-digit code." };
+  const db = await getDb();
+  if (!db) return { error: "Database not configured." };
+  const ref = db.collection("login_otps").doc(email);
+  const doc = await ref.get();
+  if (!doc.exists) return { error: "No pending login code." };
+  const data = doc.data() as any;
+  if (new Date(data.expiresAt).getTime() < Date.now()) {
+    await ref.delete();
+    return { error: "Code expired. Request a new one." };
+  }
+  if ((data.attempts || 0) >= 5) {
+    await ref.delete();
+    return { error: "Too many attempts. Request a new code." };
+  }
+  if (data.code !== code) {
+    await ref.update({ attempts: (data.attempts || 0) + 1 });
+    return { error: "Incorrect code." };
+  }
+  await ref.delete();
+  const store = await getStore();
+  const user = await store.users.findByEmail(email);
+  if (!user) return { error: "Account not found." };
+  await setSession(user);
+  revalidatePath("/", "layout");
+  const next = safeNext(formData.get("next"));
+  redirect(next || "/account");
+}
+
+export async function forgotPasswordRequestAction(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const email = clean(formData.get("email"), 200).toLowerCase();
+  if (!isEmail(email)) return { error: "Enter a valid email address." };
+  const store = await getStore();
+  const user = await store.users.findByEmail(email);
+  if (!user) return { error: "No account found for this email." };
+  const db = await getDb();
+  if (!db) return { error: "Database not configured." };
+  const code = generateOtp();
+  const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
+  await db.collection("password_resets").doc(email).set({
+    email,
+    code,
+    expiresAt,
+    attempts: 0,
+    createdAt: new Date().toISOString(),
+  });
+  await sendOtpEmail(email, code);
+  return {
+    step: "otp",
+    email,
+    success: `We sent a reset code to ${email}.`,
+    expiresAt: Date.now() + 5 * 60 * 1000,
+  };
+}
+
+export async function verifyForgotPasswordAction(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const email = clean(formData.get("email"), 200).toLowerCase();
+  const code = clean(formData.get("code"), 10).replace(/\D/g, "");
+  const newPassword = String(formData.get("newPassword") ?? "");
+  const confirm = String(formData.get("confirm") ?? "");
+  if (!isEmail(email)) return { error: "Invalid email." };
+  if (code.length !== 6) return { error: "Enter the 6-digit code." };
+  if (newPassword.length < 8) return { error: "Use at least 8 characters." };
+  if (newPassword !== confirm) return { error: "Passwords do not match." };
+  const db = await getDb();
+  if (!db) return { error: "Database not configured." };
+  const ref = db.collection("password_resets").doc(email);
+  const doc = await ref.get();
+  if (!doc.exists) return { error: "No pending reset." };
+  const data = doc.data() as any;
+  if (new Date(data.expiresAt).getTime() < Date.now()) {
+    await ref.delete();
+    return { error: "Code expired. Request a new one." };
+  }
+  if ((data.attempts || 0) >= 5) {
+    await ref.delete();
+    return { error: "Too many attempts." };
+  }
+  if (data.code !== code) {
+    await ref.update({ attempts: (data.attempts || 0) + 1 });
+    return { error: "Incorrect code." };
+  }
+  const store = await getStore();
+  const user = await store.users.findByEmail(email);
+  if (!user) return { error: "Account not found." };
+  await store.users.update(user.id, { passwordHash: hashPassword(newPassword) });
+  await ref.delete();
+  return { success: "Password updated. You can now sign in." };
 }
