@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import Link from "next/link";
 import { Loader2, Lock, Mail, Phone, User } from "lucide-react";
 import Image from "next/image";
@@ -36,6 +36,22 @@ export function AuthForm({
   const isOtp = mode === "register" && currentState?.step === "otp";
   const email = currentState?.email || "";
   const qrDataUrl = (currentState as any)?.qrDataUrl || "";
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!isOtp || !currentState?.expiresAt) {
+      setTimeLeft(null);
+      return;
+    }
+    const end = currentState.expiresAt;
+    const update = () => {
+      const remaining = Math.max(0, Math.floor((end - Date.now()) / 1000));
+      setTimeLeft(remaining);
+    };
+    update();
+    const iv = setInterval(update, 1000);
+    return () => clearInterval(iv);
+  }, [isOtp, currentState?.email, currentState?.expiresAt]);
 
   return (
     <form action={isOtp ? verifyOtpAction : formAction} className="mt-6 space-y-3.5">
@@ -47,6 +63,11 @@ export function AuthForm({
           <p className="text-[12.5px] text-body">
             {currentState?.success || "Enter the 6-digit code sent to your email."}
           </p>
+          {typeof timeLeft === "number" && (
+            <p className="text-center text-[11.5px] text-body/70">
+              {timeLeft > 0 ? `Code expires in ${Math.floor(timeLeft / 60)}:${String(timeLeft % 60).padStart(2, "0")}` : "Code has expired"}
+            </p>
+          )}
           {qrDataUrl && (
             <div className="rounded-card border border-line bg-white p-4 text-center">
               <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-body/60">
@@ -98,7 +119,7 @@ export function AuthForm({
               disabled={resendPending}
               className="link-underline text-[12px]"
             >
-              {resendPending ? "Sending a new code…" : "Resend code"}
+              {resendPending ? "Sending a new code…" : timeLeft === 0 ? "Resend code (expired)" : "Resend code"}
             </button>
           </div>
         </>

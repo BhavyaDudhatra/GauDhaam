@@ -98,6 +98,7 @@ export async function registerAction(
     step: "otp",
     email,
     success: `We sent a 6-digit code to ${email}. Enter it below to finish creating your account.`,
+    expiresAt: Date.now() + 5 * 60 * 1000,
   };
 }
 
@@ -161,6 +162,7 @@ export async function resendSignupOtpAction(
     step: "otp",
     email,
     success: `A new code is on its way to ${email}.`,
+    expiresAt: Date.now() + 5 * 60 * 1000,
   };
 }
 

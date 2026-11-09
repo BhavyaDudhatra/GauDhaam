@@ -5,4 +5,5 @@ export type FormState = {
   step?: "otp";
   email?: string;
   qrDataUrl?: string;
+  expiresAt?: number;
 } | null;

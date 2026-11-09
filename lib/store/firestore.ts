@@ -564,7 +564,7 @@ export async function createFirestoreStore(): Promise<Store> {
           passwordHash: input.passwordHash,
           secret,
           attempts: 0,
-          expiresAt: new Date(now.getTime() + 10 * 60 * 1000).toISOString(),
+          expiresAt: new Date(now.getTime() + 5 * 60 * 1000).toISOString(),
           createdAt: now.toISOString(),
           qrDataUrl,
         } as any;
@@ -605,7 +605,7 @@ export async function createFirestoreStore(): Promise<Store> {
         await ref.update({
           secret,
           attempts: 0,
-          expiresAt: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
+          expiresAt: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
           qrDataUrl,
         });
         await sendOtpEmail(key, code);

@@ -205,7 +205,7 @@ export function createFallbackStore(): Store {
             ...data,
             secret,
             attempts: 0,
-            expiresAt: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
+            expiresAt: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
             createdAt: Date.now().toString(),
             qrDataUrl,
           });
@@ -250,7 +250,7 @@ export function createFallbackStore(): Store {
           }
           entry.secret = secret;
           entry.attempts = 0;
-          entry.expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+          entry.expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
           entry.qrDataUrl = qrDataUrl;
           pending.set(email.toLowerCase(), entry);
           console.log(`[FALLBACK] TOTP secret for ${email}: ${secret}`);
