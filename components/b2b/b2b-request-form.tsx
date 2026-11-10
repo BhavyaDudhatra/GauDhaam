@@ -1,4 +1,5 @@
 "use client";
+// B2B request form updated for bulk/hamper options
 
 import { useActionState, useState } from "react";
 import Link from "next/link";
