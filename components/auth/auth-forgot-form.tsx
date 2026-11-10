@@ -67,12 +67,9 @@ export function AuthForgotForm() {
             {verifyPending ? <><Loader2 size={16} className="animate-spin"/> Updating...</> : "Reset password"}
           </button>
           <div className="text-center">
-            <form action={resendAction} className="inline">
-              <input type="hidden" name="email" value={email} />
-              <button type="submit" disabled={resendPending} className="link-underline text-[12px]">
-                {resendPending ? "Sending..." : timeLeft === 0 ? "Resend code" : `Resend code in ${Math.floor(timeLeft/60)}:${String(timeLeft%60).padStart(2,"0")}`}
-              </button>
-            </form>
+            <button type="submit" formAction={resendAction} disabled={resendPending} className="link-underline text-[12px]">
+              {resendPending ? "Sending..." : timeLeft === 0 ? "Resend code" : `Resend code in ${Math.floor(timeLeft/60)}:${String(timeLeft%60).padStart(2,"0")}`}
+            </button>
           </div>
         </form>
       )}
