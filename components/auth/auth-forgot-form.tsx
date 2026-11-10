@@ -2,19 +2,20 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
-import { forgotPasswordRequestAction, verifyForgotPasswordAction } from "@/lib/actions/auth";
+import { forgotPasswordRequestAction, verifyForgotPasswordAction, resendPasswordResetOtpAction } from "@/lib/actions/auth";
 import type { FormState } from "@/lib/actions/state";
 
 export function AuthForgotForm() {
   const [reqState, reqAction, reqPending] = useActionState<FormState, FormData>(forgotPasswordRequestAction, null);
   const [verifyState, verifyAction, verifyPending] = useActionState<FormState, FormData>(verifyForgotPasswordAction, null);
+  const [resendState, resendAction, resendPending] = useActionState<FormState, FormData>(resendPasswordResetOtpAction, null);
 
-  const isOtp = reqState?.step === "otp" || verifyState?.step === "otp";
-  const email = reqState?.email || verifyState?.email || "";
+  const isOtp = reqState?.step === "otp" || verifyState?.step === "otp" || resendState?.step === "otp";
+  const email = reqState?.email || verifyState?.email || resendState?.email || "";
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
 
   useEffect(() => {
-    const active = reqState?.expiresAt ? reqState : verifyState;
+    const active = resendState?.expiresAt ? resendState : reqState?.expiresAt ? reqState : verifyState;
     if (!active?.expiresAt) {
       setTimeLeft(null);
       return;
@@ -24,10 +25,10 @@ export function AuthForgotForm() {
     update();
     const iv = setInterval(update, 1000);
     return () => clearInterval(iv);
-  }, [reqState?.email, reqState?.expiresAt, verifyState?.email]);
+  }, [reqState?.email, reqState?.expiresAt, verifyState?.email, resendState?.email, resendState?.expiresAt]);
 
-  const error = reqState?.error || verifyState?.error;
-  const success = reqState?.success || verifyState?.success;
+  const error = reqState?.error || verifyState?.error || resendState?.error;
+  const success = resendState?.success || reqState?.success || verifyState?.success;
 
   return (
     <div className="mt-6 space-y-3.5">
@@ -65,6 +66,14 @@ export function AuthForgotForm() {
           <button disabled={verifyPending} className="btn btn-primary btn-block">
             {verifyPending ? <><Loader2 size={16} className="animate-spin"/> Updating...</> : "Reset password"}
           </button>
+          <div className="text-center">
+            <form action={resendAction} className="inline">
+              <input type="hidden" name="email" value={email} />
+              <button type="submit" disabled={resendPending} className="link-underline text-[12px]">
+                {resendPending ? "Sending..." : timeLeft === 0 ? "Resend code" : `Resend code in ${Math.floor(timeLeft/60)}:${String(timeLeft%60).padStart(2,"0")}`}
+              </button>
+            </form>
+          </div>
         </form>
       )}
       {error && (
