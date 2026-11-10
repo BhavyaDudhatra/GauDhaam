@@ -12,35 +12,25 @@ export const metadata: Metadata = {
 };
 
 export default async function B2BPage() {
-  const store = await getStore();
-  const [products, session] = await Promise.all([
-    store.products.list(),
-    getSession(),
-  ]);
-  const user = session ? await store.users.get(session.id) : null;
+  const session = await getSession();
+  const user = session ? await (await getStore()).users.get(session.id) : null;
 
   return (
     <div className="container-gd py-8 md:py-10">
       <div className="max-w-3xl">
         <span className="eyebrow">Business Orders</span>
-        <h1 className="mt-2">Bulk Custom B2B Ordering</h1>
+        <h1 className="mt-2">Bulk & Hamper Orders</h1>
         <p className="mt-2 text-[13.5px] text-body/80">
-          Share your requirements for bulk quantities, delivery frequency,
-          packaging and custom timelines. Our team will review and send a
-          tailored quote.
+          Request bulk buying or hampers. Choose self pickup or delivery and get an instant delivery estimate.
         </p>
       </div>
       <div className="card mt-6 p-6 md:p-8">
         <B2BRequestForm
-          products={products.map((product) => ({
-            id: product.id,
-            name: product.name,
-          }))}
           defaultContactName={user?.name ?? session?.name ?? ""}
-          defaultEmail={user?.email ?? session?.email ?? ""}
           defaultPhone={user?.phone ?? ""}
         />
       </div>
+
     </div>
   );
 }

@@ -1,32 +1,27 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
 import { submitB2BRequestAction } from "@/lib/actions/b2b";
 import type { FormState } from "@/lib/actions/state";
 
-type ProductOption = { id: string; name: string };
-
 type B2BRequestFormProps = {
-  products: ProductOption[];
   defaultContactName?: string;
-  defaultEmail?: string;
   defaultPhone?: string;
 };
 
 const initialState: FormState = null;
 
 export function B2BRequestForm({
-  products,
   defaultContactName = "",
-  defaultEmail = "",
   defaultPhone = "",
 }: B2BRequestFormProps) {
   const [state, formAction, pending] = useActionState(
     submitB2BRequestAction,
     initialState,
   );
+  const [pickup, setPickup] = useState<"self"|"delivery">("delivery");
 
   if (state?.success) {
     return (
@@ -52,104 +47,45 @@ export function B2BRequestForm({
 
   return (
     <form action={formAction} className="space-y-4">
+      <div className="flex gap-3">
+        <label className="flex items-center gap-2">
+          <input type="radio" name="orderType" value="bulk" defaultChecked /> Bulk buying
+        </label>
+        <label className="flex items-center gap-2">
+          <input type="radio" name="orderType" value="hamper" /> Hampers order
+        </label>
+      </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <label className="field">
-          <span className="label">Company name</span>
-          <input
-            name="companyName"
-            required
-            className="input"
-            placeholder="Business name"
-          />
-        </label>
-        <label className="field">
-          <span className="label">Contact person</span>
-          <input
-            name="contactName"
-            required
-            className="input"
-            defaultValue={defaultContactName}
-            placeholder="Who should we speak to?"
-          />
-        </label>
-        <label className="field">
-          <span className="label">Email</span>
-          <input
-            name="email"
-            type="email"
-            required
-            className="input"
-            defaultValue={defaultEmail}
-            placeholder="you@business.com"
-          />
+          <span className="label">Full name</span>
+          <input name="fullName" required className="input" placeholder="Your name" defaultValue={defaultContactName} />
         </label>
         <label className="field">
           <span className="label">Phone</span>
-          <input
-            name="phone"
-            type="tel"
-            required
-            className="input"
-            defaultValue={defaultPhone}
-            placeholder="10-digit mobile number"
-          />
-        </label>
-        <label className="field">
-          <span className="label">GST number (optional)</span>
-          <input name="gstNumber" className="input" placeholder="15-digit GSTIN" />
-        </label>
-        <label className="field">
-          <span className="label">Product</span>
-          <select name="productId" required className="input" defaultValue="">
-            <option value="" disabled>
-              Choose a product
-            </option>
-            {products.map((product) => (
-              <option key={product.id} value={product.id}>
-                {product.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="field">
-          <span className="label">Quantity needed</span>
-          <input
-            name="quantity"
-            type="number"
-            min={1}
-            max={100000}
-            required
-            className="input"
-            placeholder="e.g. 100"
-          />
-        </label>
-        <label className="field">
-          <span className="label">Delivery frequency</span>
-          <select name="frequency" className="input" defaultValue="once">
-            <option value="once">Once</option>
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-            <option value="monthly">Monthly</option>
-          </select>
+          <input name="phone" type="tel" required className="input" placeholder="10-digit mobile" defaultValue={defaultPhone} />
         </label>
       </div>
-
+      <div className="flex gap-3">
+        <label className="flex items-center gap-2">
+          <input type="radio" name="pickupOption" value="self" onChange={()=>setPickup('self')} /> Self pickup
+        </label>
+        <label className="flex items-center gap-2">
+          <input type="radio" name="pickupOption" value="delivery" defaultChecked onChange={()=>setPickup('delivery')} /> Delivery
+        </label>
+      </div>
+      {pickup === 'delivery' && (
+        <label className="field">
+          <span className="label">Full address</span>
+          <textarea name="address" required className="textarea" placeholder="House no, street, city, pincode" />
+        </label>
+      )}
       <label className="field">
-        <span className="label">Packaging preferences</span>
-        <input
-          name="packagingDetails"
-          className="input"
-          placeholder="e.g. 1L pouches, 5kg tins, branded cartons"
-        />
+        <span className="label">Deadline for delivery</span>
+        <input name="deadline" type="date" required className="input" />
       </label>
-
       <label className="field">
-        <span className="label">Specific requirements</span>
-        <textarea
-          name="customNotes"
-          className="textarea"
-          placeholder="Delivery dates, special instructions, tender details..."
-        />
+        <span className="label">Notes</span>
+        <textarea name="notes" className="textarea" placeholder="Any specific requirements" />
       </label>
 
       {state?.error && (

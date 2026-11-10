@@ -7,6 +7,45 @@ import { parseFrequency } from "@/lib/subscriptions";
 import { clean, isEmail, isPhone, normalisePhone, toInt } from "@/lib/validate";
 import type { FormState } from "./state";
 import type { B2BOrderStatus } from "@/lib/types";
+import { getDb } from "@/lib/firebase";
+
+const GOOGLE_API_KEY = process.env.GOOGLE_MAPS_API_KEY || 'AIzaSyDJR8t41dcVSIz9J4QLKXf85zpJV6F1O0k';
+
+async function geocode(address: string) {
+  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${GOOGLE_API_KEY}`;
+  const res = await fetch(url);
+  const data = await res.json();
+  if (data.status !== 'OK' || !data.results[0]) return null;
+  const loc = data.results[0].geometry.location;
+  return { lat: loc.lat, lng: loc.lng };
+}
+async function distanceMatrix(origins: {lat:number,lng:number}[], destination:{lat:number,lng:number}) {
+  const originsParam = origins.map(o => `${o.lat},${o.lng}`).join('|');
+  const destParam = `${destination.lat},${destination.lng}`;
+  const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${originsParam}&destinations=${destParam}&units=metric&key=${GOOGLE_API_KEY}`;
+  const res = await fetch(url);
+  return res.json();
+}
+async function computeDeliveryCharge(address: string) {
+  const db = await getDb();
+  if (!db) return { charge: 0, distance: 0 };
+  const branchesSnap = await db.collection('branches').get();
+  const branches = branchesSnap.docs.map(d=>({id:d.id,...d.data() as any}));
+  if (!branches.length) return { charge:0, distance:0 };
+  const dest = await geocode(address);
+  if (!dest) return { charge:0, distance:0 };
+  const origins = branches.map(b=>({lat:b.lat,lng:b.lng}));
+  const dm = await distanceMatrix(origins, dest);
+  let best = {distance:Infinity};
+  dm.rows?.forEach((row:any)=>{const e=row.elements[0]; if(e.status==='OK'){const meters=e.distance.value; if(meters<best.distance) best.distance=meters/1000;}});
+  const configSnap = await db.collection('config').doc('delivery').get();
+  const config = configSnap.exists ? configSnap.data() as any : {baseFee:0, perKmRate:0};
+  const baseFee = Number(config.baseFee||0);
+  const perKmRate = Number(config.perKmRate||0);
+  const distanceKm = best.distance;
+  const charge = baseFee + distanceKm * perKmRate;
+  return { charge: Math.round(charge), distance: distanceKm };
+}
 
 const b2bStatuses: B2BOrderStatus[] = [
   "pending",
@@ -19,56 +58,50 @@ export async function submitB2BRequestAction(
   _previous: FormState,
   formData: FormData,
 ): Promise<FormState> {
-  const companyName = clean(formData.get("companyName"), 140);
-  const contactName = clean(formData.get("contactName"), 80);
-  const email = clean(formData.get("email"), 160).toLowerCase();
+  const orderType = clean(formData.get("orderType"), 20);
+  const fullName = clean(formData.get("fullName"), 120);
   const phone = normalisePhone(clean(formData.get("phone"), 20));
-  const gstNumber = clean(formData.get("gstNumber"), 20).toUpperCase();
-  const productId = clean(formData.get("productId"), 80);
-  const quantity = Math.min(100000, Math.max(1, toInt(formData.get("quantity"), 0)));
-  const frequency = parseFrequency(clean(formData.get("frequency"), 20));
-  const packagingDetails = clean(formData.get("packagingDetails"), 300);
-  const customNotes = clean(formData.get("customNotes"), 1200);
+  const pickupOption = clean(formData.get("pickupOption"), 20);
+  const address = clean(formData.get("address"), 500);
+  const deadline = clean(formData.get("deadline"), 20);
+  const notes = clean(formData.get("notes"), 1200);
 
-  if (companyName.length < 2) {
-    return { error: "Add your company or business name." };
+  if (!['bulk','hamper'].includes(orderType)) return { error: "Choose order type." };
+  if (fullName.length < 2) return { error: "Enter full name." };
+  if (!isPhone(phone)) return { error: "Enter valid 10-digit mobile." };
+  if (!['self','delivery'].includes(pickupOption)) return { error: "Choose pickup option." };
+  if (pickupOption === 'delivery' && address.length < 10) return { error: "Enter delivery address." };
+  if (!deadline) return { error: "Select delivery deadline." };
+
+  let deliveryCharge = 0;
+  let distanceKm = 0;
+  if (pickupOption === 'delivery') {
+    const result = await computeDeliveryCharge(address);
+    deliveryCharge = result.charge;
+    distanceKm = result.distance;
   }
-  if (contactName.length < 2) return { error: "Add a contact person." };
-  if (!isEmail(email)) return { error: "Enter a valid email address." };
-  if (!isPhone(phone)) {
-    return { error: "Enter a valid 10-digit mobile number." };
-  }
-  if (gstNumber && !/^[0-9A-Z]{15}$/.test(gstNumber)) {
-    return { error: "GSTIN should be 15 letters and numbers." };
-  }
-  if (!productId) return { error: "Choose the product you need." };
-  if (quantity < 1) return { error: "Enter the quantity you need." };
-  if (!frequency) return { error: "Choose a delivery frequency." };
 
   const store = await getStore();
-  const product = await store.products.get(productId);
-  if (!product) return { error: "That product is no longer available." };
-
   const session = await getSession();
   await store.b2bOrders.create({
     userId: session?.id ?? null,
-    companyName,
-    contactName,
-    email,
+    orderType,
+    fullName,
     phone,
-    ...(gstNumber ? { gstNumber } : {}),
-    productId: product.id,
-    productName: product.name,
-    quantity,
-    frequency,
-    ...(packagingDetails ? { packagingDetails } : {}),
-    ...(customNotes ? { customNotes } : {}),
+    pickupOption,
+    address: pickupOption === 'delivery' ? address : '',
+    deadline,
+    notes,
+    deliveryCharge,
+    distanceKm,
+    status: 'pending',
   });
 
   revalidatePath("/admin/b2b");
   return {
-    success:
-      "Your bulk inquiry is in. Our team will review it and send a quote within one working day.",
+    success: pickupOption === 'self' 
+      ? "Your B2B request is received. Our team will contact you for self-pickup details."
+      : `Your B2B request is received. Estimated delivery charge is ₹${deliveryCharge}. Our team will confirm.`,
   };
 }
 
