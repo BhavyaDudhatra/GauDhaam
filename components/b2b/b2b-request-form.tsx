@@ -7,7 +7,10 @@ import { CheckCircle2 } from "lucide-react";
 import { submitB2BRequestAction } from "@/lib/actions/b2b";
 import type { FormState } from "@/lib/actions/state";
 
+type ProductOption = { id: string; name: string };
+
 type B2BRequestFormProps = {
+  products: ProductOption[];
   defaultContactName?: string;
   defaultPhone?: string;
 };
@@ -15,6 +18,7 @@ type B2BRequestFormProps = {
 const initialState: FormState = null;
 
 export function B2BRequestForm({
+  products,
   defaultContactName = "",
   defaultPhone = "",
 }: B2BRequestFormProps) {
@@ -73,7 +77,12 @@ export function B2BRequestForm({
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <label className="field">
           <span className="label">Item name</span>
-          <input name="itemName" required className="input" placeholder="Product / hamper description" />
+          <select name="itemName" required className="input">
+            <option value="" disabled>Select product</option>
+            {products.map(p=>(
+              <option key={p.id} value={p.name}>{p.name}</option>
+            ))}
+          </select>
         </label>
         <label className="field">
           <span className="label">Quantity</span>

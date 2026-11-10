@@ -12,8 +12,10 @@ export const metadata: Metadata = {
 };
 
 export default async function B2BPage() {
+  const store = await getStore();
   const session = await getSession();
-  const user = session ? await (await getStore()).users.get(session.id) : null;
+  const user = session ? await store.users.get(session.id) : null;
+  const products = await store.products.list();
 
   return (
     <div className="container-gd py-8 md:py-10">
@@ -26,6 +28,7 @@ export default async function B2BPage() {
       </div>
       <div className="card mt-6 p-6 md:p-8">
         <B2BRequestForm
+          products={products.map(p=>({id:p.id,name:p.name}))}
           defaultContactName={user?.name ?? session?.name ?? ""}
           defaultPhone={user?.phone ?? ""}
         />
