@@ -17,23 +17,6 @@ export type Event = {
   createdAt: string;
 };
 
-export type MessageThread = {
-  id: string;
-  userId: string;
-  subject: string;
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type Message = {
-  id: string;
-  threadId: string;
-  senderId: string;
-  senderRole: "user" | "admin";
-  body: string;
-  createdAt: string;
-};
-
 export type OfferType = "percentage" | "fixed";
 
 export type Offer = {
@@ -306,17 +289,15 @@ export type B2BOrderStatus = "pending" | "quoted" | "confirmed" | "rejected";
 export type B2BOrder = {
   id: string;
   userId: string | null;
-  companyName: string;
-  contactName: string;
-  email: string;
+  orderType: 'bulk' | 'hamper';
+  fullName: string;
   phone: string;
-  gstNumber?: string;
-  productId: string;
-  productName?: string;
-  quantity: number;
-  frequency: B2BFrequency;
-  packagingDetails?: string;
-  customNotes?: string;
+  pickupOption: 'self' | 'delivery';
+  address: string;
+  deadline: string;
+  notes?: string;
+  deliveryCharge: number;
+  distanceKm: number;
   priceQuoted?: number;
   status: B2BOrderStatus;
   createdAt: string;
@@ -382,12 +363,6 @@ export type Store = {
     create: (input: MessageInput) => Promise<ContactMessage>;
     markRead: (id: string) => Promise<void>;
     remove: (id: string) => Promise<void>;
-  };
-  userMessages: {
-    listThreads: (userId?: string) => Promise<MessageThread[]>;
-    getThread: (id: string) => Promise<{ thread: MessageThread; messages: Message[] } | null>;
-    createThread: (input: { userId: string; subject: string; body: string }) => Promise<MessageThread>;
-    sendMessage: (input: { threadId: string; senderId: string; senderRole: "user" | "admin"; body: string }) => Promise<Message>;
   };
   subscriptions: {
     list: (options?: { userId?: string }) => Promise<Subscription[]>;

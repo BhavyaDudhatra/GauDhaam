@@ -7,27 +7,17 @@ import { getStore } from "@/lib/store";
 export const metadata: Metadata = { title: "B2B Orders · Admin" };
 export const dynamic = "force-dynamic";
 
-const frequencyLabel = {
-  daily: "Daily",
-  weekly: "Weekly",
-  monthly: "Monthly",
-} as const;
-
 export default async function AdminB2BPage() {
   const store = await getStore();
-  const [orders, products] = await Promise.all([
-    store.b2bOrders.list(),
-    store.products.list({ includeUnavailable: true }),
-  ]);
-  const productsById = new Map(products.map((product) => [product.id, product]));
+  const orders = await store.b2bOrders.list();
   const open = orders.filter((order) => order.status === "pending").length;
 
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-[24px]">B2B Bulk Order Quotes</h1>
+        <h1 className="text-[24px]">B2B Bulk Order Requests</h1>
         <p className="mt-1 text-[13px] text-body">
-          {orders.length} inquiries · {open} awaiting a quote
+          {orders.length} inquiries · {open} awaiting action
         </p>
       </div>
 
@@ -36,9 +26,10 @@ export default async function AdminB2BPage() {
           <table className="w-full min-w-[1000px] text-left text-[12.5px]">
             <thead className="border-b border-line bg-cream/60 text-[11px] uppercase tracking-[0.08em] text-body/70">
               <tr>
-                <th className="px-4 py-3 font-semibold">Company</th>
-                <th className="px-4 py-3 font-semibold">Product</th>
-                <th className="px-4 py-3 font-semibold">Requirement</th>
+                <th className="px-4 py-3 font-semibold">Request</th>
+                <th className="px-4 py-3 font-semibold">Contact</th>
+                <th className="px-4 py-3 font-semibold">Pickup / Delivery</th>
+                <th className="px-4 py-3 font-semibold">Deadline</th>
                 <th className="px-4 py-3 font-semibold">Status</th>
                 <th className="px-4 py-3 text-right font-semibold">Quote</th>
               </tr>
@@ -47,41 +38,34 @@ export default async function AdminB2BPage() {
               {orders.map((order) => (
                 <tr key={order.id}>
                   <td className="px-4 py-3">
-                    <p className="font-semibold text-brand-dark">
-                      {order.companyName}
+                    <p className="font-semibold text-brand-dark capitalize">
+                      {order.orderType === 'bulk' ? 'Bulk buying' : 'Hampers order'}
                     </p>
-                    <p className="text-[11px] text-body/70">
-                      {order.contactName} · {order.phone}
-                    </p>
-                    <p className="text-[11px] text-body/70">{order.email}</p>
-                    {order.gstNumber && (
-                      <p className="text-[10.5px] text-body/60">
-                        GSTIN {order.gstNumber}
-                      </p>
+                    <p className="text-[11px] text-body/70">{formatDate(order.createdAt)}</p>
+                    {order.notes && (
+                      <p className="max-w-[240px] text-[11px] text-body/70 mt-1">{order.notes}</p>
                     )}
                   </td>
                   <td className="px-4 py-3">
-                    <p className="font-semibold text-brand-dark">
-                      {order.productName ??
-                        productsById.get(order.productId)?.name ??
-                        "Removed product"}
-                    </p>
-                    <p className="text-[11px] text-body/70">
-                      {formatDate(order.createdAt)}
-                    </p>
+                    <p className="font-semibold">{order.fullName}</p>
+                    <p className="text-[11px] text-body/70">{order.phone}</p>
                   </td>
                   <td className="px-4 py-3 text-body">
-                    {order.quantity} units · {frequencyLabel[order.frequency]}
-                    {order.packagingDetails && (
-                      <p className="text-[11px] text-body/70">
-                        {order.packagingDetails}
-                      </p>
+                    <p className="capitalize">{order.pickupOption}</p>
+                    {order.pickupOption === 'delivery' && (
+                      <>
+                        <p className="text-[11px] text-body/70">{order.address}</p>
+                        <p className="text-[11px] font-semibold text-brand-dark">
+                          Delivery ₹{order.deliveryCharge || 0} · {order.distanceKm?.toFixed ? order.distanceKm.toFixed(1) : order.distanceKm} km
+                        </p>
+                      </>
                     )}
-                    {order.customNotes && (
-                      <p className="max-w-[240px] text-[11px] text-body/70">
-                        {order.customNotes}
-                      </p>
+                    {order.pickupOption === 'self' && (
+                      <p className="text-[11px] text-body/70">Self pickup, charge ₹0</p>
                     )}
+                  </td>
+                  <td className="px-4 py-3">
+                    {order.deadline ? new Date(order.deadline).toLocaleDateString() : '—'}
                   </td>
                   <td className="px-4 py-3">
                     <span
@@ -140,7 +124,7 @@ export default async function AdminB2BPage() {
               ))}
               {orders.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-12 text-center text-body">
+                  <td colSpan={6} className="px-4 py-12 text-center text-body">
                     <Building2
                       size={24}
                       className="mx-auto text-body/40"
