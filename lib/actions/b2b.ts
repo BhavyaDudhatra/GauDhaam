@@ -61,9 +61,12 @@ export async function submitB2BRequestAction(
   const orderType = clean(formData.get("orderType"), 20);
   const fullName = clean(formData.get("fullName"), 120);
   const phone = normalisePhone(clean(formData.get("phone"), 20));
+  const gstNumber = clean(formData.get("gstNumber"), 20).toUpperCase();
   const pickupOption = clean(formData.get("pickupOption"), 20);
   const address = clean(formData.get("address"), 500);
   const deadline = clean(formData.get("deadline"), 20);
+  const itemName = clean(formData.get("itemName"), 200);
+  const quantityRaw = clean(formData.get("quantity"), 10);
   const notes = clean(formData.get("notes"), 1200);
 
   if (!['bulk','hamper'].includes(orderType)) return { error: "Choose order type." };
@@ -72,6 +75,9 @@ export async function submitB2BRequestAction(
   if (!['self','delivery'].includes(pickupOption)) return { error: "Choose pickup option." };
   if (pickupOption === 'delivery' && address.length < 10) return { error: "Enter delivery address." };
   if (!deadline) return { error: "Select delivery deadline." };
+  if (!itemName) return { error: "Enter item name." };
+  const quantity = Number(quantityRaw);
+  if (!quantity || quantity < 1) return { error: "Enter valid quantity." };
 
   let deliveryCharge = 0;
   let distanceKm = 0;
@@ -88,9 +94,12 @@ export async function submitB2BRequestAction(
     orderType,
     fullName,
     phone,
+    gstNumber: gstNumber || undefined,
     pickupOption,
     address: pickupOption === 'delivery' ? address : '',
     deadline,
+    itemName,
+    quantity,
     notes,
     deliveryCharge,
     distanceKm,

@@ -50,10 +50,10 @@ export function B2BRequestForm({
     <form action={formAction} className="space-y-4">
       <div className="flex gap-3">
         <label className="flex items-center gap-2">
-          <input type="radio" name="orderType" value="bulk" defaultChecked /> Bulk buying
+          <input type="radio" name="orderType" value="bulk" defaultChecked required /> Bulk buying
         </label>
         <label className="flex items-center gap-2">
-          <input type="radio" name="orderType" value="hamper" /> Hampers order
+          <input type="radio" name="orderType" value="hamper" required /> Hampers order
         </label>
       </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -66,12 +66,26 @@ export function B2BRequestForm({
           <input name="phone" type="tel" required className="input" placeholder="10-digit mobile" defaultValue={defaultPhone} />
         </label>
       </div>
+      <label className="field">
+        <span className="label">GST number <span className="text-[11px] text-body/60">(optional)</span></span>
+        <input name="gstNumber" className="input" placeholder="15-digit GSTIN" />
+      </label>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <label className="field">
+          <span className="label">Item name</span>
+          <input name="itemName" required className="input" placeholder="Product / hamper description" />
+        </label>
+        <label className="field">
+          <span className="label">Quantity</span>
+          <input name="quantity" type="number" min="1" required className="input" placeholder="e.g. 100" />
+        </label>
+      </div>
       <div className="flex gap-3">
         <label className="flex items-center gap-2">
-          <input type="radio" name="pickupOption" value="self" onChange={()=>setPickup('self')} /> Self pickup
+          <input type="radio" name="pickupOption" value="self" onChange={()=>setPickup('self')} required /> Self pickup
         </label>
         <label className="flex items-center gap-2">
-          <input type="radio" name="pickupOption" value="delivery" defaultChecked onChange={()=>setPickup('delivery')} /> Delivery
+          <input type="radio" name="pickupOption" value="delivery" defaultChecked onChange={()=>setPickup('delivery')} required /> Delivery
         </label>
       </div>
       {pickup === 'delivery' && (

@@ -11,8 +11,13 @@ export async function POST(request: Request) {
   const lng = parseFloat(String(form.get('lng')||'0'));
   const phone = String(form.get('phone')||'').trim();
   const isMain = String(form.get('isMain')||'false') === 'true';
-  if (!name || !address || !lat || !lng) return NextResponse.json({error:'required'}, {status:400});
+  if (!name || !address || isNaN(lat) || isNaN(lng)) {
+    return NextResponse.json({error:'required'}, {status:400});
+  }
   const db = await getDb();
+  if (!db) {
+    return NextResponse.json({error:'Database not configured'}, {status:500});
+  }
   await db.collection('branches').add({name, address, lat, lng, phone, isMain, createdAt: new Date().toISOString()});
-  return NextResponse.redirect(new URL('/admin/branches', request.url));
+  return NextResponse.redirect(new URL('/admin/branches', request.url), 303);
 }

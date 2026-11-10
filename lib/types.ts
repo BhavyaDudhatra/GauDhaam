@@ -292,9 +292,12 @@ export type B2BOrder = {
   orderType: 'bulk' | 'hamper';
   fullName: string;
   phone: string;
+  gstNumber?: string;
   pickupOption: 'self' | 'delivery';
   address: string;
   deadline: string;
+  itemName?: string;
+  quantity?: number;
   notes?: string;
   deliveryCharge: number;
   distanceKm: number;

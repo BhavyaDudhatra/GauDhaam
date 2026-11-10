@@ -8,8 +8,13 @@ export default async function AdminBranchesPage() {
   const db = await getDb();
   let branches = [];
   if (db) {
-    const snap = await db.collection('branches').orderBy('createdAt','desc').get();
-    branches = snap.docs.map(d=>({id:d.id,...d.data()}));
+    try {
+      const snap = await db.collection('branches').orderBy('createdAt','desc').get();
+      branches = snap.docs.map(d=>({id:d.id,...d.data()}));
+    } catch {
+      const snap = await db.collection('branches').get();
+      branches = snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=> (b.createdAt||'').localeCompare(a.createdAt||''));
+    }
   }
   return (
     <div className="space-y-6">

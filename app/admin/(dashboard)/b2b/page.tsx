@@ -42,6 +42,12 @@ export default async function AdminB2BPage() {
                       {order.orderType === 'bulk' ? 'Bulk buying' : 'Hampers order'}
                     </p>
                     <p className="text-[11px] text-body/70">{formatDate(order.createdAt)}</p>
+                    <p className="text-[11px] font-semibold mt-1">
+                      {order.itemName} · Qty {order.quantity}
+                    </p>
+                    {order.gstNumber && (
+                      <p className="text-[10px] text-body/60">GST {order.gstNumber}</p>
+                    )}
                     {order.notes && (
                       <p className="max-w-[240px] text-[11px] text-body/70 mt-1">{order.notes}</p>
                     )}
