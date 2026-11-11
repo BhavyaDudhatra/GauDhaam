@@ -103,7 +103,7 @@ export default async function OrderPage({
           <div className="mt-5 flex flex-wrap items-center gap-2">
             <OrderStatusBadge status={order.status} />
             <span className="badge badge-neutral">
-              {paymentStatusLabel(order.payment.status)}
+              {paymentStatusLabel(order.payment?.status)}
             </span>
             <span className="badge badge-neutral">{order.number}</span>
           </div>
@@ -113,7 +113,7 @@ export default async function OrderPage({
       <section className="section">
         <div className="container-gd grid gap-6 lg:grid-cols-[1.3fr_0.7fr] lg:gap-8">
           <div className="space-y-4">
-            {order.payment.status === "created" && (
+            {order.payment?.status === "created" && (
               <div className="flex items-start gap-3 rounded-card border border-[#E6D5B4] bg-[#FBF4E4] p-4 text-[12.5px] leading-relaxed text-[#6D5320]">
                 <CircleAlert size={18} className="mt-0.5 shrink-0" />
                 <div>
@@ -287,9 +287,9 @@ export default async function OrderPage({
               <div className="mt-4 rounded-xl bg-light/60 p-3 text-[11.5px] leading-relaxed text-body">
                 <p>
                   <span className="font-semibold text-brand-dark">Payment: </span>
-                  {paymentStatusLabel(order.payment.status)} · Razorpay
+                  {paymentStatusLabel(order.payment?.status)} · Razorpay
                 </p>
-                {order.payment.razorpayPaymentId && (
+                {order.payment?.razorpayPaymentId && (
                   <p className="mt-1 break-all text-body/70">
                     Ref: {order.payment.razorpayPaymentId}
                   </p>

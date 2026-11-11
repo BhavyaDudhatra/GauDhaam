@@ -49,8 +49,6 @@ export async function createFirestoreStore(): Promise<Store> {
   const subscriptionsCol = db.collection("subscriptions");
   const dailyDeliveriesCol = db.collection("dailyDeliveries");
   const b2bOrdersCol = db.collection("b2bOrders");
-  const messageThreadsCol = db.collection("messageThreads");
-  const userMessagesCol = db.collection("userMessages");
   const galleryCol = db.collection("gallery");
   const eventsCol = db.collection("events");
 
@@ -353,7 +351,7 @@ export async function createFirestoreStore(): Promise<Store> {
           if (
             patch.status === "cancelled" &&
             order.status !== "cancelled" &&
-            order.payment.status === "paid" &&
+            order.payment?.status === "paid" &&
             !order.stockRestored
           ) {
             const batch = db!.batch();
@@ -417,7 +415,7 @@ export async function createFirestoreStore(): Promise<Store> {
         const doc = await ref.get();
         if (!doc.exists) return null;
         const order = doc.data() as Order;
-        if (order.payment.status === "paid") return order;
+        if (order.payment?.status === "paid") return order;
 
         const batch = db!.batch();
         if (!order.stockRestored) {
@@ -637,38 +635,6 @@ export async function createFirestoreStore(): Promise<Store> {
       },
       async remove(id) {
         await messagesCol.doc(id).delete();
-      },
-    },
-
-    userMessages: {
-      async listThreads(userId?: string) {
-        const snap = await messageThreadsCol.get();
-        let threads = snap.docs.map(doc => doc.data() as any);
-        if (userId) threads = threads.filter(t => t.userId === userId);
-        return threads.sort((a,b) => b.updatedAt.localeCompare(a.updatedAt));
-      },
-      async getThread(id) {
-        const threadSnap = await messageThreadsCol.doc(id).get();
-        if (!threadSnap.exists) return null;
-        const thread = threadSnap.data() as any;
-        const msgsSnap = await userMessagesCol.where('threadId','==',id).get();
-        const messages = msgsSnap.docs.map(d => d.data() as any).sort((a,b)=> a.createdAt.localeCompare(b.createdAt));
-        return { thread, messages };
-      },
-      async createThread(input) {
-        const id = randomUUID();
-        const now = new Date().toISOString();
-        const thread = { id, userId: input.userId, subject: input.subject, createdAt: now, updatedAt: now };
-        await messageThreadsCol.doc(id).set(thread);
-        const msg = { id: randomUUID(), threadId: id, senderId: input.userId, senderRole: 'user', body: input.body, createdAt: now };
-        await userMessagesCol.doc(msg.id).set(msg);
-        return thread;
-      },
-      async sendMessage(input) {
-        const msg = { id: randomUUID(), threadId: input.threadId, senderId: input.senderId, senderRole: input.senderRole, body: input.body, createdAt: new Date().toISOString() };
-        await userMessagesCol.doc(msg.id).set(msg);
-        await messageThreadsCol.doc(input.threadId).update({ updatedAt: new Date().toISOString() });
-        return msg;
       },
     },
 

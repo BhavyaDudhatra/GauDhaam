@@ -106,7 +106,7 @@ export default async function AdminDashboardPage() {
                     {formatINR(order.total)}
                   </p>
                   <p className="text-[11px] uppercase tracking-wide text-body/60">
-                    {order.payment.status}
+                    {order.payment?.status}
                   </p>
                 </div>
                 <ArrowRight size={15} className="text-body/40" />

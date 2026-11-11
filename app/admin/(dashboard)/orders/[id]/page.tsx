@@ -130,7 +130,7 @@ export default async function AdminOrderDetailPage({
               <span className="label">Payment status</span>
               <select
                 name="paymentStatus"
-                defaultValue={order.payment.status}
+                defaultValue={order.payment?.status}
                 className="select"
               >
                 <option value="created">created</option>
@@ -155,12 +155,12 @@ export default async function AdminOrderDetailPage({
 
           <div className="mt-4 rounded-xl border border-line bg-cream/40 p-3 text-[11.5px] text-body">
             <p className="font-semibold text-brand-dark">Payment</p>
-            <p className="mt-1">Provider: {order.payment.provider}</p>
-            <p>Status: {order.payment.status}</p>
-            {order.payment.razorpayOrderId && (
+            <p className="mt-1">Provider: {order.payment?.provider}</p>
+            <p>Status: {order.payment?.status}</p>
+            {order.payment?.razorpayOrderId && (
               <p className="mt-1 break-all">Razorpay order: {order.payment.razorpayOrderId}</p>
             )}
-            {order.payment.razorpayPaymentId && (
+            {order.payment?.razorpayPaymentId && (
               <p className="mt-1 break-all">Payment ID: {order.payment.razorpayPaymentId}</p>
             )}
           </div>

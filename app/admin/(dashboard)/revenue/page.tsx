@@ -104,7 +104,7 @@ export default async function AdminRevenuePage({
                     </td>
                     <td className="px-4 py-3">
                       <span className="badge badge-neutral">
-                        {paymentStatusLabel(order.payment.status)}
+                        {paymentStatusLabel(order.payment?.status)}
                       </span>
                     </td>
                     <td className="px-4 py-3">
