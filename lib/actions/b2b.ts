@@ -140,23 +140,33 @@ export async function updateB2BOrderAction(formData: FormData) {
 
 export async function payB2BOrderAction(formData: FormData) {
   const session = await getSession();
-  if (!session) return;
+  if (!session) {
+    throw new Error("Not authenticated");
+  }
   const id = clean(formData.get("id"), 80);
   const store = await getStore();
   const order = await store.b2bOrders.get(id);
-  if (!order || order.userId !== session.id) return;
-  if (!order.priceQuoted) return;
-  // Simulate payment success
-  await store.b2bOrders.update(id, { status: 'completed' });
-  // Optionally create a regular order entry for incomplete orders
-  await store.orders.create({
-    userId: session.id,
-    items: [{ productId: order.itemName, name: order.itemName, qty: order.quantity || 1, price: order.priceQuoted }],
-    subtotal: order.priceQuoted,
-    total: order.priceQuoted + (order.deliveryCharge || 0),
-    status: 'pending',
-    notes: `Converted from B2B ${order.id}`,
-  });
-  revalidatePath("/b2b/orders");
-  revalidatePath("/account/orders");
+  if (!order || order.userId !== session.id) {
+    throw new Error("Order not found");
+  }
+  if (!order.priceQuoted) {
+    throw new Error("No price quoted");
+  }
+  // Create Razorpay order
+  const { createRazorpayOrder, razorpayKeyId } = await import("@/lib/razorpay");
+  const amount = Math.round((order.priceQuoted + (order.deliveryCharge || 0)) * 100);
+  const rzpOrder = await createRazorpayOrder(amount, `B2B-${order.id}`);
+  // Store payment reference
+  const db = await getDb();
+  if (db) {
+    await db.collection("b2bOrders").doc(id).update({
+      razorpayOrderId: rzpOrder.id,
+      paymentStatus: "pending",
+    });
+  }
+  // Redirect to Razorpay checkout
+  const redirectUrl = `https://checkout.razorpay.com/v1/checkout.js?key_id=${razorpayKeyId}&order_id=${rzpOrder.id}&amount=${amount}&currency=INR&name=GauDhaam&description=B2B Order ${order.id}`;
+  // For simplicity, redirect to a placeholder page
+  const { redirect } = await import("next/navigation");
+  redirect(`/b2b/pay/${id}?rzp=${rzpOrder.id}`);
 }

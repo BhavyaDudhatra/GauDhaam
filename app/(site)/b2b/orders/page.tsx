@@ -34,10 +34,7 @@ export default async function B2BOrdersPage() {
               </div>
               <div className="text-right">
                 {o.status === 'quoted' || o.status === 'confirmed' ? (
-                  <form action={payB2BOrderAction}>
-                    <input type="hidden" name="id" value={o.id} />
-                    <button className="btn btn-primary btn-sm">Pay ₹{o.priceQuoted || 0}</button>
-                  </form>
+                  <a href={`/b2b/pay/${o.id}`} className="btn btn-primary btn-sm">Pay ₹{o.priceQuoted || 0}</a>
                 ) : (
                   <span className="badge capitalize">{o.status}</span>
                 )}

@@ -40,7 +40,7 @@ export default async function AccountPage() {
 
   const orders = await store.orders.list({ userId: user.id });
   const spent = orders
-    .filter((order) => order.payment.status === "paid")
+    .filter((order) => order.payment?.status === "paid")
     .reduce((sum, order) => sum + order.total, 0);
   const initials = user.name
     .split(" ")
