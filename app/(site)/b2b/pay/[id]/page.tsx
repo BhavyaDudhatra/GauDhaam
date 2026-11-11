@@ -7,18 +7,19 @@ import { razorpayKeyId, isRazorpayConfigured } from "@/lib/razorpay";
 
 export const dynamic = "force-dynamic";
 
-export default async function B2BPayPage({ params }: { params: { id: string } }) {
+export default async function B2BPayPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await getSession();
   if (!session) redirect("/login?next=/b2b/orders");
   const store = await getStore();
-  const order = await store.b2bOrders.get(params.id);
+  const order = await store.b2bOrders.get(id);
   if (!order || order.userId !== session.id) redirect("/b2b/orders");
   if (!order.priceQuoted) redirect("/b2b/orders");
 
   const db = await getDb();
   let razorpayOrderId = "";
   if (db) {
-    const doc = await db.collection("b2bOrders").doc(params.id).get();
+    const doc = await db.collection("b2bOrders").doc(id).get();
     razorpayOrderId = doc.data()?.razorpayOrderId || "";
   }
 
