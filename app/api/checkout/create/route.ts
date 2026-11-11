@@ -186,8 +186,6 @@ export async function POST(request: Request) {
   const shipping = deliveryCharge;
   const total = subtotal + shipping;
 
-  const session = await getSession();
-
   const order = await store.orders.create({
     userId: session?.role === "user" ? session.id : null,
     email,
