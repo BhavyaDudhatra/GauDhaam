@@ -145,7 +145,7 @@ export default async function OrderPage({
                       className="relative h-16 w-16 shrink-0 overflow-hidden rounded-[12px] border border-line bg-light"
                     >
                       <Image
-                        src={item.image}
+                        src={item.image || "/assets/images/Ghee.jpg"}
                         alt={item.name}
                         fill
                         sizes="64px"
@@ -273,7 +273,7 @@ export default async function OrderPage({
                 <div className="flex justify-between">
                   <dt>Delivery</dt>
                   <dd className="font-semibold text-brand-dark">
-                    {order.shipping === 0 ? "Free" : formatINR(order.shipping)}
+                    {order.shipping === 0 || order.shipping == null ? "Free" : formatINR(order.shipping)}
                   </dd>
                 </div>
                 <div className="flex justify-between border-t border-line pt-3 text-[15px]">

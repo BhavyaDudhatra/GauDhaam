@@ -9,6 +9,8 @@ import { useState } from "react";
 export function AddressManager({ addresses }: { addresses: Address[] }) {
   const [addState, addAction, addPending] = useActionState<FormState, FormData>(addAddressAction, null);
   const [editState, editAction, editPending] = useActionState<FormState, FormData>(updateAddressAction, null);
+  const [defaultState, defaultAction, defaultPending] = useActionState<FormState, FormData>(setDefaultAddressAction, null);
+  const [deleteState, deleteAction, deletePending] = useActionState<FormState, FormData>(deleteAddressAction, null);
 
   const [editing, setEditing] = useState<Address | null>(null);
 
@@ -25,14 +27,14 @@ export function AddressManager({ addresses }: { addresses: Address[] }) {
                 <p className="text-[12.5px] text-body/70">{addr.city}, {addr.state} {addr.pincode}</p>
               </div>
               <div className="flex gap-2">
-                <form action={setDefaultAddressAction}>
+                <form action={defaultAction}>
                   <input type="hidden" name="id" value={addr.id} />
-                  <button type="submit" className="text-[11px] underline">Set default</button>
+                  <button type="submit" disabled={defaultPending} className="text-[11px] underline">Set default</button>
                 </form>
                 <button onClick={() => setEditing(addr)} className="text-[11px] underline">Edit</button>
-                <form action={deleteAddressAction}>
+                <form action={deleteAction}>
                   <input type="hidden" name="id" value={addr.id} />
-                  <button type="submit" className="text-[11px] underline text-red-600">Delete</button>
+                  <button type="submit" disabled={deletePending} className="text-[11px] underline text-red-600">Delete</button>
                 </form>
               </div>
             </div>

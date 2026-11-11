@@ -218,6 +218,7 @@ export function CheckoutForm({
       pincode: String(formData.get("pincode") ?? ""),
       notes: String(formData.get("notes") ?? ""),
       fulfillment: String(formData.get("fulfillment") ?? "delivery"),
+      savedAddressId: String(formData.get("savedAddress") ?? ""),
     };
 
     try {

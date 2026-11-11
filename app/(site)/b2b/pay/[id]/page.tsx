@@ -19,12 +19,26 @@ export default async function B2BPayPage({ params }: { params: Promise<{ id: str
 
   const db = await getDb();
   let razorpayOrderId = "";
-  if (db) {
-    const doc = await db.collection("b2bOrders").doc(id).get();
-    razorpayOrderId = doc.data()?.razorpayOrderId || "";
+  let amount = Math.round((order.priceQuoted + (order.deliveryCharge || 0)) * 100);
+
+  // Create Razorpay order if not exists
+  if (isRazorpayConfigured()) {
+    const { createRazorpayOrder } = await import("@/lib/razorpay");
+    if (db) {
+      const doc = await db.collection("b2bOrders").doc(id).get();
+      razorpayOrderId = doc.data()?.razorpayOrderId || "";
+      if (!razorpayOrderId) {
+        const rzp = await createRazorpayOrder(amount, `B2B-${id}`);
+        razorpayOrderId = rzp.id;
+        await db.collection("b2bOrders").doc(id).update({
+          razorpayOrderId,
+          paymentStatus: "pending",
+        });
+      }
+    }
   }
 
-  const amount = Math.round((order.priceQuoted + (order.deliveryCharge || 0)) * 100);
+  const total = order.priceQuoted + (order.deliveryCharge || 0);
 
   return (
     <div className="container-gd py-10 max-w-xl">
@@ -33,13 +47,37 @@ export default async function B2BPayPage({ params }: { params: Promise<{ id: str
         <p><strong>Item:</strong> {order.itemName} × {order.quantity}</p>
         <p><strong>Quoted amount:</strong> {formatINR(order.priceQuoted)}</p>
         <p><strong>Delivery charge:</strong> {formatINR(order.deliveryCharge || 0)}</p>
-        <p className="text-[18px] font-bold">Total: {formatINR(order.priceQuoted + (order.deliveryCharge || 0))}</p>
+        <p className="text-[18px] font-bold">Total: {formatINR(total)}</p>
         {isRazorpayConfigured() ? (
-          <form action={`https://checkout.razorpay.com/v1/checkout`} method="POST">
+          <div>
+            <button id="rzp-button" className="btn btn-primary btn-sm">Pay {formatINR(total)}</button>
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+                  document.getElementById('rzp-button').addEventListener('click', function(e){
+                    var options = {
+                      key: "${razorpayKeyId()}",
+                      amount: ${amount},
+                      currency: "INR",
+                      name: "GauDhaam",
+                      description: "B2B Order ${id}",
+                      order_id: "${razorpayOrderId}",
+                      handler: function(response){
+                        window.location.href = '/b2b/orders?paid=1';
+                      },
+                      prefill: {},
+                      theme: { color: "#496B45" }
+                    };
+                    var rzp = new Razorpay(options);
+                    rzp.open();
+                    e.preventDefault();
+                  });
+                `
+              }}
+            />
             <script src="https://checkout.razorpay.com/v1/checkout.js" async></script>
-            <p>Razorpay integration will be handled here. Order ID: {razorpayOrderId || "pending"}</p>
-            <a href="/b2b/orders" className="btn btn-outline btn-sm mt-4">Back</a>
-          </form>
+            <a href="/b2b/orders" className="btn btn-outline btn-sm mt-4 ml-2">Back</a>
+          </div>
         ) : (
           <p className="text-body/70">Razorpay not configured. Payment endpoint will be integrated.</p>
         )}

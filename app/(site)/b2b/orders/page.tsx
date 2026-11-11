@@ -31,6 +31,9 @@ export default async function B2BOrdersPage() {
                 <p className="text-[12px] text-body/70">Requested {formatDate(o.createdAt)} · Deadline {o.deadline ? new Date(o.deadline).toLocaleDateString() : '—'}</p>
                 {o.deliveryCharge > 0 && <p className="text-[12px]">Delivery charge ₹{o.deliveryCharge}</p>}
                 {o.priceQuoted && <p className="text-[13px] font-semibold">Quoted amount ₹{o.priceQuoted}</p>}
+                {(o.status === 'confirmed' || o.status === 'completed') && (
+                  <p className="text-[12px] text-brand mt-1">Tracking: Order confirmed, awaiting dispatch and delivery.</p>
+                )}
               </div>
               <div className="text-right">
                 {o.status === 'quoted' || o.status === 'confirmed' ? (

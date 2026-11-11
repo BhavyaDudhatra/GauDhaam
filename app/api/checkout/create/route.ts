@@ -46,16 +46,38 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Too many items in one order." }, { status: 400 });
   }
 
-  const name = clean(payload.name, 120);
-  const email = clean(payload.email, 200).toLowerCase();
-  const phoneRaw = clean(payload.phone, 20);
-  const line1 = clean(payload.line1, 240);
-  const line2 = clean(payload.line2, 240);
-  const city = clean(payload.city, 120);
-  const state = clean(payload.state, 120);
-  const pincode = clean(payload.pincode, 10);
+  const session = await getSession();
+  const savedAddressId = clean(String(payload.savedAddressId ?? ""), 80);
+
+  let name = clean(payload.name, 120);
+  let email = clean(payload.email, 200).toLowerCase();
+  let phoneRaw = clean(payload.phone, 20);
+  let line1 = clean(payload.line1, 240);
+  let line2 = clean(payload.line2, 240);
+  let city = clean(payload.city, 120);
+  let state = clean(payload.state, 120);
+  let pincode = clean(payload.pincode, 10);
   const notes = clean(payload.notes, 600);
   const fulfillment = clean(String(payload.fulfillment ?? "delivery"), 20) === "self" ? "self" : "delivery";
+
+  const store = await getStore();
+
+  // If saved address selected, override address fields from user's saved address
+  let skipAddressSave = false;
+  if (session?.role === "user" && savedAddressId) {
+    const user = await store.users.get(session.id);
+    const addr = user?.addresses?.find(a => a.id === savedAddressId);
+    if (addr) {
+      name = name || addr.name;
+      phoneRaw = phoneRaw || addr.phone;
+      line1 = addr.line1;
+      line2 = addr.line2 ?? "";
+      city = addr.city;
+      state = addr.state;
+      pincode = addr.pincode;
+      skipAddressSave = true;
+    }
+  }
 
   if (name.length < 2) {
     return NextResponse.json({ error: "Please enter your full name." }, { status: 400 });
@@ -73,7 +95,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Please enter a valid 6-digit PIN code." }, { status: 400 });
   }
 
-  const store = await getStore();
   const items: OrderItem[] = [];
 
   for (const entry of rawItems) {
@@ -200,7 +221,7 @@ export async function POST(request: Request) {
   } as never);
 
   // Persist address to user profile if logged in
-  if (session?.role === "user") {
+  if (session?.role === "user" && !skipAddressSave) {
     try {
       const user = await store.users.get(session.id);
       if (user) {
