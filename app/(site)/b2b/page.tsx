@@ -19,12 +19,15 @@ export default async function B2BPage() {
 
   return (
     <div className="container-gd py-8 md:py-10">
-      <div className="max-w-3xl">
-        <span className="eyebrow">Business Orders</span>
-        <h1 className="mt-2">Bulk & Hamper Orders</h1>
-        <p className="mt-2 text-[13.5px] text-body/80">
-          Request bulk buying or hampers. Choose self pickup or delivery and get an instant delivery estimate.
-        </p>
+      <div className="max-w-3xl flex items-start justify-between gap-4">
+        <div>
+          <span className="eyebrow">Business Orders</span>
+          <h1 className="mt-2">Bulk & Hamper Orders</h1>
+          <p className="mt-2 text-[13.5px] text-body/80">
+            Request bulk buying or hampers. Choose self pickup or delivery and get an instant delivery estimate.
+          </p>
+        </div>
+        <a href="/b2b/orders" className="btn btn-outline btn-sm mt-6">My B2B Orders</a>
       </div>
       <div className="card mt-6 p-6 md:p-8">
         <B2BRequestForm
