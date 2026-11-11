@@ -225,13 +225,13 @@ export default async function OrderPage({
                   <MapPin size={16} className="mt-0.5 shrink-0 text-brand" />
                   <div>
                     <p className="font-semibold text-brand-dark">
-                      {order.address.name}
+                      {order.address?.name}
                     </p>
-                    <p>{order.address.line1}</p>
-                    {order.address.line2 && <p>{order.address.line2}</p>}
+                    <p>{order.address?.line1}</p>
+                    {order.address?.line2 && <p>{order.address?.line2}</p>}
                     <p>
-                      {order.address.city}, {order.address.state} —{" "}
-                      {order.address.pincode}
+                      {order.address?.city}, {order.address?.state} —{" "}
+                      {order.address?.pincode}
                     </p>
                   </div>
                 </div>
