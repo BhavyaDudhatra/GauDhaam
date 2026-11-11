@@ -19,10 +19,10 @@ export default async function AdminDashboardPage() {
     store.coupons.list(),
   ]);
 
-  const paidOrders = orders.filter((order) => order.payment.status === "paid");
+  const paidOrders = orders.filter((order) => order.payment?.status === "paid");
   const revenue = paidOrders.reduce((sum, order) => sum + order.total, 0);
   const pendingOrders = orders.filter(
-    (order) => order.payment.status === "created" && order.status === "pending",
+    (order) => order.payment?.status === "created" && order.status === "pending",
   ).length;
 
   const cards = [

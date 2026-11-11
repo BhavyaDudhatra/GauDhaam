@@ -60,7 +60,7 @@ export default async function OrderPage({
 
   const session = await getSession();
   const current = stepIndex(order.status);
-  const paid = order.payment.status === "paid";
+  const paid = order.payment?.status === "paid";
 
   const feedbackByProduct: Record<string, any[]> = {};
   if (session && order.status === "delivered") {
