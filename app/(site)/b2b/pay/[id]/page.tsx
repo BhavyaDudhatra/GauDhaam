@@ -9,6 +9,7 @@ export const dynamic = "force-dynamic";
 
 export default async function B2BPayPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  if (!id) redirect("/b2b/orders");
   const session = await getSession();
   if (!session) redirect("/login?next=/b2b/orders");
   const store = await getStore();
