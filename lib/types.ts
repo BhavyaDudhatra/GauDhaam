@@ -284,7 +284,7 @@ export type DailyDelivery = {
   createdAt: string;
 };
 
-export type B2BOrderStatus = "pending" | "quoted" | "confirmed" | "rejected";
+export type B2BOrderStatus = "pending" | "quoted" | "confirmed" | "rejected" | "completed";
 
 export type B2BOrder = {
   id: string;

@@ -117,6 +117,7 @@ export default async function AdminB2BPage() {
                         <option value="quoted">Quoted</option>
                         <option value="confirmed">Confirmed</option>
                         <option value="rejected">Rejected</option>
+                        <option value="completed">Completed</option>
                       </select>
                       <button
                         type="submit"
