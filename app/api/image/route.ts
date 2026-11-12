@@ -1,27 +1,38 @@
 import { NextResponse } from "next/server";
 import { google } from "googleapis";
 import { Readable } from "node:stream";
+import fs from "fs";
 
-function getDriveClient() {
-  const {
-    GOOGLE_OAUTH_CLIENT_ID,
-    GOOGLE_OAUTH_CLIENT_SECRET,
-    GOOGLE_OAUTH_REDIRECT_URI,
-    GOOGLE_DRIVE_REFRESH_TOKEN,
-  } = process.env;
-
-  if (!GOOGLE_OAUTH_CLIENT_ID || !GOOGLE_OAUTH_CLIENT_SECRET || !GOOGLE_OAUTH_REDIRECT_URI || !GOOGLE_DRIVE_REFRESH_TOKEN) {
-    throw new Error("Google Drive OAuth configuration is incomplete.");
+function getAuth() {
+  // Try service account JSON file first
+  const jsonPath = process.env.GOOGLE_SERVICE_ACCOUNT_JSON_PATH;
+  if (jsonPath && fs.existsSync(jsonPath)) {
+    try {
+      const content = fs.readFileSync(jsonPath, "utf8");
+      const json = JSON.parse(content);
+      const auth = new google.auth.GoogleAuth({
+        credentials: json,
+        scopes: ["https://www.googleapis.com/auth/drive.readonly"],
+      });
+      return auth;
+    } catch (e) {
+      console.error("Failed to load service account JSON:", e);
+    }
   }
 
-  const oauth2Client = new google.auth.OAuth2(
-    GOOGLE_OAUTH_CLIENT_ID,
-    GOOGLE_OAUTH_CLIENT_SECRET,
-    GOOGLE_OAUTH_REDIRECT_URI
-  );
+  // Fall back to env vars
+  const email = process.env.GOOGLE_DRIVE_SERVICE_ACCOUNT_EMAIL;
+  const key = process.env.GOOGLE_DRIVE_PRIVATE_KEY?.replace(/\\n/g, "\n");
 
-  oauth2Client.setCredentials({ refresh_token: GOOGLE_DRIVE_REFRESH_TOKEN });
-  return google.drive({ version: "v3", auth: oauth2Client });
+  if (email && key) {
+    return new google.auth.JWT({
+      email,
+      key,
+      scopes: ["https://www.googleapis.com/auth/drive.readonly"],
+    });
+  }
+
+  throw new Error("No Google Drive credentials available.");
 }
 
 export async function GET(request: Request) {
@@ -32,7 +43,8 @@ export async function GET(request: Request) {
   }
 
   try {
-    const drive = getDriveClient();
+    const auth = getAuth();
+    const drive = google.drive({ version: "v3", auth });
 
     const meta = await drive.files.get({
       fileId: id,
