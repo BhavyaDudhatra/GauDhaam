@@ -90,11 +90,11 @@ export default async function AdminOrderDetailPage({
           <div className="card p-5">
             <h2 className="text-[16px]">Delivery</h2>
             <div className="mt-3 space-y-1 text-[12.5px] text-body">
-              <p className="font-semibold text-brand-dark">{order.address.name}</p>
-              <p>{order.address.line1}</p>
-              {order.address.line2 && <p>{order.address.line2}</p>}
+              <p className="font-semibold text-brand-dark">{order.address?.name}</p>
+              <p>{order.address?.line1}</p>
+              {order.address?.line2 && <p>{order.address?.line2}</p>}
               <p>
-                {order.address.city}, {order.address.state} {order.address.pincode}
+                {order.address?.city}, {order.address?.state} {order.address?.pincode}
               </p>
               <p>{order.phone}</p>
               <p>{order.email}</p>
