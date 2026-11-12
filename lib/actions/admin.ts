@@ -228,6 +228,22 @@ export async function saveServiceAction(
   const slug = slugify(requestedSlug || name);
   const images = parseImages(formData.get("images"), "/assets/images/banner.jpg");
   const galleryImages = parseImages(formData.get("galleryImages"), "");
+  const complimentaryItemsRaw = clean(formData.get("complimentaryItems"), 2000);
+  let complimentaryItems: { productId: string; name: string; quantity: number }[] = [];
+  if (complimentaryItemsRaw) {
+    try {
+      const parsed = JSON.parse(complimentaryItemsRaw);
+      if (Array.isArray(parsed)) {
+        complimentaryItems = parsed
+          .filter((item: any) => item && item.productId && item.name && Number.isFinite(item.quantity))
+          .map((item: any) => ({
+            productId: clean(item.productId, 80),
+            name: clean(item.name, 140),
+            quantity: Math.max(1, toInt(item.quantity, 1)),
+          }));
+      }
+    } catch {}
+  }
 
   if (name.length < 2) return { error: "Give the service a name." };
   if (!tagline) return { error: "Add a one-line tagline." };
@@ -245,6 +261,7 @@ export async function saveServiceAction(
     priceNote,
     active,
     sort,
+    complimentaryItems: complimentaryItems.length ? complimentaryItems : undefined,
   };
 
   if (id) {

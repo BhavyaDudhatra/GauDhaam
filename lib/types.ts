@@ -75,6 +75,13 @@ export type Service = {
   sort: number;
   createdAt: string;
   updatedAt: string;
+  complimentaryItems?: ComplimentaryItem[];
+};
+
+export type ComplimentaryItem = {
+  productId: string;
+  name: string;
+  quantity: number;
 };
 
 export type ServiceInput = Omit<Service, "id" | "createdAt" | "updatedAt">;

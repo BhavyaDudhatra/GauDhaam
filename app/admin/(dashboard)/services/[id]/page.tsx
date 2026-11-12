@@ -16,6 +16,7 @@ export default async function EditServicePage({
   const { id } = await params;
   const store = await getStore();
   const service = await store.services.get(id);
+  const products = await store.products.list();
   if (!service) notFound();
 
   return (
@@ -30,7 +31,7 @@ export default async function EditServicePage({
         </Link>
         <h1 className="mt-2 text-[24px]">{service.name}</h1>
       </div>
-      <ServiceForm service={service} />
+      <ServiceForm service={service} products={products} />
     </div>
   );
 }

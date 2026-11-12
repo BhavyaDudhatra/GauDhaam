@@ -2,10 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { ServiceForm } from "@/components/admin/service-form";
+import { getStore } from "@/lib/store";
 
 export const metadata: Metadata = { title: "New service · Admin" };
 
-export default function NewServicePage() {
+export default async function NewServicePage() {
+  const store = await getStore();
+  const products = await store.products.list();
+
   return (
     <div className="space-y-5">
       <div>
@@ -18,7 +22,7 @@ export default function NewServicePage() {
         </Link>
         <h1 className="mt-2 text-[24px]">New service</h1>
       </div>
-      <ServiceForm />
+      <ServiceForm products={products} />
     </div>
   );
 }
