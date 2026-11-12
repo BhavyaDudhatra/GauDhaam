@@ -55,7 +55,6 @@ export async function registerAction(
   _previous: FormState,
   formData: FormData,
 ): Promise<FormState> {
-  console.log("[AUTH] registerAction called");
   const name = clean(formData.get("name"), 120);
   const email = clean(formData.get("email"), 200).toLowerCase();
   const phone = clean(formData.get("phone"), 20);
@@ -79,14 +78,12 @@ export async function registerAction(
   }
 
   try {
-    console.log("[AUTH] calling signups.start for", email);
     await store.signups.start({
       email,
       name,
       phone: normalisePhone(phone),
       passwordHash: hashPassword(password),
     });
-    console.log("[AUTH] signups.start completed for", email);
   } catch (error) {
     console.error("Signup OTP error", error);
     return {
