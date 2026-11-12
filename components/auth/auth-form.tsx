@@ -3,7 +3,6 @@
 import { useActionState, useEffect, useState } from "react";
 import Link from "next/link";
 import { Loader2, Lock, Mail, Phone, User } from "lucide-react";
-import Image from "next/image";
 import {
   loginAction,
   registerAction,

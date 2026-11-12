@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, Check, Leaf } from "lucide-react";
 import { getStore } from "@/lib/store";
+import { Img } from "@/components/ui/Img";
 import { normalizeDriveLink } from "@/lib/drive-utils";
 
 export const dynamic = "force-dynamic";
@@ -102,14 +102,13 @@ export default async function ServicePage({ params }: PageProps) {
 
           <div className="order-1 lg:order-2">
             <div className="relative aspect-[4/3] overflow-hidden rounded-banner border border-line bg-light">
-              <Image
-                src={normalizeDriveLink(service.images?.[0] ?? "/assets/images/banner.jpg")}
+              <Img
+                src={service.images?.[0] ?? "/assets/images/banner.jpg"}
                 alt={service.name}
                 fill
                 priority
                 sizes="(max-width: 1024px) 100vw, 560px"
                 className="object-cover"
-                unoptimized
               />
             </div>
           </div>

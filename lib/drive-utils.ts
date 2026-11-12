@@ -16,11 +16,6 @@ export function normalizeDriveLink(link: string) {
   if (!trimmed) return "";
   const id = driveFileId(trimmed);
   if (!id) return trimmed;
-  // Already a direct lh3 image URL — ensure it has a size suffix so it renders
-  if (trimmed.includes("lh3.googleusercontent.com/d/")) {
-    if (/=[a-z]+\d+$/i.test(trimmed)) return trimmed;
-    return `${trimmed}=w2000`;
-  }
-  // Convert any Drive sharing link to a direct image URL
-  return `https://lh3.googleusercontent.com/d/${id}=w2000`;
+  // Google Drive public sharing URL - most reliable for embedded images
+  return `https://drive.google.com/uc?export=view&id=${id}`;
 }

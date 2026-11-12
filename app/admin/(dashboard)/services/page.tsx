@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { Plus } from "lucide-react";
+import { Img } from "@/components/ui/Img";
 import { deleteServiceAction, toggleServiceAction } from "@/lib/actions/admin";
 import { getStore } from "@/lib/store";
 import { normalizeDriveLink } from "@/lib/drive-utils";
@@ -46,13 +46,12 @@ export default async function AdminServicesPage() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-lg border border-line bg-light">
-                        <Image
-                          src={normalizeDriveLink(service.images[0] ?? "/assets/images/banner.jpg")}
+                        <Img
+                          src={service.images[0] ?? "/assets/images/banner.jpg"}
                           alt={service.name}
                           fill
                           sizes="44px"
                           className="object-cover"
-                          unoptimized
                         />
                       </div>
                       <div className="min-w-0">

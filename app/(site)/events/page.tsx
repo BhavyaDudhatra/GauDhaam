@@ -1,6 +1,6 @@
 import { getStore } from "@/lib/store";
-import Image from "next/image";
 import Link from "next/link";
+import { Img } from "@/components/ui/Img";
 import { normalizeDriveLink } from "@/lib/drive-utils";
 
 export const dynamic = "force-dynamic";
@@ -30,7 +30,7 @@ export default async function EventsPage() {
               <div className="mt-3 flex gap-2 overflow-auto">
                 {e.images.slice(0,3).map(img => (
                   <div key={img} className="relative h-24 w-32 rounded overflow-hidden">
-                    <Image src={normalizeDriveLink(img)} alt="" fill className="object-cover" unoptimized />
+                    <Img src={img} alt="" fill className="object-cover" />
                   </div>
                 ))}
               </div>

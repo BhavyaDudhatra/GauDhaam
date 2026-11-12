@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -21,6 +20,7 @@ import { getStore } from "@/lib/store";
 import { site } from "@/lib/site";
 import { submitFeedbackAction } from "@/lib/actions/feedback";
 import { StarRating } from "@/components/ui/star-rating";
+import { Img } from "@/components/ui/Img";
 
 export const dynamic = "force-dynamic";
 
@@ -144,8 +144,8 @@ export default async function OrderPage({
                       href={`/product/${item.slug}`}
                       className="relative h-16 w-16 shrink-0 overflow-hidden rounded-[12px] border border-line bg-light"
                     >
-                      <Image
-                        src={normalizeDriveLink(item.image || "/assets/images/Ghee.jpg")}
+                      <Img
+                        src={item.image || "/assets/images/Ghee.jpg"}
                         alt={item.name}
                         fill
                         sizes="64px"

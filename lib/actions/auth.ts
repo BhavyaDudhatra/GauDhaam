@@ -322,6 +322,33 @@ export async function forgotPasswordRequestAction(
   };
 }
 
+export async function resendPasswordResetOtpAction(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const email = clean(formData.get("email"), 200).toLowerCase();
+  if (!isEmail(email)) return { error: "Enter a valid email address." };
+  const db = await getDb();
+  if (!db) return { error: "Database not configured." };
+  const ref = db.collection("password_resets").doc(email);
+  const doc = await ref.get();
+  if (!doc.exists) return { error: "No pending reset. Request a new code." };
+  const code = generateOtp();
+  const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
+  await ref.update({
+    code,
+    expiresAt,
+    attempts: 0,
+  });
+  await sendOtpEmail(email, code);
+  return {
+    step: "otp",
+    email,
+    success: `A new reset code is on its way to ${email}.`,
+    expiresAt: Date.now() + 5 * 60 * 1000,
+  };
+}
+
 export async function verifyForgotPasswordAction(
   _prev: FormState,
   formData: FormData,

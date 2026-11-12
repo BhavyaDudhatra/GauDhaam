@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { deleteProductAction, toggleProductAction } from "@/lib/actions/admin";
 import { formatINR } from "@/lib/money";
 import { activeVariants, priceRange, variantStock } from "@/lib/pricing";
 import { getStore } from "@/lib/store";
-import { normalizeDriveLink } from "@/lib/drive-utils";
+import { Img } from "@/components/ui/Img";
 
 export const metadata: Metadata = { title: "Products · Admin" };
 export const dynamic = "force-dynamic";
@@ -63,13 +62,12 @@ export default async function AdminProductsPage({
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-lg border border-line bg-light">
-                          <Image
-                            src={normalizeDriveLink(product.images[0] ?? "/assets/images/Ghee.jpg")}
+                          <Img
+                            src={product.images[0] ?? "/assets/images/Ghee.jpg"}
                             alt={product.name}
                             fill
                             sizes="44px"
                             className="object-cover"
-                            unoptimized
                           />
                         </div>
                         <div className="min-w-0">

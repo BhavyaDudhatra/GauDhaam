@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Img } from "@/components/ui/Img";
 import {
   ArrowRight,
   Check,
@@ -598,13 +598,12 @@ export function CheckoutForm({
                 {lines.map((line) => (
                   <li key={`${line.productId}:${line.variantId}`} className="flex gap-3 py-3.5">
                     <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-[10px] border border-line bg-light">
-                      <Image
+                      <Img
                         src={line.image}
                         alt={line.name}
                         fill
                         sizes="56px"
                         className="object-cover"
-                        unoptimized
                       />
                       <span className="absolute right-0 top-0 grid h-[18px] min-w-[18px] place-items-center rounded-bl-[8px] rounded-tr-[9px] bg-brand px-1 text-[10px] font-bold text-white">
                         {line.qty}

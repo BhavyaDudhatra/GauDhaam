@@ -1,16 +1,11 @@
-import Image, { type ImageProps } from "next/image";
+import { Img } from "@/components/ui/Img";
 
 /**
- * Local artwork is optimised by Next; Google Drive links are served directly.
+ * Renders an  tag. Google Drive links are normalized to a direct image URL.
+ * No Next.js image optimization — the browser handles the src directly.
  */
-export function SmartImage({ src, alt, ...props }: ImageProps) {
-  const remote = typeof src === "string" && /^https?:/i.test(src);
-  return (
-    <Image
-      src={src}
-      alt={alt}
-      unoptimized={remote || props.unoptimized}
-      {...props}
-    />
-  );
+export function SmartImage({ src, alt, ...props }: React.ImgHTMLAttributes<HTMLImageElement>) {
+  return <Img src={src} alt={alt} {...props} />;
 }
+
+export default SmartImage;

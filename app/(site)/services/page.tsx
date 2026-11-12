@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Check, Leaf } from "lucide-react";
 import { getStore } from "@/lib/store";
-import { normalizeDriveLink } from "@/lib/drive-utils";
+import { Img } from "@/components/ui/Img";
 
 export const dynamic = "force-dynamic";
 
@@ -48,13 +47,13 @@ export default async function ServicesPage() {
                   index % 2 === 1 ? "lg:order-2" : ""
                 }`}
               >
-                <Image
-                  src={normalizeDriveLink(service.images?.[0] ?? "/assets/images/banner.jpg")}
+                <Img
+                  src={service.images?.[0] ?? "/assets/images/banner.jpg"}
                   alt={service.name}
                   fill
                   sizes="(max-width: 1024px) 100vw, 580px"
                   className="object-cover"
-                  unoptimized
+                  priority
                 />
                 <span className="absolute left-4 top-4 grid h-9 w-9 place-items-center rounded-full bg-cream/90 text-[12px] font-bold text-brand-dark backdrop-blur">
                   0{index + 1}

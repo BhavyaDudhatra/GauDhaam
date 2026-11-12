@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -10,6 +9,7 @@ import {
   Sprout,
 } from "lucide-react";
 import { GalleryGrid } from "@/components/about/gallery-grid";
+import { Img } from "@/components/ui/Img";
 
 export const metadata: Metadata = {
   title: "Our story",
@@ -84,7 +84,7 @@ export default function AboutPage() {
 
           <div className="relative">
             <div className="relative aspect-[4/3] overflow-hidden rounded-banner border border-line bg-white">
-              <Image
+              <Img
                 src="/assets/images/aboutus.jpg"
                 alt="Fields and a farmhouse at the GauDhaam farm"
                 fill
@@ -186,7 +186,7 @@ export default function AboutPage() {
             <span className="eyebrow">How we got here</span>
             <h2 className="mt-2">Slowly, and in the right order</h2>
             <div className="relative mt-6 hidden aspect-[4/5] overflow-hidden rounded-banner border border-line lg:block">
-              <Image
+              <Img
                 src="/assets/images/gheehome.jpg"
                 alt="A jar of ghee and a wooden spoon"
                 fill
@@ -236,7 +236,7 @@ export default function AboutPage() {
       <section className="section pt-0">
         <div className="container-gd">
           <div className="relative overflow-hidden rounded-banner border border-line">
-            <Image
+            <Img
               src="/assets/images/herbalbanner.jpg"
               alt=""
               fill

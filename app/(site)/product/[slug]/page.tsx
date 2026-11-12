@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Check, ChevronRight, Leaf, Package, ShieldCheck, Truck } from "lucide-react";
@@ -8,6 +7,7 @@ import { ProductCard } from "@/components/product/product-card";
 import { SubscribeButton } from "@/components/product/subscribe-button";
 import { getSession } from "@/lib/auth";
 import { getStore } from "@/lib/store";
+import { Img } from "@/components/ui/Img";
 import { normalizeDriveLink } from "@/lib/drive-utils";
 import { submitFeedbackAction } from "@/lib/actions/feedback";
 import { StarRating } from "@/components/ui/star-rating";
@@ -110,14 +110,13 @@ export default async function ProductPage({ params }: PageProps) {
         <div className="container-gd grid gap-8 lg:grid-cols-[1.02fr_0.98fr] lg:gap-12">
           <div className="relative">
             <div className="relative aspect-square overflow-hidden rounded-banner border border-line bg-light">
-              <Image
+              <Img
                 src={image}
                 alt={product.name}
                 fill
                 priority
                 sizes="(max-width: 1024px) 100vw, 560px"
                 className="object-cover"
-                unoptimized
               />
               {product.featured && (
                 <span className="badge absolute bottom-4 left-4 border border-line bg-cream/90 text-brand-dark backdrop-blur">
@@ -133,13 +132,12 @@ export default async function ProductPage({ params }: PageProps) {
                     key={`${src}-${index}`}
                     className="relative aspect-square overflow-hidden rounded-2xl border border-line"
                   >
-                    <Image
-                      src={normalizeDriveLink(src)}
+                    <Img
+                      src={src}
                       alt={`${product.name} ${index + 1}`}
                       fill
                       sizes="160px"
                       className="object-cover"
-                      unoptimized
                     />
                   </div>
                 ))}
@@ -260,7 +258,7 @@ export default async function ProductPage({ params }: PageProps) {
             <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
               {product.galleryImages.filter(Boolean).map((src, idx) => (
                 <div key={src + idx} className="relative aspect-square overflow-hidden rounded-2xl border border-line bg-light">
-                  <Image src={normalizeDriveLink(src)} alt={`Gallery ${idx+1}`} fill className="object-cover" unoptimized />
+                  <Img src={src} alt={`Gallery ${idx+1}`} fill className="object-cover" />
                 </div>
               ))}
             </div>

@@ -1,9 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Image from "next/image";
 import { ArrowDown, ArrowUp, ImagePlus, Link2, Loader2, Trash2 } from "lucide-react";
-import { normalizeDriveLink } from "@/lib/drive-utils";
+import { Img } from "@/components/ui/Img";
 
 export function ImageManager({
   value,
@@ -108,13 +107,12 @@ export function ImageManager({
               className="overflow-hidden rounded-xl border border-line bg-white"
             >
               <div className="relative aspect-square bg-light">
-                <Image
-                  src={normalizeDriveLink(src)}
+                <Img
+                  src={src}
                   alt={`Image ${index + 1}`}
                   fill
                   sizes="160px"
                   className="object-cover"
-                  unoptimized
                 />
                 {index === 0 && (
                   <span className="absolute left-1.5 top-1.5 rounded-full bg-brand px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">

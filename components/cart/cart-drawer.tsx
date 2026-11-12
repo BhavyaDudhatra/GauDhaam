@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect } from "react";
 import { ArrowRight, ShoppingBag, Trash2, X } from "lucide-react";
@@ -8,6 +7,7 @@ import { useCart } from "@/components/cart/cart-context";
 import { QuantityStepper } from "@/components/cart/quantity-stepper";
 import { formatINR } from "@/lib/money";
 import { site } from "@/lib/site";
+import { Img } from "@/components/ui/Img";
 
 export function CartDrawer() {
   const {
@@ -113,13 +113,12 @@ export function CartDrawer() {
                         onClick={closeCart}
                         className="relative h-[74px] w-[74px] shrink-0 overflow-hidden rounded-[12px] border border-line bg-light"
                       >
-                        <Image
+                        <Img
                           src={line.image}
                           alt={line.name}
                           fill
                           sizes="74px"
                           className="object-cover"
-                          unoptimized
                         />
                       </Link>
 

@@ -1,12 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, ShoppingBag, Trash2, Truck } from "lucide-react";
 import { useCart } from "@/components/cart/cart-context";
 import { QuantityStepper } from "@/components/cart/quantity-stepper";
 import { formatINR, shippingFor } from "@/lib/money";
 import { site } from "@/lib/site";
+import { Img } from "@/components/ui/Img";
 
 export default function CartPage() {
   const { lines, hydrated, subtotal, setQty, removeItem, count } = useCart();
@@ -60,13 +60,12 @@ export default function CartPage() {
                           href={`/product/${line.slug}`}
                           className="relative h-[86px] w-[86px] shrink-0 overflow-hidden rounded-[14px] border border-line bg-light sm:h-24 sm:w-24"
                         >
-                          <Image
+                          <Img
                             src={line.image}
                             alt={line.name}
                             fill
                             sizes="96px"
                             className="object-cover"
-                            unoptimized
                           />
                         </Link>
 

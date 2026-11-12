@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
+import { Img } from "@/components/ui/Img";
 
 export function Logo({ compact = false }: { compact?: boolean }) {
   return (
@@ -8,7 +8,7 @@ export function Logo({ compact = false }: { compact?: boolean }) {
       className="flex items-center gap-2.5 rounded-btn focus-visible:outline-2"
       aria-label="GauDhaam home"
     >
-      <Image
+      <Img
         src="/assets/images/gaudhamlogo.png"
         alt=""
         width={44}

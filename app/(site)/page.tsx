@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Leaf, ShieldCheck, Sparkles, Truck } from "lucide-react";
 import { ProductCard } from "@/components/product/product-card";
 import { getStore } from "@/lib/store";
 import { getDb } from "@/lib/firebase";
-import { normalizeDriveLink } from "@/lib/drive-utils";
+import { Img } from "@/components/ui/Img";
 
 export const dynamic = "force-dynamic";
 
@@ -97,7 +96,11 @@ export default async function HomePage() {
               <div className="flex overflow-x-auto gap-4 py-4">
                 {slides.map(s => (
                   <div key={s.id} className="min-w-[320px] shrink-0">
-                    <img src={normalizeDriveLink(s.imageUrl)} alt={s.title} className="h-48 w-full object-cover rounded-card"/>
+                    <Img
+                      src={s.imageUrl}
+                      alt={s.title}
+                      className="h-48 w-full object-cover rounded-card"
+                    />
                     <div className="mt-2 p-3 bg-white rounded-card border border-line">
                       <h3 className="text-[16px] font-semibold">{s.title}</h3>
                       <p className="text-[13px] text-body/80">{s.subtitle}</p>

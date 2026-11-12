@@ -46,8 +46,6 @@ export function createFallbackStore(): Store {
   const subscriptions: any[] = [];
   const dailyDeliveries: any[] = [];
   const b2bOrders: any[] = [];
-  const messageThreads: any[] = [];
-  const userMessages: any[] = [];
   const gallery: any[] = [];
   const events: any[] = [];
 
@@ -282,33 +280,6 @@ export function createFallbackStore(): Store {
       remove: async (id: string) => {
         const idx = messages.findIndex((m: any) => m.id === id);
         if (idx >= 0) messages.splice(idx, 1);
-      },
-    },
-    userMessages: {
-      listThreads: async (userId?: string) => {
-        return messageThreads.filter(t => !userId || t.userId === userId) as any;
-      },
-      getThread: async (id: string) => {
-        const thread = messageThreads.find(t => t.id === id);
-        if (!thread) return null;
-        const msgs = userMessages.filter(m => m.threadId === id);
-        return { thread, messages: msgs } as any;
-      },
-      createThread: async (input: any) => {
-        const id = localId('thread');
-        const now = nowIso;
-        const thread = { id, userId: input.userId, subject: input.subject, createdAt: now, updatedAt: now };
-        messageThreads.push(thread);
-        const msg = { id: localId('msg'), threadId: id, senderId: input.userId, senderRole: 'user', body: input.body, createdAt: now };
-        userMessages.push(msg);
-        return thread as any;
-      },
-      sendMessage: async (input: any) => {
-        const msg = { id: localId('msg'), threadId: input.threadId, senderId: input.senderId, senderRole: input.senderRole, body: input.body, createdAt: nowIso };
-        userMessages.push(msg);
-        const thread = messageThreads.find(t => t.id === input.threadId);
-        if (thread) thread.updatedAt = nowIso;
-        return msg as any;
       },
     },
     subscriptions: {
