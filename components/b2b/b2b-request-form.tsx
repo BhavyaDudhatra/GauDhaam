@@ -98,10 +98,31 @@ export function B2BRequestForm({
         </label>
       </div>
       {pickup === 'delivery' && (
-        <label className="field">
-          <span className="label">Full address</span>
-          <textarea name="address" required className="textarea" placeholder="House no, street, city, pincode" />
-        </label>
+        <div className="space-y-3 rounded-card border border-line p-4">
+          <h3 className="text-[14px] font-semibold">Delivery address</h3>
+          <label className="field">
+            <span className="label">Address line 1</span>
+            <input name="line1" required={pickup === 'delivery'} className="input" placeholder="House / flat, building, street" />
+          </label>
+          <label className="field">
+            <span className="label">Address line 2 (optional)</span>
+            <input name="line2" className="input" placeholder="Area, landmark" />
+          </label>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <label className="field">
+              <span className="label">City</span>
+              <input name="city" required={pickup === 'delivery'} className="input" placeholder="City" />
+            </label>
+            <label className="field">
+              <span className="label">PIN code</span>
+              <input name="pincode" required={pickup === 'delivery'} inputMode="numeric" pattern="[1-9][0-9]{5}" maxLength={6} className="input" placeholder="6-digit PIN" />
+            </label>
+          </div>
+          <label className="field">
+            <span className="label">State</span>
+            <input name="state" required={pickup === 'delivery'} className="input" placeholder="State" />
+          </label>
+        </div>
       )}
       <label className="field">
         <span className="label">Deadline for delivery</span>

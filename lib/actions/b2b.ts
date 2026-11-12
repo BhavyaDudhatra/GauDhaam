@@ -64,7 +64,11 @@ export async function submitB2BRequestAction(
   const phone = normalisePhone(clean(formData.get("phone"), 20));
   const gstNumber = clean(formData.get("gstNumber"), 20).toUpperCase();
   const pickupOption = clean(formData.get("pickupOption"), 20);
-  const address = clean(formData.get("address"), 500);
+  const line1 = clean(formData.get("line1"), 240);
+  const line2 = clean(formData.get("line2"), 240);
+  const city = clean(formData.get("city"), 120);
+  const state = clean(formData.get("state"), 120);
+  const pincode = clean(formData.get("pincode"), 10);
   const deadline = clean(formData.get("deadline"), 20);
   const itemName = clean(formData.get("itemName"), 200);
   const quantityRaw = clean(formData.get("quantity"), 10);
@@ -74,11 +78,18 @@ export async function submitB2BRequestAction(
   if (fullName.length < 2) return { error: "Enter full name." };
   if (!isPhone(phone)) return { error: "Enter valid 10-digit mobile." };
   if (!['self','delivery'].includes(pickupOption)) return { error: "Choose pickup option." };
-  if (pickupOption === 'delivery' && address.length < 10) return { error: "Enter delivery address." };
+  if (pickupOption === 'delivery') {
+    if (line1.length < 4 || !city || !state) return { error: "Enter complete delivery address (line 1, city, state)." };
+    if (!/^[1-9][0-9]{5}$/.test(pincode)) return { error: "Enter a valid 6-digit PIN code." };
+  }
   if (!deadline) return { error: "Select delivery deadline." };
   if (!itemName) return { error: "Enter item name." };
   const quantity = Number(quantityRaw);
   if (!quantity || quantity < 1) return { error: "Enter valid quantity." };
+
+  const address = pickupOption === 'delivery'
+    ? [line1, line2, city, state, pincode].filter(Boolean).join(", ")
+    : "";
 
   let deliveryCharge = 0;
   let distanceKm = 0;
