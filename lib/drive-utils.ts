@@ -16,6 +16,6 @@ export function normalizeDriveLink(link: string) {
   if (!trimmed) return "";
   const id = driveFileId(trimmed);
   if (!id) return trimmed;
-  // Google Drive public sharing URL - most reliable for embedded images
-  return `https://drive.google.com/uc?export=view&id=${id}`;
+  // Use lh3.googleusercontent.com direct image URL with size hint
+  return `https://lh3.googleusercontent.com/d/${id}=w2000`;
 }
