@@ -119,6 +119,7 @@ export function CartDrawer() {
                           fill
                           sizes="74px"
                           className="object-cover"
+                          unoptimized
                         />
                       </Link>
 
