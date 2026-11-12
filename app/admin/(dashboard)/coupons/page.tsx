@@ -83,7 +83,7 @@ export default async function AdminCouponsPage({
                     {coupon.minOrderValue ? formatINR(coupon.minOrderValue) : "—"}
                   </td>
                   <td className="px-4 py-3 text-body">
-                    {coupon.usedCount}
+                    {coupon.usedCount ?? 0}
                     {coupon.usageLimit ? ` / ${coupon.usageLimit}` : ""}
                   </td>
                   <td className="px-4 py-3 text-[11.5px] text-body">

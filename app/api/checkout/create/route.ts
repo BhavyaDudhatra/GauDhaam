@@ -204,7 +204,13 @@ export async function POST(request: Request) {
         couponId = coupon.id;
         discountCode = coupon.code;
         // Increment usage
-        await store.coupons.incrementUsage(coupon.id);
+        console.log("[CHECKOUT] Incrementing usage for coupon:", coupon.id);
+        try {
+          await store.coupons.incrementUsage(coupon.id);
+          console.log("[CHECKOUT] Usage incremented successfully");
+        } catch (e) {
+          console.error("[CHECKOUT] Failed to increment usage:", e);
+        }
       }
     }
   }
