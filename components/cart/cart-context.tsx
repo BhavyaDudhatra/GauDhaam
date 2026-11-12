@@ -135,8 +135,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [isOpen]);
 
   const addItem = useCallback((item: AddableItem, qty = 1) => {
+    // If auth is still loading, wait and retry
+    if (userId === undefined) {
+      setTimeout(() => addItem(item, qty), 200);
+      return;
+    }
     // Require login to add to cart
-    if (!userId) {
+    if (userId === null) {
       const currentPath = window.location.pathname;
       router.push(`/login?next=${encodeURIComponent(currentPath)}`);
       return;

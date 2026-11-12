@@ -32,7 +32,11 @@ export async function getDb() {
   const db = getFirestore();
 
   if (!settingsApplied) {
-    db.settings({ ignoreUndefinedProperties: true });
+    try {
+      db.settings({ ignoreUndefinedProperties: true });
+    } catch {
+      // Settings already applied or Firestore already initialized
+    }
     settingsApplied = true;
   }
 
