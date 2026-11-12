@@ -6,6 +6,7 @@ import { AuthForm } from "@/components/auth/auth-form";
 import { getSession } from "@/lib/auth";
 import { getStore } from "@/lib/store";
 import { site } from "@/lib/site";
+import { Img } from "@/components/ui/Img";
 
 export const dynamic = "force-dynamic";
 
@@ -53,7 +54,7 @@ export default async function LoginPage({
 
       <div className="mt-4 grid overflow-hidden rounded-banner border border-line bg-white lg:grid-cols-2">
         <div className="relative hidden min-h-[560px] lg:block">
-          <Image
+          <Img
             src="/assets/images/aboutus.jpg"
             alt="The GauDhaam farm at golden hour"
             fill

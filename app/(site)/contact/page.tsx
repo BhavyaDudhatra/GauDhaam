@@ -10,6 +10,7 @@ import {
 import { ContactForm } from "@/components/site/contact-form";
 import { getStore } from "@/lib/store";
 import { site } from "@/lib/site";
+import { Img } from "@/components/ui/Img";
 
 export const dynamic = "force-dynamic";
 
@@ -50,7 +51,7 @@ export default async function ContactPage({
         <div className="container-gd grid gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:gap-8">
           <div className="space-y-4">
             <div className="relative aspect-[4/3] overflow-hidden rounded-banner border border-line">
-              <Image
+              <Img
                 src="/assets/images/conus.jpg"
                 alt="The fields around the GauDhaam farm"
                 fill

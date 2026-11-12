@@ -5,6 +5,7 @@ import { ArrowLeft, Leaf } from "lucide-react";
 import { AuthForm } from "@/components/auth/auth-form";
 import { getSession } from "@/lib/auth";
 import { getStore } from "@/lib/store";
+import { Img } from "@/components/ui/Img";
 
 export const dynamic = "force-dynamic";
 
@@ -43,7 +44,7 @@ export default async function RegisterPage({
 
       <div className="mt-4 grid overflow-hidden rounded-banner border border-line bg-white lg:grid-cols-2">
         <div className="relative hidden min-h-[640px] lg:block">
-          <Image
+          <Img
             src="/assets/images/conus.jpg"
             alt="Fields at the GauDhaam farm"
             fill
