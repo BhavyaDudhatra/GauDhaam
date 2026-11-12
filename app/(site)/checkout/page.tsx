@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { CheckoutForm } from "@/components/checkout/checkout-form";
 import { getSession } from "@/lib/auth";
 import { isPaymentSimulationAllowed, isRazorpayConfigured } from "@/lib/razorpay";
@@ -13,8 +14,14 @@ export const metadata: Metadata = {
 
 export default async function CheckoutPage() {
   const session = await getSession();
+  if (!session) {
+    redirect("/login?next=%2Fcheckout");
+  }
   const store = await getStore();
-  const user = session ? await store.users.get(session.id) : null;
+  const user = await store.users.get(session.id);
+  if (!user) {
+    redirect("/login?next=%2Fcheckout");
+  }
 
   const paymentMode: "live" | "simulate" | "unavailable" = isRazorpayConfigured()
     ? "live"

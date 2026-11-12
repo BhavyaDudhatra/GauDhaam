@@ -185,7 +185,31 @@ export async function POST(request: Request) {
     }
   }
   const shipping = deliveryCharge;
-  const total = subtotal + shipping;
+  
+  // Handle coupon discount
+  let discount = 0;
+  let couponId: string | undefined;
+  let discountCode: string | undefined;
+  const couponCodeRaw = clean(String(payload.couponCode ?? ""), 40).toUpperCase();
+  const couponIdRaw = clean(String(payload.couponId ?? ""), 80);
+  const clientDiscount = Number(payload.discount) || 0;
+  
+  if (couponCodeRaw && session?.role === "user") {
+    const coupon = await store.coupons.getByCode(couponCodeRaw);
+    if (coupon) {
+      const { evaluateCoupon } = await import("@/lib/pricing");
+      const result = evaluateCoupon(coupon, subtotal);
+      if (result.ok) {
+        discount = result.discount;
+        couponId = coupon.id;
+        discountCode = coupon.code;
+        // Increment usage
+        await store.coupons.incrementUsage(coupon.id);
+      }
+    }
+  }
+  
+  const total = Math.max(0, subtotal + shipping - discount);
 
   // create order
   const order = await store.orders.create({
@@ -205,9 +229,9 @@ export async function POST(request: Request) {
     items,
     subtotal,
     shipping,
-    discount: 0,
-    discountCode: undefined,
-    couponId: undefined,
+    discount,
+    discountCode,
+    couponId,
     total,
     status: "pending",
     payment: {

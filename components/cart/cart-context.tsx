@@ -9,6 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useRouter } from "next/navigation";
 
 export type CartLine = {
   productId: string;
@@ -80,6 +81,7 @@ function readStored(key: string): CartLine[] {
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
+  const router = useRouter();
   const [lines, setLines] = useState<CartLine[]>([]);
   const [hydrated, setHydrated] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -133,6 +135,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [isOpen]);
 
   const addItem = useCallback((item: AddableItem, qty = 1) => {
+    // Require login to add to cart
+    if (!userId) {
+      const currentPath = window.location.pathname;
+      router.push(`/login?next=${encodeURIComponent(currentPath)}`);
+      return;
+    }
     if (item.stock <= 0) return;
     const key = lineKey(item);
     setLines((current) => {
@@ -160,7 +168,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       ];
     });
     setIsOpen(true);
-  }, []);
+  }, [userId, router]);
 
   const setQty = useCallback((key: string, qty: number) => {
     setLines((current) =>

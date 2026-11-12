@@ -74,9 +74,14 @@ export function CheckoutForm({
   const [fulfillment, setFulfillment] = useState<"delivery" | "self">("delivery");
   const [deliveryCharge, setDeliveryCharge] = useState<number>(0);
   const [pincode, setPincode] = useState<string>(selectedAddress?.pincode ?? "");
+  const [couponCode, setCouponCode] = useState("");
+  const [couponApplied, setCouponApplied] = useState<{ code: string; discount: number; couponId: string } | null>(null);
+  const [couponError, setCouponError] = useState("");
+  const [couponBusy, setCouponBusy] = useState(false);
 
   const shipping = fulfillment === "self" ? 0 : deliveryCharge;
-  const total = subtotal + shipping;
+  const discount = couponApplied?.discount ?? 0;
+  const total = Math.max(0, subtotal + shipping - discount);
   const canPay = paymentMode !== "unavailable" && lines.length > 0;
 
   useEffect(()=>{
@@ -192,6 +197,36 @@ export function CheckoutForm({
     setBusy(false);
   }
 
+  async function applyCoupon() {
+    if (!couponCode.trim()) return;
+    setCouponBusy(true);
+    setCouponError("");
+    try {
+      const res = await fetch("/api/coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: couponCode, subtotal }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        setCouponError(data.error || "Invalid coupon code.");
+        setCouponApplied(null);
+        return;
+      }
+      setCouponApplied({ code: data.code, discount: data.discount, couponId: data.couponId });
+    } catch {
+      setCouponError("Could not validate coupon. Try again.");
+    } finally {
+      setCouponBusy(false);
+    }
+  }
+
+  function removeCoupon() {
+    setCouponApplied(null);
+    setCouponCode("");
+    setCouponError("");
+  }
+
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!canPay || busy) return;
@@ -219,6 +254,9 @@ export function CheckoutForm({
       notes: String(formData.get("notes") ?? ""),
       fulfillment: String(formData.get("fulfillment") ?? "delivery"),
       savedAddressId: String(formData.get("savedAddress") ?? ""),
+      couponCode: couponApplied?.code ?? "",
+      couponId: couponApplied?.couponId ?? "",
+      discount: couponApplied?.discount ?? 0,
     };
 
     try {
@@ -501,6 +539,42 @@ export function CheckoutForm({
             </div>
 
             <div className="card p-5 md:p-6">
+              <h2 className="text-[16px]">Coupon code</h2>
+              <div className="mt-3 flex gap-2">
+                <input
+                  type="text"
+                  value={couponCode}
+                  onChange={e => setCouponCode(e.target.value.toUpperCase())}
+                  placeholder="Enter coupon code"
+                  className="input flex-1"
+                  disabled={!!couponApplied}
+                />
+                {couponApplied ? (
+                  <button type="button" onClick={removeCoupon} className="btn btn-outline btn-sm">
+                    Remove
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={applyCoupon}
+                    disabled={couponBusy || !couponCode.trim()}
+                    className="btn btn-primary btn-sm"
+                  >
+                    {couponBusy ? "Checking…" : "Apply"}
+                  </button>
+                )}
+              </div>
+              {couponError && (
+                <p className="mt-2 text-[12px] text-red-600">{couponError}</p>
+              )}
+              {couponApplied && (
+                <p className="mt-2 text-[12px] text-green-700">
+                  Coupon {couponApplied.code} applied — you save ₹{couponApplied.discount}!
+                </p>
+              )}
+            </div>
+
+            <div className="card p-5 md:p-6">
               <h2 className="text-[16px]">Payment</h2>
               <div className="mt-3 flex items-start gap-3 rounded-xl border border-brand/25 bg-light/60 p-3.5">
                 <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white text-brand">
@@ -635,6 +709,12 @@ export function CheckoutForm({
                     {shipping === 0 ? "Free" : formatINR(shipping)}
                   </dd>
                 </div>
+                {discount > 0 && (
+                  <div className="flex justify-between text-green-700">
+                    <dt>Coupon ({couponApplied?.code})</dt>
+                    <dd className="font-semibold">-{formatINR(discount)}</dd>
+                  </div>
+                )}
                 <div className="flex justify-between border-t border-line pt-3 text-[15px]">
                   <dt className="font-semibold text-brand-dark">Total</dt>
                   <dd className="font-bold text-brand-dark">{formatINR(total)}</dd>
