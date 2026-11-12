@@ -103,11 +103,11 @@ export async function submitB2BRequestAction(
   const session = await getSession();
   await store.b2bOrders.create({
     userId: session?.id ?? null,
-    orderType,
+    orderType: orderType as 'bulk' | 'hamper',
     fullName,
     phone,
     gstNumber: gstNumber || undefined,
-    pickupOption,
+    pickupOption: pickupOption as 'self' | 'delivery',
     address: pickupOption === 'delivery' ? address : '',
     deadline,
     itemName,
@@ -115,7 +115,6 @@ export async function submitB2BRequestAction(
     notes,
     deliveryCharge,
     distanceKm,
-    status: 'pending',
   });
 
   revalidatePath("/admin/b2b");
@@ -166,7 +165,7 @@ export async function payB2BOrderAction(formData: FormData) {
   // Create Razorpay order
   const { createRazorpayOrder, razorpayKeyId } = await import("@/lib/razorpay");
   const amount = Math.round((order.priceQuoted + (order.deliveryCharge || 0)) * 100);
-  const rzpOrder = await createRazorpayOrder(amount, `B2B-${order.id}`);
+  const rzpOrder = await createRazorpayOrder({ amount, receipt: `B2B-${order.id}` });
   // Store payment reference
   const db = await getDb();
   if (db) {

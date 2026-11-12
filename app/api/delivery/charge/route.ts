@@ -27,6 +27,7 @@ export async function GET(request: Request) {
   if (!address) return NextResponse.json({error:'address required'}, {status:400});
   
   const db = await getDb();
+  if (!db) return NextResponse.json({charge:0, distance:0});
   const branchesSnap = await db.collection('branches').get();
   const branches = branchesSnap.docs.map(d=>({id:d.id,...d.data() as any}));
   if (branches.length === 0) return NextResponse.json({charge:0, distance:0});

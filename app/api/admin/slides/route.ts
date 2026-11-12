@@ -12,7 +12,9 @@ export async function POST(request: Request) {
   const order = Number(form.get('order')||0);
   if (!title || !imageUrl) return NextResponse.json({error:'title and image required'}, {status:400});
   const db = await getDb();
-  const doc = db.collection('slides').doc();
-  await doc.set({title, subtitle, imageUrl, link, order, createdAt: new Date().toISOString()});
+  if (db) {
+    const doc = db.collection('slides').doc();
+    await doc.set({title, subtitle, imageUrl, link, order, createdAt: new Date().toISOString()});
+  }
   return NextResponse.redirect(new URL('/admin/slides', request.url));
 }

@@ -198,7 +198,7 @@ export default async function OrderPage({
                     ) : (
                       <p className="text-[12px] text-body/70 mt-1">No reviews yet.</p>
                     )}
-                    <form action={submitFeedbackAction} className="mt-3 grid gap-2 sm:grid-cols-2">
+                    <form action={async (formData: FormData) => { await submitFeedbackAction(formData); }} className="mt-3 grid gap-2 sm:grid-cols-2">
                       <input type="hidden" name="productId" value={item.productId} />
                       <input type="hidden" name="productName" value={item.name} />
                       <div className="field">

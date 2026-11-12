@@ -6,14 +6,14 @@ export const dynamic = "force-dynamic";
 export default async function AdminBranchesPage() {
   await requireAdmin();
   const db = await getDb();
-  let branches = [];
+  let branches: any[] = [];
   if (db) {
     try {
       const snap = await db.collection('branches').orderBy('createdAt','desc').get();
       branches = snap.docs.map(d=>({id:d.id,...d.data()}));
     } catch {
       const snap = await db.collection('branches').get();
-      branches = snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=> (b.createdAt||'').localeCompare(a.createdAt||''));
+      branches = snap.docs.map(d=>({id:d.id,...d.data()})).sort((a:any,b:any)=> (b.createdAt||'').localeCompare(a.createdAt||''));
     }
   }
   return (

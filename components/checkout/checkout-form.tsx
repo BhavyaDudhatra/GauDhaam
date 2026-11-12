@@ -412,7 +412,7 @@ export function CheckoutForm({
                           name="savedAddress"
                           value={addr.id}
                           checked={selectedAddressId === addr.id}
-                          onChange={() => setSelectedAddressId(addr.id)}
+                          onChange={() => setSelectedAddressId(addr.id ?? null)}
                         />
                         <div>
                           <p className="font-semibold">{addr.label}{addr.isDefault ? " • Default" : ""}</p>

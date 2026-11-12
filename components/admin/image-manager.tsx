@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { ArrowDown, ArrowUp, ImagePlus, Link2, Loader2, Trash2 } from "lucide-react";
 import { Img } from "@/components/ui/Img";
+import { normalizeDriveLink } from "@/lib/drive-utils";
 
 export function ImageManager({
   value,

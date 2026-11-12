@@ -14,7 +14,7 @@ export default async function MyOrdersAggregationPage() {
   if (!user) redirect("/login?next=/account/orders");
 
   const orders = await store.orders.list({ userId: user.id });
-  const b2b = await store.b2b.list({ userId: user.id });
+  const b2b = await store.b2bOrders.list({ userId: user.id });
   const subscriptions = await store.subscriptions.list({ userId: user.id });
 
   return (
@@ -53,7 +53,7 @@ export default async function MyOrdersAggregationPage() {
               {b2b.map(b => (
                 <li key={b.id} className="py-3 flex items-center gap-3">
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium">{b.productName || b.productId} • {formatDate(b.createdAt)}</p>
+                    <p className="font-medium">{b.itemName || 'B2B order'} • {formatDate(b.createdAt)}</p>
                     <p className="text-[12px] text-body/70">{b.status}</p>
                   </div>
                   <Link href="/b2b" className="btn btn-outline btn-sm">Reorder</Link>
@@ -72,8 +72,8 @@ export default async function MyOrdersAggregationPage() {
               {subscriptions.map(s => (
                 <li key={s.id} className="py-3 flex items-center gap-3">
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium">{s.productName} • {s.frequency}</p>
-                    <p className="text-[12px] text-body/70">Next delivery: {formatDate(s.nextDeliveryDate ?? s.createdAt)}</p>
+                    <p className="font-medium">{s.productId} • {s.frequency}</p>
+                    <p className="text-[12px] text-body/70">Started: {formatDate(s.createdAt)}</p>
                   </div>
                   <Link href={`/subscriptions/${s.id}`} className="btn btn-outline btn-sm">Manage</Link>
                 </li>

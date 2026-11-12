@@ -6,8 +6,8 @@ export const dynamic = "force-dynamic";
 export default async function DeliveryConfigPage() {
   await requireAdmin();
   const db = await getDb();
-  const snap = await db.collection('config').doc('delivery').get();
-  const config = snap.exists ? snap.data() as any : {baseFee:0, perKmRate:0};
+  const snap = db ? await db.collection('config').doc('delivery').get() : null;
+  const config = snap && snap.exists ? snap.data() as any : {baseFee:0, perKmRate:0};
   return (
     <div className="space-y-6">
       <h1 className="text-[22px]">Delivery Config</h1>

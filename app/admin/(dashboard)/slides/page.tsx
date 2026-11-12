@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export default async function AdminSlidesPage() {
   await requireAdmin();
   const db = await getDb();
-  let slides = [];
+  let slides: any[] = [];
   if (db) {
     const snap = await db.collection('slides').orderBy('order','asc').get();
     slides = snap.docs.map(d=>({id:d.id,...d.data()}));

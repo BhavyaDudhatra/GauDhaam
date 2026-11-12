@@ -87,8 +87,8 @@ export type ComplimentaryItem = {
 export type ServiceInput = Omit<Service, "id" | "createdAt" | "updatedAt">;
 
 export type Address = {
-  id: string;
-  label: string;
+  id?: string;
+  label?: string;
   name: string;
   phone: string;
   line1: string;
@@ -96,7 +96,7 @@ export type Address = {
   city: string;
   state: string;
   pincode: string;
-  isDefault: boolean;
+  isDefault?: boolean;
 };
 
 export type User = {
@@ -135,16 +135,6 @@ export type OrderStatus =
   | "cancelled";
 
 export type PaymentStatus = "created" | "paid" | "failed" | "refunded";
-
-export type Address = {
-  name: string;
-  phone: string;
-  line1: string;
-  line2: string;
-  city: string;
-  state: string;
-  pincode: string;
-};
 
 export type OrderItem = {
   productId: string;

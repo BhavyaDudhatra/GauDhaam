@@ -28,7 +28,7 @@ export default async function B2BPayPage({ params }: { params: Promise<{ id: str
       const doc = await db.collection("b2bOrders").doc(id).get();
       razorpayOrderId = doc.data()?.razorpayOrderId || "";
       if (!razorpayOrderId) {
-        const rzp = await createRazorpayOrder(amount, `B2B-${id}`);
+        const rzp = await createRazorpayOrder({ amount, receipt: `B2B-${id}` });
         razorpayOrderId = rzp.id;
         await db.collection("b2bOrders").doc(id).update({
           razorpayOrderId,

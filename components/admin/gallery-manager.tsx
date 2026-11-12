@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { createGalleryItemAction, updateGalleryItemAction, deleteGalleryItemAction } from "@/lib/actions/admin";
+import { createGalleryItemAction, deleteGalleryItemAction } from "@/lib/actions/admin";
 import { ImageManager } from "@/components/admin/image-manager";
 import { Trash2 } from "lucide-react";
 import { Img } from "@/components/ui/Img";
@@ -20,7 +20,7 @@ export function GalleryManager({ items }: { items: GalleryItem[] }) {
         </label>
         <label className="field">
           <span className="label">Image URL</span>
-          <ImageManager onChange={(url)=>{ (document.querySelector('input[name="image"]') as HTMLInputElement).value = url; }} />
+          <ImageManager onChange={(urls)=>{ (document.querySelector('input[name="image"]') as HTMLInputElement).value = urls[0] ?? ""; }} />
           <input name="image" required className="input mt-2" placeholder="https://" />
         </label>
         <button className="btn btn-primary">Add</button>

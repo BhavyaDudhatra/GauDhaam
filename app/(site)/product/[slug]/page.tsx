@@ -270,7 +270,7 @@ export default async function ProductPage({ params }: PageProps) {
         <div className="container-gd">
           <h2 className="text-[18px] font-semibold">Reviews</h2>
           {session && hasPurchasedDelivered && (
-            <form action={submitFeedbackAction} className="mt-4 card p-4 space-y-3">
+            <form action={async (formData: FormData) => { await submitFeedbackAction(formData); }} className="mt-4 card p-4 space-y-3">
               <input type="hidden" name="productId" value={product.id} />
               <input type="hidden" name="productName" value={product.name} />
               <div className="field">

@@ -8,6 +8,6 @@ export async function POST(request: Request) {
   const baseFee = parseFloat(String(form.get('baseFee')||'0'));
   const perKmRate = parseFloat(String(form.get('perKmRate')||'0'));
   const db = await getDb();
-  await db.collection('config').doc('delivery').set({baseFee, perKmRate, updatedAt: new Date().toISOString()});
+  if (db) await db.collection('config').doc('delivery').set({baseFee, perKmRate, updatedAt: new Date().toISOString()});
   return NextResponse.redirect(new URL('/admin/delivery-config', request.url));
 }

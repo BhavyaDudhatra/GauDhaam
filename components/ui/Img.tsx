@@ -2,7 +2,7 @@
 
 import { normalizeDriveLink } from "@/lib/drive-utils";
 
-type ImgProps = {
+export type ImgProps = {
   src: string;
   alt?: string;
   className?: string;

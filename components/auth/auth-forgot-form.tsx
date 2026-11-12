@@ -68,7 +68,7 @@ export function AuthForgotForm() {
           </button>
           <div className="text-center">
             <button type="submit" formAction={resendAction} disabled={resendPending} className="link-underline text-[12px]">
-              {resendPending ? "Sending..." : timeLeft === 0 ? "Resend code" : `Resend code in ${Math.floor(timeLeft/60)}:${String(timeLeft%60).padStart(2,"0")}`}
+              {resendPending ? "Sending..." : timeLeft === 0 || timeLeft === null ? "Resend code" : `Resend code in ${Math.floor(timeLeft/60)}:${String(timeLeft%60).padStart(2,"0")}`}
             </button>
           </div>
         </form>
