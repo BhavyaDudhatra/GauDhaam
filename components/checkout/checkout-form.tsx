@@ -539,42 +539,6 @@ export function CheckoutForm({
             </div>
 
             <div className="card p-5 md:p-6">
-              <h2 className="text-[16px]">Coupon code</h2>
-              <div className="mt-3 flex gap-2">
-                <input
-                  type="text"
-                  value={couponCode}
-                  onChange={e => setCouponCode(e.target.value.toUpperCase())}
-                  placeholder="Enter coupon code"
-                  className="input flex-1"
-                  disabled={!!couponApplied}
-                />
-                {couponApplied ? (
-                  <button type="button" onClick={removeCoupon} className="btn btn-outline btn-sm">
-                    Remove
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={applyCoupon}
-                    disabled={couponBusy || !couponCode.trim()}
-                    className="btn btn-primary btn-sm"
-                  >
-                    {couponBusy ? "Checking…" : "Apply"}
-                  </button>
-                )}
-              </div>
-              {couponError && (
-                <p className="mt-2 text-[12px] text-red-600">{couponError}</p>
-              )}
-              {couponApplied && (
-                <p className="mt-2 text-[12px] text-green-700">
-                  Coupon {couponApplied.code} applied — you save ₹{couponApplied.discount}!
-                </p>
-              )}
-            </div>
-
-            <div className="card p-5 md:p-6">
               <h2 className="text-[16px]">Payment</h2>
               <div className="mt-3 flex items-start gap-3 rounded-xl border border-brand/25 bg-light/60 p-3.5">
                 <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white text-brand">
@@ -714,6 +678,36 @@ export function CheckoutForm({
                     <dt>Coupon ({couponApplied?.code})</dt>
                     <dd className="font-semibold">-{formatINR(discount)}</dd>
                   </div>
+                )}
+                <div className="mt-2 flex gap-2">
+                  <input
+                    type="text"
+                    value={couponCode}
+                    onChange={e => setCouponCode(e.target.value.toUpperCase())}
+                    placeholder="Coupon code"
+                    className="input input-sm flex-1"
+                    disabled={!!couponApplied}
+                  />
+                  {couponApplied ? (
+                    <button type="button" onClick={removeCoupon} className="btn btn-outline btn-xs">
+                      Remove
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={applyCoupon}
+                      disabled={couponBusy || !couponCode.trim()}
+                      className="btn btn-primary btn-xs"
+                    >
+                      {couponBusy ? "…" : "Apply"}
+                    </button>
+                  )}
+                </div>
+                {couponError && (
+                  <p className="text-[11px] text-red-600">{couponError}</p>
+                )}
+                {couponApplied && (
+                  <p className="text-[11px] text-green-700">Saved ₹{couponApplied.discount}!</p>
                 )}
                 <div className="flex justify-between border-t border-line pt-3 text-[15px]">
                   <dt className="font-semibold text-brand-dark">Total</dt>
