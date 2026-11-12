@@ -40,10 +40,9 @@ export default function ShippingPage() {
 
             <h2 className="mt-6 text-[17px]">Shipping charges</h2>
             <p>
-              <strong>Free delivery</strong> on orders of{" "}
-              <strong>₹{site.freeShippingAbove}</strong> and above. For orders
-              below that, a flat shipping fee of{" "}
-              <strong>₹{site.shippingFee}</strong> is applied at checkout.
+              A flat shipping fee of <strong>₹{site.shippingFee}</strong> is applied
+              at checkout for all orders. Delivery charges may vary based on your
+              location and the size of your order.
             </p>
 
             <h2 className="mt-6 text-[17px]">Tracking</h2>

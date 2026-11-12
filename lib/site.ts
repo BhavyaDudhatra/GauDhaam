@@ -9,7 +9,7 @@ export const site = {
   whatsapp: "+917096136182",
   address: "GauDhaam Farm, Indore, Madhya Pradesh, India",
   hours: "Mon – Sat, 10:00 am – 6:00 pm",
-  freeShippingAbove: 999,
+  freeShippingAbove: Infinity,
   shippingFee: 59,
   instagram: "https://www.instagram.com/gaudhaamorganic",
   facebook: "https://facebook.com",

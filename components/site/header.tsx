@@ -39,9 +39,8 @@ export function Header({ user }: { user: SessionUser | null }) {
     <header className="sticky top-0 z-40">
       <div className="border-b border-line bg-light dark:bg-[#1f251f] dark:border-[#2a322a]">
         <div className="container-gd flex h-8 items-center justify-between text-[11px] font-semibold text-brand-dark dark:text-[#d4d4d4]">
-          <p className="truncate">Free delivery on orders above ₹{site.freeShippingAbove}</p>
+          <p className="truncate">Farm-direct · Made in small batches</p>
           <p className="hidden items-center gap-4 sm:flex">
-            <span className="text-brand/70 dark:text-[#a0b0a0]">Farm-direct · Made in small batches</span>
             <a href={`tel:${site.phoneHref}`} className="hover:text-brand dark:hover:text-[#8ba888]">
               {site.phone}
             </a>

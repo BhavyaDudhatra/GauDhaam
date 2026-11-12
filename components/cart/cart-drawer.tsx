@@ -31,9 +31,6 @@ export function CartDrawer() {
 
   if (!isOpen) return null;
 
-  const remaining = site.freeShippingAbove - subtotal;
-  const progress = Math.min(100, Math.round((subtotal / site.freeShippingAbove) * 100));
-
   return (
     <div className="fixed inset-0 z-50">
       <button
@@ -42,7 +39,6 @@ export function CartDrawer() {
         onClick={closeCart}
         className="absolute inset-0 animate-fade-in cursor-default bg-brand-dark/35 backdrop-blur-[1px]"
       />
-
       <aside
         role="dialog"
         aria-modal="true"
@@ -84,24 +80,6 @@ export function CartDrawer() {
           </div>
         ) : (
           <>
-            <div className="border-b border-line bg-white/60 px-5 py-3.5">
-              {remaining > 0 ? (
-                <p className="text-[12px] font-semibold text-brand-dark">
-                  Add {formatINR(remaining)} more for free delivery
-                </p>
-              ) : (
-                <p className="text-[12px] font-semibold text-brand-dark">
-                  Free delivery unlocked
-                </p>
-              )}
-              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-line">
-                <div
-                  className="h-full rounded-full bg-brand transition-all duration-500"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-            </div>
-
             <div className="flex-1 overflow-y-auto px-5">
               <ul className="divide-y divide-line">
                 {lines.map((line) => {

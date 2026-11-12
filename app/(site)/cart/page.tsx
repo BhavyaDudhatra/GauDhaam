@@ -12,7 +12,7 @@ export default function CartPage() {
   const { lines, hydrated, subtotal, setQty, removeItem, count } = useCart();
 
   const shipping = shippingFor(subtotal, site.freeShippingAbove, site.shippingFee);
-  const remaining = site.freeShippingAbove - subtotal;
+  const remaining = 0; // No free shipping threshold
 
   return (
     <>
@@ -148,17 +148,10 @@ export default function CartPage() {
                     </div>
                   </dl>
 
-                  {remaining > 0 ? (
-                    <p className="mt-3 flex items-start gap-2 rounded-xl bg-light/80 p-3 text-[11.5px] text-brand-dark">
-                      <Truck size={15} className="mt-0.5 shrink-0 text-brand" />
-                      Add {formatINR(remaining)} more and delivery is on us.
-                    </p>
-                  ) : (
-                    <p className="mt-3 flex items-start gap-2 rounded-xl bg-light/80 p-3 text-[11.5px] text-brand-dark">
-                      <Truck size={15} className="mt-0.5 shrink-0 text-brand" />
-                      Free delivery applies to this order.
-                    </p>
-                  )}
+                  <p className="mt-3 flex items-start gap-2 rounded-xl bg-light/80 p-3 text-[11.5px] text-brand-dark">
+                    <Truck size={15} className="mt-0.5 shrink-0 text-brand" />
+                    Delivery charges apply. Final delivery cost calculated at checkout.
+                  </p>
 
                   <Link href="/checkout" className="btn btn-primary btn-block mt-4">
                     Proceed to checkout
