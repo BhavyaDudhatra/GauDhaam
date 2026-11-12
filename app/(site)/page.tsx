@@ -39,7 +39,7 @@ export default async function HomePage() {
     <>
       <section className="relative overflow-hidden border-b border-line">
         <div className="absolute inset-0">
-          <Image
+          <Img
             src="/assets/images/banner.jpg"
             alt="GauDhaam organic farm"
             fill
@@ -153,8 +153,8 @@ export default async function HomePage() {
                   className="card group overflow-hidden"
                 >
                   <div className="relative h-48">
-                    <Image
-                      src={normalizeDriveLink(service.images[0] ?? "/assets/images/banner.jpg")}
+                    <Img
+                      src={service.images[0] ?? "/assets/images/banner.jpg"}
                       alt={service.name}
                       fill
                       className="object-cover transition duration-700 group-hover:scale-105"

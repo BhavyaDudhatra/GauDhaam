@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useState } from "react";
 import Link from "next/link";
 import { Loader2, Lock, Mail, Phone, User } from "lucide-react";
+import { Img } from "@/components/ui/Img";
 import {
   loginAction,
   registerAction,
@@ -125,7 +126,7 @@ export function AuthForm({
                 <div className="rounded-card border border-line bg-white p-4 text-center">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-body/60">Scan with Google Authenticator</p>
                   <div className="mt-3 flex justify-center">
-                    <Image src={regQr} alt="TOTP QR" width={180} height={180} className="rounded-xl" />
+                    <Img src={regQr} alt="TOTP QR" width={180} height={180} className="rounded-xl" />
                   </div>
                 </div>
               )}
