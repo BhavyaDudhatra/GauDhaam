@@ -117,6 +117,7 @@ export default async function ProductPage({ params }: PageProps) {
                 priority
                 sizes="(max-width: 1024px) 100vw, 560px"
                 className="object-cover"
+                unoptimized
               />
               {product.featured && (
                 <span className="badge absolute bottom-4 left-4 border border-line bg-cream/90 text-brand-dark backdrop-blur">
@@ -133,11 +134,12 @@ export default async function ProductPage({ params }: PageProps) {
                     className="relative aspect-square overflow-hidden rounded-2xl border border-line"
                   >
                     <Image
-                      src={src}
+                      src={normalizeDriveLink(src)}
                       alt={`${product.name} ${index + 1}`}
                       fill
                       sizes="160px"
                       className="object-cover"
+                      unoptimized
                     />
                   </div>
                 ))}
@@ -258,7 +260,7 @@ export default async function ProductPage({ params }: PageProps) {
             <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
               {product.galleryImages.filter(Boolean).map((src, idx) => (
                 <div key={src + idx} className="relative aspect-square overflow-hidden rounded-2xl border border-line bg-light">
-                  <Image src={src} alt={`Gallery ${idx+1}`} fill className="object-cover" unoptimized />
+                  <Image src={normalizeDriveLink(src)} alt={`Gallery ${idx+1}`} fill className="object-cover" unoptimized />
                 </div>
               ))}
             </div>

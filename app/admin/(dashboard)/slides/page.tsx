@@ -1,5 +1,6 @@
 import { getDb } from "@/lib/firebase";
 import { requireAdmin } from "@/lib/auth";
+import { normalizeDriveLink } from "@/lib/drive-utils";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +29,7 @@ export default async function AdminSlidesPage() {
         <ul className="space-y-2">
           {slides.map(s=>(
             <li key={s.id} className="border-b border-line py-2 text-[13px] flex items-center gap-3">
-              <img src={s.imageUrl} className="h-12 w-20 object-cover rounded"/>
+              <img src={normalizeDriveLink(s.imageUrl)} className="h-12 w-20 object-cover rounded"/>
               <div><div className="font-semibold">{s.title}</div><div className="text-body/70">{s.subtitle}</div></div>
             </li>
           ))}

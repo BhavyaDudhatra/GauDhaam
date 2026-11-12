@@ -109,6 +109,7 @@ export default async function ServicePage({ params }: PageProps) {
                 priority
                 sizes="(max-width: 1024px) 100vw, 560px"
                 className="object-cover"
+                unoptimized
               />
             </div>
           </div>

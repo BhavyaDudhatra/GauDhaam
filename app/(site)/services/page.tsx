@@ -54,6 +54,7 @@ export default async function ServicesPage() {
                   fill
                   sizes="(max-width: 1024px) 100vw, 580px"
                   className="object-cover"
+                  unoptimized
                 />
                 <span className="absolute left-4 top-4 grid h-9 w-9 place-items-center rounded-full bg-cream/90 text-[12px] font-bold text-brand-dark backdrop-blur">
                   0{index + 1}

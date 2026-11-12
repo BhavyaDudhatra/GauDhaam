@@ -97,7 +97,7 @@ export default async function HomePage() {
               <div className="flex overflow-x-auto gap-4 py-4">
                 {slides.map(s => (
                   <div key={s.id} className="min-w-[320px] shrink-0">
-                    <img src={s.imageUrl} alt={s.title} className="h-48 w-full object-cover rounded-card"/>
+                    <img src={normalizeDriveLink(s.imageUrl)} alt={s.title} className="h-48 w-full object-cover rounded-card"/>
                     <div className="mt-2 p-3 bg-white rounded-card border border-line">
                       <h3 className="text-[16px] font-semibold">{s.title}</h3>
                       <p className="text-[13px] text-body/80">{s.subtitle}</p>
