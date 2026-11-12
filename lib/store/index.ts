@@ -11,10 +11,14 @@ export function getStore(): Promise<Store> {
       const { isFirebaseConfigured } = await import("@/lib/firebase");
       if (isFirebaseConfigured()) {
         const { createFirestoreStore } = await import("./firestore");
-        return createFirestoreStore();
+        const store = await createFirestoreStore();
+        await store.ready();
+        return store;
       }
       const { createFallbackStore } = await import("./fallback");
-      return createFallbackStore();
+      const store = createFallbackStore();
+      await store.ready();
+      return store;
     })().catch((error) => {
       globalForStore.__gaudhaamStore = undefined;
       throw error;
