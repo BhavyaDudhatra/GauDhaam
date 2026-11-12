@@ -536,18 +536,16 @@ export async function createFirestoreStore(): Promise<Store> {
       },
       async incrementUsage(id) {
         const ref = couponsCol.doc(id);
-        const doc = await ref.get();
-        if (!doc.exists) {
-          console.log("[FIRESTORE] incrementUsage: doc not found", id);
-          return;
-        }
-        const coupon = doc.data() as Coupon;
-        console.log("[FIRESTORE] incrementUsage: current count", coupon.usedCount, "for", id);
         try {
-          await ref.update({ usedCount: (coupon.usedCount || 0) + 1 });
-          console.log("[FIRESTORE] incrementUsage: updated to", (coupon.usedCount || 0) + 1);
+          const { FieldValue } = await import("firebase-admin/firestore");
+          await ref.update({ usedCount: FieldValue.increment(1) });
         } catch (e) {
           console.error("[FIRESTORE] incrementUsage error:", e);
+          // Fallback: read and update
+          const doc = await ref.get();
+          if (!doc.exists) return;
+          const coupon = doc.data() as Coupon;
+          await ref.update({ usedCount: (coupon.usedCount || 0) + 1 });
         }
       },
     },
