@@ -38,6 +38,7 @@ export default async function AccountPage() {
   }
 
   const orders = await store.orders.list({ userId: user.id });
+  const recentOrders = orders.slice(0, 3);
   const spent = orders
     .filter((order) => order.payment?.status === "paid")
     .reduce((sum, order) => sum + order.total, 0);
@@ -97,13 +98,13 @@ export default async function AccountPage() {
               </dl>
 
               <nav className="mt-4 space-y-1" aria-label="Account sections">
-                <a
-                  href="#orders"
+                <Link
+                  href="/account/orders"
                   className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-semibold text-brand-dark transition-colors hover:bg-light"
                 >
                   <Package size={16} className="text-brand" />
                   My orders
-                </a>
+                </Link>
                 <a
                   href="#addresses"
                   className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-semibold text-brand-dark transition-colors hover:bg-light"
@@ -161,13 +162,20 @@ export default async function AccountPage() {
                     Track what is on its way and reorder what you loved.
                   </p>
                 </div>
-                <Link href="/shop" className="btn btn-outline btn-sm">
-                  Shop
-                  <ArrowRight size={13} />
-                </Link>
+                <div className="flex items-center gap-2">
+                  {orders.length > 0 && (
+                    <Link href="/account/orders" className="btn btn-outline btn-sm">
+                      View all
+                    </Link>
+                  )}
+                  <Link href="/shop" className="btn btn-outline btn-sm">
+                    Shop
+                    <ArrowRight size={13} />
+                  </Link>
+                </div>
               </div>
 
-              {orders.length === 0 ? (
+              {recentOrders.length === 0 ? (
                 <div className="flex flex-col items-center px-6 py-12 text-center">
                   <span className="grid h-14 w-14 place-items-center rounded-full bg-light text-brand">
                     <ShoppingBag size={23} strokeWidth={1.6} />
@@ -182,32 +190,41 @@ export default async function AccountPage() {
                   </Link>
                 </div>
               ) : (
-                <ul className="divide-y divide-line">
-                  {orders.map((order) => (
-                    <li key={order.id}>
-                      <Link
-                        href={`/order/${order.id}`}
-                        className="flex flex-wrap items-center gap-3 px-5 py-4 transition-colors hover:bg-cream/60"
-                      >
-                        <div className="min-w-0 flex-1">
-                          <p className="text-[13.5px] font-semibold text-brand-dark">
-                            {order.number}
+                <>
+                  <ul className="divide-y divide-line">
+                    {recentOrders.map((order) => (
+                      <li key={order.id}>
+                        <Link
+                          href={`/order/${order.id}`}
+                          className="flex flex-wrap items-center gap-3 px-5 py-4 transition-colors hover:bg-cream/60"
+                        >
+                          <div className="min-w-0 flex-1">
+                            <p className="text-[13.5px] font-semibold text-brand-dark">
+                              {order.number}
+                            </p>
+                            <p className="mt-0.5 text-[11.5px] text-body/70">
+                              {formatDate(order.createdAt)} ·{" "}
+                              {order.items.reduce((sum, item) => sum + item.qty, 0)}{" "}
+                              items
+                            </p>
+                          </div>
+                          <OrderStatusBadge status={order.status} />
+                          <p className="w-20 text-right text-[13.5px] font-bold text-brand-dark">
+                            {formatINR(order.total)}
                           </p>
-                          <p className="mt-0.5 text-[11.5px] text-body/70">
-                            {formatDate(order.createdAt)} ·{" "}
-                            {order.items.reduce((sum, item) => sum + item.qty, 0)}{" "}
-                            items
-                          </p>
-                        </div>
-                        <OrderStatusBadge status={order.status} />
-                        <p className="w-20 text-right text-[13.5px] font-bold text-brand-dark">
-                          {formatINR(order.total)}
-                        </p>
-                        <ChevronRight size={16} className="text-body/40" />
+                          <ChevronRight size={16} className="text-body/40" />
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                  {orders.length > 3 && (
+                    <div className="border-t border-line px-5 py-3 text-center">
+                      <Link href="/account/orders" className="text-[12.5px] font-semibold text-brand hover:underline">
+                        View all {orders.length} orders →
                       </Link>
-                    </li>
-                  ))}
-                </ul>
+                    </div>
+                  )}
+                </>
               )}
             </section>
 
