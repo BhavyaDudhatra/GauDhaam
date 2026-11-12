@@ -16,11 +16,15 @@ export function normalizeDriveLink(link: string) {
   if (!trimmed) return "";
   const id = driveFileId(trimmed);
   if (!id) return trimmed;
+  // Already a direct lh3 image URL with size param
+  if (trimmed.includes("lh3.googleusercontent.com/d/")) {
+    return trimmed;
+  }
   // Already a working public view URL
   if (trimmed.includes("drive.google.com/uc?export=view")) {
     return trimmed;
   }
-  // lh3.googleusercontent.com direct links often return HTML or 403;
-  // use the standard public sharing endpoint instead.
-  return `https://drive.google.com/uc?export=view&id=${id}`;
+  // Use lh3.googleusercontent.com direct image URL with size hint;
+  // this serves the image directly instead of an HTML preview page.
+  return `https://lh3.googleusercontent.com/d/${id}=w2000`;
 }
