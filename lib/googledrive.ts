@@ -67,7 +67,7 @@ export async function uploadToGoogleDrive(
     supportsAllDrives: true,
   });
 
-  return `https://lh3.googleusercontent.com/d/${fileId}=w2000`;
+  return `/api/image?id=${fileId}`;
 }
 
 export async function deleteFromGoogleDrive(link: string) {
