@@ -6,6 +6,7 @@ import { useCart } from "@/components/cart/cart-context";
 import { getVariantPricing, isVariantBuyable } from "@/lib/pricing";
 import { formatINR } from "@/lib/money";
 import type { Product } from "@/lib/types";
+import { normalizeDriveLink } from "@/lib/drive-utils";
 
 export function ProductDetail({ product }: { product: Product }) {
   const { addItem } = useCart();
@@ -128,7 +129,7 @@ export function ProductDetail({ product }: { product: Product }) {
                 variantId: variant.id,
                 slug: product.slug,
                 name: product.name,
-                image: product.images[0] ?? "/assets/images/Ghee.jpg",
+                image: normalizeDriveLink(product.images[0] ?? "/assets/images/Ghee.jpg"),
                 variantLabel: variant.label,
                 price: pricing.price,
                 originalPrice: pricing.mrp && pricing.mrp > pricing.price ? pricing.mrp : undefined,

@@ -145,7 +145,7 @@ export default async function OrderPage({
                       className="relative h-16 w-16 shrink-0 overflow-hidden rounded-[12px] border border-line bg-light"
                     >
                       <Image
-                        src={item.image || "/assets/images/Ghee.jpg"}
+                        src={normalizeDriveLink(item.image || "/assets/images/Ghee.jpg")}
                         alt={item.name}
                         fill
                         sizes="64px"

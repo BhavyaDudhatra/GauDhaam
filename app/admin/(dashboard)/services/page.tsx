@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Plus } from "lucide-react";
 import { deleteServiceAction, toggleServiceAction } from "@/lib/actions/admin";
 import { getStore } from "@/lib/store";
+import { normalizeDriveLink } from "@/lib/drive-utils";
 
 export const metadata: Metadata = { title: "Services · Admin" };
 export const dynamic = "force-dynamic";
@@ -46,7 +47,7 @@ export default async function AdminServicesPage() {
                     <div className="flex items-center gap-3">
                       <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-lg border border-line bg-light">
                         <Image
-                          src={service.images[0] ?? "/assets/images/banner.jpg"}
+                          src={normalizeDriveLink(service.images[0] ?? "/assets/images/banner.jpg")}
                           alt={service.name}
                           fill
                           sizes="44px"

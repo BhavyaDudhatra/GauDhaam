@@ -6,6 +6,7 @@ import { deleteProductAction, toggleProductAction } from "@/lib/actions/admin";
 import { formatINR } from "@/lib/money";
 import { activeVariants, priceRange, variantStock } from "@/lib/pricing";
 import { getStore } from "@/lib/store";
+import { normalizeDriveLink } from "@/lib/drive-utils";
 
 export const metadata: Metadata = { title: "Products · Admin" };
 export const dynamic = "force-dynamic";
@@ -63,7 +64,7 @@ export default async function AdminProductsPage({
                       <div className="flex items-center gap-3">
                         <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-lg border border-line bg-light">
                           <Image
-                            src={product.images[0] ?? "/assets/images/Ghee.jpg"}
+                            src={normalizeDriveLink(product.images[0] ?? "/assets/images/Ghee.jpg")}
                             alt={product.name}
                             fill
                             sizes="44px"

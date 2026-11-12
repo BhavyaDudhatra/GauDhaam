@@ -1,5 +1,6 @@
 import { getStore } from "@/lib/store";
 import Image from "next/image";
+import { normalizeDriveLink } from "@/lib/drive-utils";
 
 export async function GalleryGrid() {
   const store = await getStore();
@@ -10,7 +11,7 @@ export async function GalleryGrid() {
       {items.map(item => (
         <div key={item.id} className="overflow-hidden rounded-banner border border-line">
           <div className="relative aspect-[4/3]">
-            <Image src={item.image} alt={item.title} fill className="object-cover" />
+            <Image src={normalizeDriveLink(item.image)} alt={item.title} fill className="object-cover" />
           </div>
           <div className="p-3 text-[13px] font-medium">{item.title}</div>
         </div>

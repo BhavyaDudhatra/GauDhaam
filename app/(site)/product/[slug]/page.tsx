@@ -8,6 +8,7 @@ import { ProductCard } from "@/components/product/product-card";
 import { SubscribeButton } from "@/components/product/subscribe-button";
 import { getSession } from "@/lib/auth";
 import { getStore } from "@/lib/store";
+import { normalizeDriveLink } from "@/lib/drive-utils";
 import { submitFeedbackAction } from "@/lib/actions/feedback";
 import { StarRating } from "@/components/ui/star-rating";
 
@@ -22,7 +23,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!product) return { title: "Product not found" };
 
-  const image = product.images?.[0] ?? "/assets/images/Ghee.jpg";
+  const image = normalizeDriveLink(product.images?.[0] ?? "/assets/images/Ghee.jpg");
 
   return {
     title: product.name,
@@ -62,7 +63,7 @@ export default async function ProductPage({ params }: PageProps) {
     ),
   ].slice(0, 4);
 
-  const image = product.images?.[0] ?? "/assets/images/Ghee.jpg";
+  const image = normalizeDriveLink(product.images?.[0] ?? "/assets/images/Ghee.jpg");
 
   const jsonLd = {
     "@context": "https://schema.org",

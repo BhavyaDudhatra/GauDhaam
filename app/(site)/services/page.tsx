@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Check, Leaf } from "lucide-react";
 import { getStore } from "@/lib/store";
+import { normalizeDriveLink } from "@/lib/drive-utils";
 
 export const dynamic = "force-dynamic";
 
@@ -48,7 +49,7 @@ export default async function ServicesPage() {
                 }`}
               >
                 <Image
-                  src={service.images?.[0] ?? "/assets/images/banner.jpg"}
+                  src={normalizeDriveLink(service.images?.[0] ?? "/assets/images/banner.jpg")}
                   alt={service.name}
                   fill
                   sizes="(max-width: 1024px) 100vw, 580px"

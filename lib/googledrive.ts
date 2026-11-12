@@ -67,7 +67,7 @@ export async function uploadToGoogleDrive(
     supportsAllDrives: true,
   });
 
-  return `https://lh3.googleusercontent.com/d/${fileId}`;
+  return `https://drive.google.com/uc?export=view&id=${fileId}`;
 }
 
 export async function deleteFromGoogleDrive(link: string) {

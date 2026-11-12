@@ -16,8 +16,11 @@ export function normalizeDriveLink(link: string) {
   if (!trimmed) return "";
   const id = driveFileId(trimmed);
   if (!id) return trimmed;
-  if (trimmed.includes("lh3.googleusercontent.com") || trimmed.includes("drive.google.com/thumbnail")) {
+  // Already a working public view URL
+  if (trimmed.includes("drive.google.com/uc?export=view")) {
     return trimmed;
   }
-  return `https://lh3.googleusercontent.com/d/${id}`;
+  // lh3.googleusercontent.com direct links often return HTML or 403;
+  // use the standard public sharing endpoint instead.
+  return `https://drive.google.com/uc?export=view&id=${id}`;
 }

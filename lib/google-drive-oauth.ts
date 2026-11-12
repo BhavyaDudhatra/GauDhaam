@@ -51,5 +51,5 @@ export async function uploadImageToDrive(buffer: Buffer, fileName: string, mimeT
     supportsAllDrives: true,
   });
 
-  return `https://lh3.googleusercontent.com/d/${fileId}`;
+  return `https://drive.google.com/uc?export=view&id=${fileId}`;
 }

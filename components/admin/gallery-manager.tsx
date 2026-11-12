@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import { createGalleryItemAction, updateGalleryItemAction, deleteGalleryItemAction } from "@/lib/actions/admin";
 import { ImageManager } from "@/components/admin/image-manager";
 import { Trash2 } from "lucide-react";
+import { normalizeDriveLink } from "@/lib/drive-utils";
 
 type GalleryItem = { id: string; title: string; image: string; createdAt: string };
 
@@ -27,7 +28,7 @@ export function GalleryManager({ items }: { items: GalleryItem[] }) {
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {list.map(item => (
           <div key={item.id} className="card p-3 space-y-2">
-            <img src={item.image} alt={item.title} className="aspect-video object-cover rounded" />
+            <img src={normalizeDriveLink(item.image)} alt={item.title} className="aspect-video object-cover rounded" />
             <p className="font-semibold">{item.title}</p>
             <form action={deleteGalleryItemAction} className="flex gap-2">
               <input type="hidden" name="id" value={item.id} />

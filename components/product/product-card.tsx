@@ -11,6 +11,7 @@ import {
   pricingFor,
 } from "@/lib/pricing";
 import type { Product } from "@/lib/types";
+import { normalizeDriveLink } from "@/lib/drive-utils";
 
 export function ProductCard({
   product,
@@ -25,7 +26,7 @@ export function ProductCard({
   const cheapest = cheapestVariant(product);
   const pricing = cheapest ? pricingFor(product, cheapest) : null;
   const buyable = isProductBuyable(product);
-  const image = product.images[0] || "/assets/images/Ghee.jpg";
+  const image = normalizeDriveLink(product.images[0] || "/assets/images/Ghee.jpg");
   const hasMultiple = variants.length > 1;
 
   return (

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, Check, Leaf } from "lucide-react";
 import { getStore } from "@/lib/store";
+import { normalizeDriveLink } from "@/lib/drive-utils";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +21,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title: service.name,
       description: service.tagline,
-      images: [{ url: service.images?.[0] ?? "/assets/images/banner.jpg" }],
+      images: [{ url: normalizeDriveLink(service.images?.[0] ?? "/assets/images/banner.jpg") }],
     },
   };
 }
@@ -102,7 +103,7 @@ export default async function ServicePage({ params }: PageProps) {
           <div className="order-1 lg:order-2">
             <div className="relative aspect-[4/3] overflow-hidden rounded-banner border border-line bg-light">
               <Image
-                src={service.images?.[0] ?? "/assets/images/banner.jpg"}
+                src={normalizeDriveLink(service.images?.[0] ?? "/assets/images/banner.jpg")}
                 alt={service.name}
                 fill
                 priority

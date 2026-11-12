@@ -4,6 +4,7 @@ import { shippingFor } from "@/lib/money";
 import { site } from "@/lib/site";
 import { getStore } from "@/lib/store";
 import { getDb } from "@/lib/firebase";
+import { normalizeDriveLink } from "@/lib/drive-utils";
 import {
   clean,
   isEmail,
@@ -134,7 +135,7 @@ export async function POST(request: Request) {
 
     const { getVariantPricing } = await import("@/lib/pricing");
     const pricing = getVariantPricing(product, variant);
-    const image = product.images[0] ?? "/assets/images/Ghee.jpg";
+    const image = normalizeDriveLink(product.images[0] ?? "/assets/images/Ghee.jpg");
 
     items.push({
       productId: product.id,

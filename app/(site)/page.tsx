@@ -5,6 +5,7 @@ import { ArrowRight, Leaf, ShieldCheck, Sparkles, Truck } from "lucide-react";
 import { ProductCard } from "@/components/product/product-card";
 import { getStore } from "@/lib/store";
 import { getDb } from "@/lib/firebase";
+import { normalizeDriveLink } from "@/lib/drive-utils";
 
 export const dynamic = "force-dynamic";
 
@@ -150,7 +151,7 @@ export default async function HomePage() {
                 >
                   <div className="relative h-48">
                     <Image
-                      src={service.images[0] ?? "/assets/images/banner.jpg"}
+                      src={normalizeDriveLink(service.images[0] ?? "/assets/images/banner.jpg")}
                       alt={service.name}
                       fill
                       className="object-cover transition duration-700 group-hover:scale-105"
