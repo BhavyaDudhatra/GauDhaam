@@ -763,18 +763,12 @@ export function CheckoutForm({
                     {fulfillment === "self" ? "Free (self pickup)" : deliveryChargeLoading ? "Calculating…" : formatINR(shipping)}
                   </dd>
                 </div>
-                {fulfillment === "delivery" && !deliveryChargeLoading && deliveryCharge > 0 && (
+                {fulfillment === "delivery" && !deliveryChargeLoading && (
                   <div className="rounded-lg bg-cream/60 px-3 py-2 text-[11px] text-body/70 space-y-0.5">
                     <p className="font-semibold text-brand-dark text-[11.5px]">Delivery charge breakdown:</p>
-                    {deliveryDistance > 0 && (
-                      <p>Distance from nearest branch: {deliveryDistance.toFixed(1)} km</p>
-                    )}
-                    {deliveryBaseFee > 0 && (
-                      <p>Base fee: {formatINR(deliveryBaseFee)}</p>
-                    )}
-                    {deliveryPerKmRate > 0 && deliveryDistance > 0 && (
-                      <p>Per km rate: {formatINR(deliveryPerKmRate)} × {deliveryDistance.toFixed(1)} km = {formatINR(Math.round(deliveryPerKmRate * deliveryDistance))}</p>
-                    )}
+                    <p>Distance from nearest branch: {deliveryDistance > 0 ? `${deliveryDistance.toFixed(1)} km` : "N/A"}</p>
+                    <p>Base fee: {formatINR(deliveryBaseFee)}</p>
+                    <p>Per km rate: {formatINR(deliveryPerKmRate)} × {deliveryDistance > 0 ? deliveryDistance.toFixed(1) : "0"} km = {formatINR(Math.round(deliveryPerKmRate * (deliveryDistance > 0 ? deliveryDistance : 0)))}</p>
                     <p className="font-semibold text-brand-dark">
                       Total delivery charge: {formatINR(deliveryCharge)}
                     </p>
