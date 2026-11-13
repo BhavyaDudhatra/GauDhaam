@@ -73,6 +73,10 @@ export function CheckoutForm({
   const selectedAddress = addresses?.find(a => a.id === selectedAddressId) ?? null;
   const [fulfillment, setFulfillment] = useState<"delivery" | "self">("delivery");
   const [deliveryCharge, setDeliveryCharge] = useState<number>(0);
+  const [deliveryDistance, setDeliveryDistance] = useState<number>(0);
+  const [deliveryBaseFee, setDeliveryBaseFee] = useState<number>(0);
+  const [deliveryPerKmRate, setDeliveryPerKmRate] = useState<number>(0);
+  const [deliveryMethod, setDeliveryMethod] = useState<string>("");
   const [deliveryChargeLoading, setDeliveryChargeLoading] = useState(false);
   const [pincode, setPincode] = useState<string>(selectedAddress?.pincode ?? "");
   const [couponCode, setCouponCode] = useState("");
@@ -94,6 +98,10 @@ export function CheckoutForm({
   useEffect(() => {
     if (fulfillment === "self") {
       setDeliveryCharge(0);
+      setDeliveryDistance(0);
+      setDeliveryBaseFee(0);
+      setDeliveryPerKmRate(0);
+      setDeliveryMethod("");
       return;
     }
     // Build address string from form fields or selected address
@@ -117,6 +125,10 @@ export function CheckoutForm({
         .then(data => {
           if (!cancelled) {
             setDeliveryCharge(Number(data.charge) || 0);
+            setDeliveryDistance(Number(data.distance) || 0);
+            setDeliveryBaseFee(Number(data.baseFee) || 0);
+            setDeliveryPerKmRate(Number(data.perKmRate) || 0);
+            setDeliveryMethod(data.method || "");
             setDeliveryChargeLoading(false);
           }
         })
@@ -751,6 +763,28 @@ export function CheckoutForm({
                     {fulfillment === "self" ? "Free (self pickup)" : deliveryChargeLoading ? "Calculating…" : formatINR(shipping)}
                   </dd>
                 </div>
+                {fulfillment === "delivery" && !deliveryChargeLoading && deliveryCharge > 0 && (
+                  <div className="rounded-lg bg-cream/60 px-3 py-2 text-[11px] text-body/70 space-y-0.5">
+                    <p className="font-semibold text-brand-dark text-[11.5px]">Delivery charge breakdown:</p>
+                    {deliveryDistance > 0 && (
+                      <p>Distance from nearest branch: {deliveryDistance.toFixed(1)} km</p>
+                    )}
+                    {deliveryBaseFee > 0 && (
+                      <p>Base fee: {formatINR(deliveryBaseFee)}</p>
+                    )}
+                    {deliveryPerKmRate > 0 && deliveryDistance > 0 && (
+                      <p>Per km rate: {formatINR(deliveryPerKmRate)} × {deliveryDistance.toFixed(1)} km = {formatINR(Math.round(deliveryPerKmRate * deliveryDistance))}</p>
+                    )}
+                    <p className="font-semibold text-brand-dark">
+                      Total delivery charge: {formatINR(deliveryCharge)}
+                    </p>
+                    {deliveryMethod === "pincode-fallback" && (
+                      <p className="text-[10px] text-amber-600 italic">
+                        (Estimated based on pincode — Google Maps not available for exact distance)
+                      </p>
+                    )}
+                  </div>
+                )}
                 {discount > 0 && (
                   <div className="flex justify-between text-green-700">
                     <dt>Coupon ({couponApplied?.code})</dt>

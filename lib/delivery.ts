@@ -32,7 +32,7 @@ function pincodeFallbackCharge(pincode: string): number {
   return 400;
 }
 
-export async function computeDeliveryCharge(address: string): Promise<{ charge: number; distanceKm: number; branchId?: string; method: string }> {
+export async function computeDeliveryCharge(address: string): Promise<{ charge: number; distanceKm: number; branchId?: string; method: string; baseFee: number; perKmRate: number }> {
   const { getDb } = await import('@/lib/firebase');
   const db = await getDb();
   
@@ -44,7 +44,7 @@ export async function computeDeliveryCharge(address: string): Promise<{ charge: 
     // No DB - use pincode fallback
     const baseFee = 0;
     const perKmRate = 0;
-    return { charge: pincodeFallbackCharge(pincode), distanceKm: 0, method: 'pincode-fallback' };
+    return { charge: pincodeFallbackCharge(pincode), distanceKm: 0, method: 'pincode-fallback', baseFee, perKmRate };
   }
   
   // Get delivery config
@@ -58,14 +58,14 @@ export async function computeDeliveryCharge(address: string): Promise<{ charge: 
   
   if (branches.length === 0) {
     // No branches - use pincode fallback with config
-    return { charge: pincodeFallbackCharge(pincode), distanceKm: 0, method: 'pincode-fallback' };
+    return { charge: pincodeFallbackCharge(pincode), distanceKm: 0, method: 'pincode-fallback', baseFee, perKmRate };
   }
   
   // Try Google Maps geocoding
   const dest = await geocode(address);
   if (!dest) {
     // Geocoding failed - use pincode fallback
-    return { charge: pincodeFallbackCharge(pincode), distanceKm: 0, method: 'pincode-fallback' };
+    return { charge: pincodeFallbackCharge(pincode), distanceKm: 0, method: 'pincode-fallback', baseFee, perKmRate };
   }
   
   const origins = branches.map(b => ({ lat: b.lat, lng: b.lng }));
@@ -89,11 +89,11 @@ export async function computeDeliveryCharge(address: string): Promise<{ charge: 
   
   if (!mapsWorked) {
     // Distance Matrix failed - use pincode fallback
-    return { charge: pincodeFallbackCharge(pincode), distanceKm: 0, method: 'pincode-fallback' };
+    return { charge: pincodeFallbackCharge(pincode), distanceKm: 0, method: 'pincode-fallback', baseFee, perKmRate };
   }
   
   const distanceKm = bestDistance === Infinity ? 0 : bestDistance;
   const charge = baseFee + distanceKm * perKmRate;
   
-  return { charge: Math.round(charge), distanceKm, branchId: bestBranchId, method: 'google-maps' };
+  return { charge: Math.round(charge), distanceKm, branchId: bestBranchId, method: 'google-maps', baseFee, perKmRate };
 }
