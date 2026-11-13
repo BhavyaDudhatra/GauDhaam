@@ -248,6 +248,29 @@ export function CheckoutForm({
     setError("");
 
     const formData = new FormData(event.currentTarget);
+    const saveAddr = formData.get("saveAddress") === "on";
+
+    // If save address is checked, save the address first
+    if (saveAddr && !selectedAddressId) {
+      try {
+        await fetch("/api/address/save", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: String(formData.get("name") ?? ""),
+            phone: String(formData.get("phone") ?? ""),
+            line1: String(formData.get("line1") ?? ""),
+            line2: String(formData.get("line2") ?? ""),
+            city: String(formData.get("city") ?? ""),
+            state: String(formData.get("state") ?? ""),
+            pincode: String(formData.get("pincode") ?? ""),
+          }),
+        });
+      } catch {
+        // Non-critical, continue with checkout
+      }
+    }
+
     const payload = {
       items: lines.map((line) => ({
         productId: line.productId,
@@ -575,8 +598,14 @@ export function CheckoutForm({
                     ))}
                   </select>
                 </label>
-                <label className="field sm:col-span-2">
-                  <span className="label">Delivery notes (optional)</span>
+              {!selectedAddressId && (
+                <label className="mt-3 flex items-center gap-2 text-[12.5px] text-body">
+                  <input type="checkbox" name="saveAddress" className="h-4 w-4 rounded border-line accent-[#496B45]" />
+                  <span>Save this address for future use</span>
+                </label>
+              )}
+              <label className="field sm:col-span-2">
+                <span className="label">Delivery notes (optional)</span>
                   <textarea
                     name="notes"
                     className="textarea"
