@@ -68,32 +68,27 @@ export async function computeDeliveryCharge(address: string): Promise<{ charge: 
     return { charge: pincodeFallbackCharge(pincode), distanceKm: 0, method: 'pincode-fallback', baseFee, perKmRate };
   }
   
-  const origins = branches.map(b => ({ lat: b.lat, lng: b.lng }));
+  // Use the main branch (isMain: true) for distance calculation
+  const mainBranch = branches.find(b => b.isMain === true) || branches[0];
+  
+  const origins = [{ lat: mainBranch.lat, lng: mainBranch.lng }];
   const dm = await distanceMatrix(origins, dest);
   
-  let bestDistance = Infinity;
-  let bestBranchId: string | undefined;
+  let distanceKm = 0;
   let mapsWorked = false;
   
-  dm.rows?.forEach((row: any, i: number) => {
-    const element = row.elements?.[0];
-    if (element && element.status === 'OK') {
-      const meters = element.distance.value;
-      if (meters < bestDistance) {
-        bestDistance = meters / 1000;
-        bestBranchId = branches[i]?.id;
-        mapsWorked = true;
-      }
-    }
-  });
+  const element = dm.rows?.[0]?.elements?.[0];
+  if (element && element.status === 'OK') {
+    distanceKm = element.distance.value / 1000;
+    mapsWorked = true;
+  }
   
   if (!mapsWorked) {
     // Distance Matrix failed - use pincode fallback
     return { charge: pincodeFallbackCharge(pincode), distanceKm: 0, method: 'pincode-fallback', baseFee, perKmRate };
   }
   
-  const distanceKm = bestDistance === Infinity ? 0 : bestDistance;
   const charge = baseFee + distanceKm * perKmRate;
   
-  return { charge: Math.round(charge), distanceKm, branchId: bestBranchId, method: 'google-maps', baseFee, perKmRate };
+  return { charge: Math.round(charge), distanceKm, branchId: mainBranch.id, method: 'google-maps', baseFee, perKmRate };
 }
