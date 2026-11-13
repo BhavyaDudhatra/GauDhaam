@@ -7,5 +7,12 @@ export async function GET(request: Request) {
   if (!address) return NextResponse.json({ error: 'address required' }, { status: 400 });
 
   const result = await computeDeliveryCharge(address);
-  return NextResponse.json({ charge: result.charge, distance: result.distanceKm, branchId: result.branchId });
+  return NextResponse.json({ 
+    charge: result.charge, 
+    distance: result.distanceKm, 
+    branchId: result.branchId,
+    method: result.method,
+    baseFee: result.baseFee,
+    perKmRate: result.perKmRate,
+  });
 }

@@ -70,7 +70,13 @@ export function CheckoutForm({
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
     addresses?.find(a => a.isDefault)?.id ?? addresses?.[0]?.id ?? null
   );
-  const selectedAddress = addresses?.find(a => a.id === selectedAddressId) ?? null;
+  // Auto-select first address if none selected but addresses exist
+  useEffect(() => {
+    if (!selectedAddressId && addresses && addresses.length > 0) {
+      setSelectedAddressId(addresses[0].id ?? null);
+    }
+  }, [addresses, selectedAddressId]);
+  const selectedAddress = addresses?.find(a => a.id === selectedAddressId) ?? (addresses && addresses.length > 0 ? addresses[0] : null);
   const [fulfillment, setFulfillment] = useState<"delivery" | "self">("delivery");
   const [deliveryCharge, setDeliveryCharge] = useState<number>(0);
   const [deliveryDistance, setDeliveryDistance] = useState<number>(0);
