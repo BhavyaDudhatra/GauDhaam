@@ -73,6 +73,7 @@ export function CheckoutForm({
   const selectedAddress = addresses?.find(a => a.id === selectedAddressId) ?? null;
   const [fulfillment, setFulfillment] = useState<"delivery" | "self">("delivery");
   const [deliveryCharge, setDeliveryCharge] = useState<number>(0);
+  const [deliveryChargeLoading, setDeliveryChargeLoading] = useState(false);
   const [pincode, setPincode] = useState<string>(selectedAddress?.pincode ?? "");
   const [couponCode, setCouponCode] = useState("");
   const [couponApplied, setCouponApplied] = useState<{ code: string; discount: number; couponId: string } | null>(null);
@@ -105,19 +106,24 @@ export function CheckoutForm({
     }
     if (!addrStr || addrStr.length < 10) {
       setDeliveryCharge(0);
+      setDeliveryChargeLoading(false);
       return;
     }
+    setDeliveryChargeLoading(true);
     let cancelled = false;
     const timer = setTimeout(() => {
       fetch(`/api/delivery/charge?address=${encodeURIComponent(addrStr)}`)
         .then(r => r.json())
         .then(data => {
-          if (!cancelled) setDeliveryCharge(Number(data.charge) || 0);
+          if (!cancelled) {
+            setDeliveryCharge(Number(data.charge) || 0);
+            setDeliveryChargeLoading(false);
+          }
         })
-        .catch(() => { if (!cancelled) setDeliveryCharge(0); });
-    }, 800);
+        .catch(() => { if (!cancelled) { setDeliveryCharge(0); setDeliveryChargeLoading(false); } });
+    }, 300);
     return () => { cancelled = true; clearTimeout(timer); };
-  }, [fulfillment, selectedAddress, addressInput]);
+  }, [fulfillment, selectedAddress, addressInput, addresses]);
 
   function finish(orderId: string) {
     clear();
@@ -713,7 +719,7 @@ export function CheckoutForm({
                 <div className="flex justify-between">
                   <dt>Delivery</dt>
                   <dd className="font-semibold text-brand-dark">
-                    {shipping === 0 ? "Free" : formatINR(shipping)}
+                    {fulfillment === "self" ? "Free (self pickup)" : deliveryChargeLoading ? "Calculating…" : formatINR(shipping)}
                   </dd>
                 </div>
                 {discount > 0 && (
