@@ -8,44 +8,9 @@ import { clean, isEmail, isPhone, normalisePhone, toInt } from "@/lib/validate";
 import type { FormState } from "./state";
 import type { B2BOrderStatus } from "@/lib/types";
 import { getDb } from "@/lib/firebase";
+import { computeDeliveryCharge } from "@/lib/delivery";
 
 const GOOGLE_API_KEY = process.env.GOOGLE_MAPS_API_KEY || 'AIzaSyDJR8t41dcVSIz9J4QLKXf85zpJV6F1O0k';
-
-async function geocode(address: string) {
-  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${GOOGLE_API_KEY}`;
-  const res = await fetch(url);
-  const data = await res.json();
-  if (data.status !== 'OK' || !data.results[0]) return null;
-  const loc = data.results[0].geometry.location;
-  return { lat: loc.lat, lng: loc.lng };
-}
-async function distanceMatrix(origins: {lat:number,lng:number}[], destination:{lat:number,lng:number}) {
-  const originsParam = origins.map(o => `${o.lat},${o.lng}`).join('|');
-  const destParam = `${destination.lat},${destination.lng}`;
-  const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${originsParam}&destinations=${destParam}&units=metric&key=${GOOGLE_API_KEY}`;
-  const res = await fetch(url);
-  return res.json();
-}
-async function computeDeliveryCharge(address: string) {
-  const db = await getDb();
-  if (!db) return { charge: 0, distance: 0 };
-  const branchesSnap = await db.collection('branches').get();
-  const branches = branchesSnap.docs.map(d=>({id:d.id,...d.data() as any}));
-  if (!branches.length) return { charge:0, distance:0 };
-  const dest = await geocode(address);
-  if (!dest) return { charge:0, distance:0 };
-  const origins = branches.map(b=>({lat:b.lat,lng:b.lng}));
-  const dm = await distanceMatrix(origins, dest);
-  let best = {distance:Infinity};
-  dm.rows?.forEach((row:any)=>{const e=row.elements[0]; if(e.status==='OK'){const meters=e.distance.value; if(meters<best.distance) best.distance=meters/1000;}});
-  const configSnap = await db.collection('config').doc('delivery').get();
-  const config = configSnap.exists ? configSnap.data() as any : {baseFee:0, perKmRate:0};
-  const baseFee = Number(config.baseFee||0);
-  const perKmRate = Number(config.perKmRate||0);
-  const distanceKm = best.distance;
-  const charge = baseFee + distanceKm * perKmRate;
-  return { charge: Math.round(charge), distance: distanceKm };
-}
 
 const b2bStatuses: B2BOrderStatus[] = [
   "pending",
@@ -96,7 +61,7 @@ export async function submitB2BRequestAction(
   if (pickupOption === 'delivery') {
     const result = await computeDeliveryCharge(address);
     deliveryCharge = result.charge;
-    distanceKm = result.distance;
+    distanceKm = result.distanceKm;
   }
 
   const store = await getStore();

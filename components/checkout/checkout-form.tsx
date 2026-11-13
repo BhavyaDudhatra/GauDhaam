@@ -88,29 +88,36 @@ export function CheckoutForm({
     if (selectedAddress?.pincode) setPincode(selectedAddress.pincode);
   }, [selectedAddress?.pincode]);
 
+  // Calculate delivery charge when address fields change (debounced)
+  const [addressInput, setAddressInput] = useState("");
   useEffect(() => {
     if (fulfillment === "self") {
       setDeliveryCharge(0);
       return;
     }
-    if (!selectedAddress) {
-      setDeliveryCharge(0);
-      return;
+    // Build address string from form fields or selected address
+    let addrStr = "";
+    if (selectedAddress) {
+      addrStr = `${selectedAddress.line1||''} ${selectedAddress.line2||''} ${selectedAddress.city||''} ${selectedAddress.state||''} ${selectedAddress.pincode||''}`.trim();
     }
-    const addressStr = `${selectedAddress.line1||''} ${selectedAddress.line2||''} ${selectedAddress.city||''} ${selectedAddress.state||''} ${selectedAddress.pincode||''}`.trim();
-    if (!addressStr) {
+    if (!addrStr && addressInput) {
+      addrStr = addressInput;
+    }
+    if (!addrStr || addrStr.length < 10) {
       setDeliveryCharge(0);
       return;
     }
     let cancelled = false;
-    fetch(`/api/delivery/charge?address=${encodeURIComponent(addressStr)}`)
-      .then(r=>r.json())
-      .then(data=>{
-        if (!cancelled) setDeliveryCharge(Number(data.charge)||0);
-      })
-      .catch(()=>{ if (!cancelled) setDeliveryCharge(0); });
-    return ()=>{ cancelled = true; };
-  }, [fulfillment, selectedAddress]);
+    const timer = setTimeout(() => {
+      fetch(`/api/delivery/charge?address=${encodeURIComponent(addrStr)}`)
+        .then(r => r.json())
+        .then(data => {
+          if (!cancelled) setDeliveryCharge(Number(data.charge) || 0);
+        })
+        .catch(() => { if (!cancelled) setDeliveryCharge(0); });
+    }, 800);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [fulfillment, selectedAddress, addressInput]);
 
   function finish(orderId: string) {
     clear();
@@ -472,6 +479,13 @@ export function CheckoutForm({
                     className="input"
                     placeholder="House / flat, street"
                     defaultValue={selectedAddress?.line1 ?? ""}
+                    onChange={e => {
+                      const line2 = (document.querySelector('input[name="line2"]') as HTMLInputElement)?.value ?? "";
+                      const city = (document.querySelector('input[name="city"]') as HTMLInputElement)?.value ?? "";
+                      const state = (document.querySelector('select[name="state"]') as HTMLSelectElement)?.value ?? "";
+                      const pincode = (document.querySelector('input[name="pincode"]') as HTMLInputElement)?.value ?? "";
+                      setAddressInput(`${e.target.value} ${line2} ${city} ${state} ${pincode}`.trim());
+                    }}
                   />
                 </label>
                 <label className="field sm:col-span-2">
@@ -482,6 +496,13 @@ export function CheckoutForm({
                     className="input"
                     placeholder="Landmark, area"
                     defaultValue={selectedAddress?.line2 ?? ""}
+                    onChange={e => {
+                      const line1 = (document.querySelector('input[name="line1"]') as HTMLInputElement)?.value ?? "";
+                      const city = (document.querySelector('input[name="city"]') as HTMLInputElement)?.value ?? "";
+                      const state = (document.querySelector('select[name="state"]') as HTMLSelectElement)?.value ?? "";
+                      const pincode = (document.querySelector('input[name="pincode"]') as HTMLInputElement)?.value ?? "";
+                      setAddressInput(`${line1} ${e.target.value} ${city} ${state} ${pincode}`.trim());
+                    }}
                   />
                 </label>
                 <label className="field">
@@ -493,6 +514,13 @@ export function CheckoutForm({
                     className="input"
                     placeholder="City"
                     defaultValue={selectedAddress?.city ?? ""}
+                    onChange={e => {
+                      const line1 = (document.querySelector('input[name="line1"]') as HTMLInputElement)?.value ?? "";
+                      const line2 = (document.querySelector('input[name="line2"]') as HTMLInputElement)?.value ?? "";
+                      const state = (document.querySelector('select[name="state"]') as HTMLSelectElement)?.value ?? "";
+                      const pincode = (document.querySelector('input[name="pincode"]') as HTMLInputElement)?.value ?? "";
+                      setAddressInput(`${line1} ${line2} ${e.target.value} ${state} ${pincode}`.trim());
+                    }}
                   />
                 </label>
                 <label className="field">
@@ -507,7 +535,15 @@ export function CheckoutForm({
                     className="input"
                     placeholder="6-digit PIN"
                     value={pincode}
-                    onChange={e=>setPincode(e.target.value.replace(/\D/g,''))}
+                    onChange={e => {
+                      const val = e.target.value.replace(/\D/g, '');
+                      setPincode(val);
+                      const line1 = (document.querySelector('input[name="line1"]') as HTMLInputElement)?.value ?? "";
+                      const line2 = (document.querySelector('input[name="line2"]') as HTMLInputElement)?.value ?? "";
+                      const city = (document.querySelector('input[name="city"]') as HTMLInputElement)?.value ?? "";
+                      const state = (document.querySelector('select[name="state"]') as HTMLSelectElement)?.value ?? "";
+                      setAddressInput(`${line1} ${line2} ${city} ${state} ${val}`.trim());
+                    }}
                   />
                 </label>
                 <label className="field sm:col-span-2">
@@ -518,6 +554,13 @@ export function CheckoutForm({
                     defaultValue={selectedAddress?.state ?? "Madhya Pradesh"}
                     autoComplete="address-level1"
                     className="select"
+                    onChange={e => {
+                      const line1 = (document.querySelector('input[name="line1"]') as HTMLInputElement)?.value ?? "";
+                      const line2 = (document.querySelector('input[name="line2"]') as HTMLInputElement)?.value ?? "";
+                      const city = (document.querySelector('input[name="city"]') as HTMLInputElement)?.value ?? "";
+                      const pincode = (document.querySelector('input[name="pincode"]') as HTMLInputElement)?.value ?? "";
+                      setAddressInput(`${line1} ${line2} ${city} ${e.target.value} ${pincode}`.trim());
+                    }}
                   >
                     {indianStates.map((state) => (
                       <option key={state} value={state}>
