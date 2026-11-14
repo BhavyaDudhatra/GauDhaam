@@ -1,6 +1,6 @@
 const GOOGLE_API_KEY = process.env.GOOGLE_MAPS_API_KEY || 'AIzaSyDJR8t41dcVSIz9J4QLKXf85zpJV6F1O0k';
 
-async function geocode(address: string) {
+async function geocodeGoogle(address: string) {
   try {
     const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${GOOGLE_API_KEY}`;
     const res = await fetch(url);
@@ -13,7 +13,7 @@ async function geocode(address: string) {
   }
 }
 
-async function distanceMatrix(origins: {lat:number,lng:number}[], destination:{lat:number,lng:number}) {
+async function distanceMatrixGoogle(origins: {lat:number,lng:number}[], destination:{lat:number,lng:number}) {
   try {
     const originsParam = origins.map(o => `${o.lat},${o.lng}`).join('|');
     const destParam = `${destination.lat},${destination.lng}`;
@@ -23,6 +23,31 @@ async function distanceMatrix(origins: {lat:number,lng:number}[], destination:{l
   } catch {
     return { rows: [] };
   }
+}
+
+// Nominatim (OpenStreetMap) geocoding - free, no API key needed
+async function geocodeNominatim(address: string) {
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`;
+    const res = await fetch(url, { headers: { 'User-Agent': 'GauDhaam/1.0' } });
+    const data = await res.json();
+    if (!Array.isArray(data) || data.length === 0) return null;
+    return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+  } catch {
+    return null;
+  }
+}
+
+// Haversine formula for straight-line distance between two coordinates
+function haversineDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371; // Earth's radius in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
 }
 
 // Pincode-based fallback delivery charge
@@ -41,13 +66,12 @@ export async function computeDeliveryCharge(address: string): Promise<{ charge: 
   const pincode = pincodeMatch ? pincodeMatch[1] : '';
   
   if (!db) {
-    // No DB - use pincode fallback
     const baseFee = 0;
     const perKmRate = 0;
     return { charge: pincodeFallbackCharge(pincode), distanceKm: 0, method: 'pincode-fallback', baseFee, perKmRate };
   }
   
-  // Get delivery config
+  // Get delivery config (baseFee and perKmRate from admin)
   const configSnap = await db.collection('config').doc('delivery').get();
   const config = configSnap.exists ? configSnap.data() as any : { baseFee: 0, perKmRate: 0 };
   const baseFee = Number(config.baseFee || 0);
@@ -57,38 +81,36 @@ export async function computeDeliveryCharge(address: string): Promise<{ charge: 
   const branches = branchesSnap.docs.map(d => ({ id: d.id, ...d.data() as any }));
   
   if (branches.length === 0) {
-    // No branches - use pincode fallback with config
-    return { charge: pincodeFallbackCharge(pincode), distanceKm: 0, method: 'pincode-fallback', baseFee, perKmRate };
-  }
-  
-  // Try Google Maps geocoding
-  const dest = await geocode(address);
-  if (!dest) {
-    // Geocoding failed - use pincode fallback
     return { charge: pincodeFallbackCharge(pincode), distanceKm: 0, method: 'pincode-fallback', baseFee, perKmRate };
   }
   
   // Use the main branch (isMain: true) for distance calculation
   const mainBranch = branches.find(b => b.isMain === true) || branches[0];
   
-  const origins = [{ lat: mainBranch.lat, lng: mainBranch.lng }];
-  const dm = await distanceMatrix(origins, dest);
-  
-  let distanceKm = 0;
-  let mapsWorked = false;
-  
-  const element = dm.rows?.[0]?.elements?.[0];
-  if (element && element.status === 'OK') {
-    distanceKm = element.distance.value / 1000;
-    mapsWorked = true;
+  // Try Google Maps first
+  let dest = await geocodeGoogle(address);
+  if (dest) {
+    const origins = [{ lat: mainBranch.lat, lng: mainBranch.lng }];
+    const dm = await distanceMatrixGoogle(origins, dest);
+    
+    const element = dm.rows?.[0]?.elements?.[0];
+    if (element && element.status === 'OK') {
+      const distanceKm = element.distance.value / 1000;
+      const charge = baseFee + distanceKm * perKmRate;
+      return { charge: Math.round(charge), distanceKm, branchId: mainBranch.id, method: 'google-maps', baseFee, perKmRate };
+    }
   }
   
-  if (!mapsWorked) {
-    // Distance Matrix failed - use pincode fallback
-    return { charge: pincodeFallbackCharge(pincode), distanceKm: 0, method: 'pincode-fallback', baseFee, perKmRate };
+  // Fallback: Try Nominatim (OpenStreetMap) geocoding + Haversine distance
+  dest = await geocodeNominatim(address);
+  if (dest && mainBranch.lat && mainBranch.lng) {
+    const distanceKm = haversineDistance(mainBranch.lat, mainBranch.lng, dest.lat, dest.lng);
+    // Apply a road distance factor (typically 1.3-1.5x straight-line distance)
+    const roadDistanceKm = distanceKm * 1.4;
+    const charge = baseFee + roadDistanceKm * perKmRate;
+    return { charge: Math.round(charge), distanceKm: roadDistanceKm, branchId: mainBranch.id, method: 'nominatim-haversine', baseFee, perKmRate };
   }
   
-  const charge = baseFee + distanceKm * perKmRate;
-  
-  return { charge: Math.round(charge), distanceKm, branchId: mainBranch.id, method: 'google-maps', baseFee, perKmRate };
+  // Final fallback: pincode-based charges
+  return { charge: pincodeFallbackCharge(pincode), distanceKm: 0, method: 'pincode-fallback', baseFee, perKmRate };
 }
