@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, ShoppingBag, User, X } from "lucide-react";
 import { Logo } from "./logo";
-import { SearchBar } from "./search-bar";
 import { useCart } from "@/components/cart/cart-context";
 import { ThemeToggle } from "@/components/theme-provider";
 import { site } from "@/lib/site";
@@ -38,23 +37,9 @@ export function Header({ user }: { user: SessionUser | null }) {
 
   return (
     <header className="sticky top-0 z-40">
-      <div className="border-b border-line bg-light dark:bg-[#1f251f] dark:border-[#2a322a]">
-        <div className="container-gd flex h-8 items-center justify-between text-[11px] font-semibold text-brand-dark dark:text-[#d4d4d4]">
-          <p className="truncate">Farm-direct · Made in small batches</p>
-          <p className="hidden items-center gap-4 sm:flex">
-            <a href={`tel:${site.phoneHref}`} className="hover:text-brand dark:hover:text-[#8ba888]">
-              {site.phone}
-            </a>
-          </p>
-        </div>
-      </div>
-
       <div className="border-b border-line bg-cream/95 backdrop-blur dark:bg-[#1a1f1a]/95 dark:border-[#2a322a]">
         <div className="container-gd flex h-16 items-center gap-3 md:h-20">
           <Logo />
-          <div className="hidden flex-1 items-center justify-center md:flex">
-            <SearchBar />
-          </div>
           <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Main">
             {headerNavLinks.map((link) => (
               <Link
@@ -95,9 +80,6 @@ export function Header({ user }: { user: SessionUser | null }) {
       {menuOpen && (
         <div className="border-b border-line bg-cream lg:hidden dark:bg-[#1a1f1a] dark:border-[#2a322a]">
           <div className="container-gd flex flex-col py-2">
-            <div className="mb-2">
-              <SearchBar />
-            </div>
             {headerNavLinks.map((link) => (
               <Link
                 key={link.label}

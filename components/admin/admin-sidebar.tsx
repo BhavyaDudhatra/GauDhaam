@@ -30,7 +30,6 @@ const navItems = [
   { href: "/admin/b2b", label: "B2B Quotes", icon: Building2 },
   { href: "/admin/coupons", label: "Coupons", icon: Gift },
   { href: "/admin/feedback", label: "Feedback", icon: MessageSquare },
-  { href: "/admin/messages", label: "Messages", icon: Mail },
   { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/events", label: "Events", icon: CalendarClock },
   { href: "/admin/gallery", label: "Gallery", icon: Sparkles },

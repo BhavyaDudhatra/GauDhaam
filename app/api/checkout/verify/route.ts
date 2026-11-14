@@ -73,7 +73,7 @@ export async function POST(request: Request) {
       qty: item.qty,
       price: item.price,
     }));
-    await sendOrderConfirmationEmail(order.email, order.number, order.total, items);
+    await sendOrderConfirmationEmail(order.email, order.number, order.total, items, order.createdAt);
   } catch (e) {
     console.error("Failed to send order confirmation email:", e);
   }

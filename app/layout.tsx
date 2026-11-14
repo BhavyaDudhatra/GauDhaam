@@ -4,7 +4,6 @@ import "./globals.css";
 import { CartProvider } from "@/components/cart/cart-context";
 import { ThemeProvider, themeScript } from "@/components/theme-provider";
 import { site } from "@/lib/site";
-import { FloatingMessageButton } from "@/components/site/floating-message-button";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
@@ -60,7 +59,6 @@ export default function RootLayout({
         <ThemeProvider>
           <CartProvider>{children}</CartProvider>
         </ThemeProvider>
-        <FloatingMessageButton />
       </body>
     </html>
   );

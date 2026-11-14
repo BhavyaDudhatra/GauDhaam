@@ -1,6 +1,7 @@
 import { Header } from "@/components/site/header";
 import { Footer } from "@/components/site/footer";
 import { CartDrawer } from "@/components/cart/cart-drawer";
+import { SearchBar } from "@/components/site/search-bar";
 import { getSession } from "@/lib/auth";
 
 export default async function SiteLayout({
@@ -19,6 +20,11 @@ export default async function SiteLayout({
         Skip to content
       </a>
       <Header user={user} />
+      <div className="border-b border-line bg-cream/95 backdrop-blur dark:bg-[#1a1f1a]/95">
+        <div className="container-gd flex items-center justify-center py-2">
+          <SearchBar />
+        </div>
+      </div>
       <main id="main" className="flex-1">
         {children}
       </main>

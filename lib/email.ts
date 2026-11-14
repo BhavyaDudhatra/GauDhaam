@@ -104,6 +104,7 @@ export async function sendOrderConfirmationEmail(
   orderNumber: string,
   total: number,
   items: { name: string; qty: number; price: number }[],
+  createdAt?: string,
 ): Promise<void> {
   const host = process.env.SMTP_HOST;
   const port = Number(process.env.SMTP_PORT || 587);
@@ -148,6 +149,7 @@ export async function sendOrderConfirmationEmail(
             <h1 style="margin:0;font-size:20px;color:#2F4930;">Order confirmed!</h1>
             <p style="margin:10px 0 0;font-size:14px;line-height:1.65;">Thank you for your order. Here's a summary:</p>
             <p style="margin:8px 0 0;font-size:13px;font-weight:600;color:#2F4930;">Order: ${orderNumber}</p>
+            ${createdAt ? `<p style="margin:4px 0 0;font-size:12px;color:#8a807a;">Date: ${new Date(createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })} at ${new Date(createdAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}</p>` : ""}
             <table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:13px;">
               <thead><tr style="background:#EAF1E5;"><th style="padding:8px;text-align:left;">Item</th><th style="padding:8px;text-align:center;">Qty</th><th style="padding:8px;text-align:right;">Amount</th></tr></thead>
               <tbody>${itemRows}</tbody>
