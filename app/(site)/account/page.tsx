@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import {
   ArrowRight,
   ChevronRight,
+  Heart,
   LockKeyhole,
   LogOut,
   Package,
@@ -104,6 +105,13 @@ export default async function AccountPage() {
                 >
                   <Package size={16} className="text-brand" />
                   My orders
+                </Link>
+                <Link
+                  href="/account/wishlist"
+                  className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-semibold text-brand-dark transition-colors hover:bg-light"
+                >
+                  <Heart size={16} className="text-brand" />
+                  Wishlist
                 </Link>
                 <a
                   href="#addresses"

@@ -109,6 +109,7 @@ export type User = {
   emailVerified: boolean;
   createdAt: string;
   addresses?: Address[];
+  wishlist?: string[];
 };
 
 import * as speakeasy from "speakeasy";

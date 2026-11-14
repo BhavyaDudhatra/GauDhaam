@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { ArrowRight, Leaf } from "lucide-react";
 import { QuickAdd } from "@/components/product/quick-add";
+import { WishlistButton } from "@/components/product/wishlist-button";
+import { QuickView } from "@/components/product/quick-view";
+import { CompareButton } from "@/components/product/compare-button";
 import { SmartImage } from "@/components/ui/smart-image";
 import { Stars } from "@/components/ui/stars";
 import { formatINR } from "@/lib/money";
@@ -45,6 +48,10 @@ export function ProductCard({
         <span className="absolute left-3 top-3 rounded-full bg-cream/95 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-brand-dark backdrop-blur dark:bg-[#171c17]/90 dark:text-[#e7efe6]">
           {product.category}
         </span>
+        <span className="absolute right-3 top-3 flex flex-col gap-1">
+          <WishlistButton productId={product.id} />
+          <CompareButton productId={product.id} />
+        </span>
         {pricing?.hasOffer && (
           <span className="absolute right-3 top-3 rounded-full bg-brown px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-white">
             {pricing.badge}
@@ -75,6 +82,9 @@ export function ProductCard({
             {product.name}
           </Link>
         </h3>
+        <div className="mt-1">
+          <QuickView product={product} />
+        </div>
         <p className="mt-1 line-clamp-2 text-[12px] leading-relaxed text-body/85">
           {product.shortDescription}
         </p>

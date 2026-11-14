@@ -7,6 +7,7 @@ import {
   Phone,
 } from "lucide-react";
 import { Logo } from "./logo";
+import { NewsletterSignup } from "./newsletter-signup";
 import { categories, site } from "@/lib/site";
 
 const shopLinks = categories.map((category) => ({
@@ -50,6 +51,9 @@ export function Footer() {
             >
               <Facebook size={16} />
             </a>
+          </div>
+          <div className="mt-5">
+            <NewsletterSignup />
           </div>
         </div>
 

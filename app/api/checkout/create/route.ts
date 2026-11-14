@@ -66,6 +66,8 @@ export async function POST(request: Request) {
   let pincode = clean(payload.pincode, 10);
   const notes = clean(payload.notes, 600);
   const fulfillment = clean(String(payload.fulfillment ?? "delivery"), 20) === "self" ? "self" : "delivery";
+  const giftWrap = payload.giftWrap === true;
+  const giftMessage = clean(payload.giftMessage, 500);
 
   const store = await getStore();
 
@@ -199,7 +201,7 @@ export async function POST(request: Request) {
     }
   }
   
-  const total = Math.max(0, subtotal + shipping - discount);
+  const total = Math.max(0, subtotal + shipping - discount + (giftWrap ? 99 : 0));
 
   // create order
   const order = await store.orders.create({
@@ -230,7 +232,7 @@ export async function POST(request: Request) {
       razorpayOrderId: null,
       razorpayPaymentId: null,
     },
-    notes,
+    notes: giftWrap && giftMessage ? `${notes}\nGift wrap: ${giftMessage}`.trim() : notes,
     fulfillment,
   } as never);
 

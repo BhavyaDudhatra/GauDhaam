@@ -8,6 +8,7 @@ import {
   Mail,
   MessageSquare,
   Package,
+  RotateCcw,
   ShoppingCart,
   Sparkles,
   Users,
@@ -19,9 +20,12 @@ import { Logo } from "@/components/site/logo";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/analytics", label: "Analytics", icon: LayoutDashboard },
+  { href: "/admin/inventory", label: "Inventory", icon: Package },
   { href: "/admin/products", label: "Products", icon: Package },
   { href: "/admin/services", label: "Services", icon: Sparkles },
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
+  { href: "/admin/returns", label: "Returns", icon: RotateCcw },
   { href: "/admin/subscriptions", label: "Subscriptions", icon: CalendarClock },
   { href: "/admin/b2b", label: "B2B Quotes", icon: Building2 },
   { href: "/admin/coupons", label: "Coupons", icon: Gift },

@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { Check, ChevronRight, Leaf, Package, ShieldCheck, Truck } from "lucide-react";
 import { ProductDetail } from "@/components/product/product-detail";
 import { ProductCard } from "@/components/product/product-card";
+import { SocialShare } from "@/components/product/social-share";
+import { TrackView } from "@/components/product/track-view";
 import { SubscribeButton } from "@/components/product/subscribe-button";
 import { getSession } from "@/lib/auth";
 import { getStore } from "@/lib/store";
@@ -77,6 +79,7 @@ export default async function ProductPage({ params }: PageProps) {
 
   return (
     <>
+      <TrackView productId={product.id} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -156,6 +159,10 @@ export default async function ProductPage({ params }: PageProps) {
             <p className="mt-2 text-[13.5px] leading-relaxed">
               {product.shortDescription}
             </p>
+
+            <div className="mt-3">
+              <SocialShare url={`${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/product/${product.slug}`} title={product.name} />
+            </div>
 
             <ProductDetail product={product} />
 

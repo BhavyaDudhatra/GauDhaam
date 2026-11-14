@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, ShoppingBag, User, X } from "lucide-react";
 import { Logo } from "./logo";
+import { SearchBar } from "./search-bar";
 import { useCart } from "@/components/cart/cart-context";
 import { ThemeToggle } from "@/components/theme-provider";
 import { site } from "@/lib/site";
@@ -51,6 +52,9 @@ export function Header({ user }: { user: SessionUser | null }) {
       <div className="border-b border-line bg-cream/95 backdrop-blur dark:bg-[#1a1f1a]/95 dark:border-[#2a322a]">
         <div className="container-gd flex h-16 items-center justify-between gap-3 md:h-20">
           <Logo />
+          <div className="hidden md:block">
+            <SearchBar />
+          </div>
           <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Main">
             {headerNavLinks.map((link) => (
               <Link

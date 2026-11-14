@@ -130,6 +130,50 @@ export default async function OrderPage({
               </div>
             )}
 
+            {/* Order tracking timeline */}
+            <div className="card p-5">
+              <h2 className="text-[16px] mb-4">Order Progress</h2>
+              <div className="flex items-center justify-between">
+                {[
+                  { key: "confirmed", label: "Confirmed", icon: "✓" },
+                  { key: "packed", label: "Packed", icon: "📦" },
+                  { key: "shipped", label: "Shipped", icon: "🚚" },
+                  { key: "delivered", label: "Delivered", icon: "✅" },
+                ].map((step, i) => {
+                  const stepIdx = i;
+                  const isDone = current >= stepIdx;
+                  const isCurrent = current === stepIdx;
+                  return (
+                    <div key={step.key} className="flex flex-1 flex-col items-center">
+                      <div
+                        className={`grid h-10 w-10 place-items-center rounded-full text-[14px] font-bold transition-colors ${
+                          isDone
+                            ? "bg-brand text-white"
+                            : "bg-light text-body/40"
+                        } ${isCurrent ? "ring-2 ring-brand ring-offset-2" : ""}`}
+                      >
+                        {isDone ? step.icon : (i + 1)}
+                      </div>
+                      <p className={`mt-2 text-[11px] font-semibold ${isDone ? "text-brand-dark" : "text-body/50"}`}>
+                        {step.label}
+                      </p>
+                      {i < 3 && (
+                        <div
+                          className={`absolute h-0.5 w-full ${isDone ? "bg-brand" : "bg-line"}`}
+                          style={{ top: "20px", left: "50%", width: "100%" }}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              {current < 0 && (
+                <p className="mt-3 text-[12px] text-body/70 text-center">
+                  Progress begins once payment is confirmed.
+                </p>
+              )}
+            </div>
+
             <div className="card overflow-hidden">
               <div className="flex items-center justify-between border-b border-line px-5 py-4">
                 <h2 className="text-[16px]">Items</h2>

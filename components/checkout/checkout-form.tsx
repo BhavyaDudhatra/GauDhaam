@@ -89,10 +89,14 @@ export function CheckoutForm({
   const [couponApplied, setCouponApplied] = useState<{ code: string; discount: number; couponId: string } | null>(null);
   const [couponError, setCouponError] = useState("");
   const [couponBusy, setCouponBusy] = useState(false);
+  const [giftWrap, setGiftWrap] = useState(false);
+  const [giftMessage, setGiftMessage] = useState("");
+  const GIFT_WRAP_FEE = 99;
 
   const shipping = fulfillment === "self" ? 0 : deliveryCharge;
   const discount = couponApplied?.discount ?? 0;
-  const total = Math.max(0, subtotal + shipping - discount);
+  const giftWrapFee = giftWrap ? GIFT_WRAP_FEE : 0;
+  const total = Math.max(0, subtotal + shipping - discount + giftWrapFee);
   const canPay = paymentMode !== "unavailable" && lines.length > 0;
 
   useEffect(()=>{
@@ -311,6 +315,8 @@ export function CheckoutForm({
       couponCode: couponApplied?.code ?? "",
       couponId: couponApplied?.couponId ?? "",
       discount: couponApplied?.discount ?? 0,
+      giftWrap,
+      giftMessage,
     };
 
     try {
@@ -635,6 +641,31 @@ export function CheckoutForm({
             </div>
 
             <div className="card p-5 md:p-6">
+              <h2 className="text-[16px]">Gift wrapping (optional)</h2>
+              <label className="mt-3 flex items-center gap-2 text-[13px] text-body">
+                <input
+                  type="checkbox"
+                  checked={giftWrap}
+                  onChange={e => setGiftWrap(e.target.checked)}
+                  className="h-4 w-4 rounded border-line accent-[#496B45]"
+                />
+                <span>Add gift wrapping (+₹{GIFT_WRAP_FEE})</span>
+              </label>
+              {giftWrap && (
+                <label className="field mt-3">
+                  <span className="label">Gift message (optional)</span>
+                  <textarea
+                    value={giftMessage}
+                    onChange={e => setGiftMessage(e.target.value)}
+                    className="textarea"
+                    rows={2}
+                    placeholder="Write a personal message..."
+                  />
+                </label>
+              )}
+            </div>
+
+            <div className="card p-5 md:p-6">
               <h2 className="text-[16px]">Payment</h2>
               <div className="mt-3 flex items-start gap-3 rounded-xl border border-brand/25 bg-light/60 p-3.5">
                 <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white text-brand">
@@ -791,6 +822,12 @@ export function CheckoutForm({
                   <div className="flex justify-between text-green-700">
                     <dt>Coupon ({couponApplied?.code})</dt>
                     <dd className="font-semibold">-{formatINR(discount)}</dd>
+                  </div>
+                )}
+                {giftWrap && (
+                  <div className="flex justify-between">
+                    <dt>Gift wrapping</dt>
+                    <dd className="font-semibold text-brand-dark">{formatINR(GIFT_WRAP_FEE)}</dd>
                   </div>
                 )}
                 <div className="mt-2 flex gap-2">

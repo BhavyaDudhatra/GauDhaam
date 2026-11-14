@@ -5,6 +5,7 @@ import { ProductCard } from "@/components/product/product-card";
 import { getStore } from "@/lib/store";
 import { getDb } from "@/lib/firebase";
 import { Img } from "@/components/ui/Img";
+import { RecentlyViewed } from "@/components/product/recently-viewed";
 
 export const dynamic = "force-dynamic";
 
@@ -132,6 +133,8 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      <RecentlyViewed products={products} />
 
       {services.length > 0 && (
         <section className="section border-t border-line bg-white/50">

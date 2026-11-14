@@ -34,6 +34,16 @@ export default async function AdminDashboardPage() {
   const pendingB2B = b2bOrders.filter((o) => o.status === "pending").length;
   const completedB2B = b2bOrders.filter((o) => o.status === "completed").length;
 
+  // Low stock alerts
+  const lowStockProducts = products.filter((p) => {
+    const stock = p.variants.reduce((sum, v) => sum + (v.stock || 0), 0);
+    return stock > 0 && stock <= 5;
+  });
+  const outOfStockProducts = products.filter((p) => {
+    const stock = p.variants.reduce((sum, v) => sum + (v.stock || 0), 0);
+    return stock === 0;
+  });
+
   const cards = [
     { label: "Revenue (paid)", value: formatINR(revenue), icon: ShoppingCart, href: "/admin/revenue" },
     { label: "Total orders", value: orders.length, href: "/admin/orders", icon: ShoppingCart, note: `${pendingOrders} awaiting payment` },
@@ -87,6 +97,53 @@ export default async function AdminDashboardPage() {
           );
         })}
       </div>
+
+      {(lowStockProducts.length > 0 || outOfStockProducts.length > 0) && (
+        <div className="grid gap-4 md:grid-cols-2">
+          {lowStockProducts.length > 0 && (
+            <div className="card p-5 border-amber-200 bg-amber-50/50">
+              <h2 className="text-[17px] text-amber-800">⚠️ Low Stock Alerts</h2>
+              <p className="mt-1 text-[12px] text-amber-700">
+                {lowStockProducts.length} product{lowStockProducts.length !== 1 ? "s" : ""} with 5 or fewer units in stock
+              </p>
+              <div className="mt-3 space-y-2">
+                {lowStockProducts.map((p) => (
+                  <Link
+                    key={p.id}
+                    href={`/admin/products/${p.id}`}
+                    className="flex items-center justify-between rounded-lg border border-amber-200 bg-white px-3 py-2 text-[12.5px] transition-colors hover:bg-amber-50"
+                  >
+                    <span className="font-semibold text-brand-dark">{p.name}</span>
+                    <span className="text-amber-700">
+                      {p.variants.reduce((sum: number, v: any) => sum + (v.stock || 0), 0)} units left
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+          {outOfStockProducts.length > 0 && (
+            <div className="card p-5 border-red-200 bg-red-50/50">
+              <h2 className="text-[17px] text-red-800">🚫 Out of Stock</h2>
+              <p className="mt-1 text-[12px] text-red-700">
+                {outOfStockProducts.length} product{outOfStockProducts.length !== 1 ? "s" : ""} are completely out of stock
+              </p>
+              <div className="mt-3 space-y-2">
+                {outOfStockProducts.map((p) => (
+                  <Link
+                    key={p.id}
+                    href={`/admin/products/${p.id}`}
+                    className="flex items-center justify-between rounded-lg border border-red-200 bg-white px-3 py-2 text-[12.5px] transition-colors hover:bg-red-50"
+                  >
+                    <span className="font-semibold text-brand-dark">{p.name}</span>
+                    <span className="text-red-700">Sold out</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="card overflow-hidden">
