@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { normalizeDriveLink } from "@/lib/drive-utils";
 
 export type ImgProps = {
@@ -17,8 +16,8 @@ export type ImgProps = {
 };
 
 /**
- * Renders an image. Google Drive links are normalized to proxy URLs.
- * Remote images use unoptimized mode to avoid Next.js optimization failures.
+ * Renders an img tag. Google Drive links are normalized to proxy URLs.
+ * No Next.js image optimization — the browser handles the src directly.
  */
 export function Img({
   src,
@@ -34,20 +33,30 @@ export function Img({
 }: ImgProps) {
   const isRemote = typeof src === "string" && /^https?:/i.test(src);
   const normalizedSrc = isRemote ? normalizeDriveLink(src) : src;
-  const isProxyUrl = normalizedSrc.startsWith("/api/image");
+
+  if (!normalizedSrc) {
+    return null;
+  }
+
+  const imgStyle: React.CSSProperties = {};
+  if (fill) {
+    imgStyle.position = "absolute";
+    imgStyle.top = 0;
+    imgStyle.left = 0;
+    imgStyle.width = "100%";
+    imgStyle.height = "100%";
+    imgStyle.objectFit = "cover";
+  }
 
   return (
-    <Image
+    <img
       src={normalizedSrc}
       alt={alt}
       width={width ? Number(width) : undefined}
       height={height ? Number(height) : undefined}
-      fill={fill}
-      sizes={sizes}
-      priority={priority}
-      unoptimized={isRemote || isProxyUrl || unoptimized}
+      loading={priority ? "eager" : "lazy"}
       className={className}
-      style={style}
+      style={{ ...imgStyle, ...style }}
     />
   );
 }
