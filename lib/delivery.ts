@@ -1,16 +1,32 @@
 const GOOGLE_API_KEY = process.env.GOOGLE_MAPS_API_KEY || 'AIzaSyDJR8t41dcVSIz9J4QLKXf85zpJV6F1O0k';
 
 async function geocodeGoogle(address: string) {
-  try {
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${GOOGLE_API_KEY}`;
-    const res = await fetch(url);
-    const data = await res.json();
-    if (data.status !== 'OK' || !data.results?.[0]) return null;
-    const loc = data.results[0].geometry.location;
-    return { lat: loc.lat, lng: loc.lng };
-  } catch {
-    return null;
+  // Try full address first, then progressively simpler versions
+  const parts = address.split(',').map(p => p.trim()).filter(Boolean);
+  const candidates: string[] = [address];
+  if (parts.length > 2) {
+    candidates.push(parts.slice(-3).join(', '));
+    candidates.push(parts.slice(-2).join(', '));
   }
+  const pincodeMatch = address.match(/\b(\d{6})\b/);
+  if (pincodeMatch) {
+    candidates.push(pincodeMatch[1]);
+  }
+  
+  for (const candidate of candidates) {
+    try {
+      const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(candidate)}&key=${GOOGLE_API_KEY}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data.status === 'OK' && data.results?.[0]) {
+        const loc = data.results[0].geometry.location;
+        return { lat: loc.lat, lng: loc.lng };
+      }
+    } catch {
+      // continue to next candidate
+    }
+  }
+  return null;
 }
 
 async function distanceMatrixGoogle(origins: {lat:number,lng:number}[], destination:{lat:number,lng:number}) {
@@ -27,15 +43,40 @@ async function distanceMatrixGoogle(origins: {lat:number,lng:number}[], destinat
 
 // Nominatim (OpenStreetMap) geocoding - free, no API key needed
 async function geocodeNominatim(address: string) {
-  try {
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`;
-    const res = await fetch(url, { headers: { 'User-Agent': 'GauDhaam/1.0' } });
-    const data = await res.json();
-    if (!Array.isArray(data) || data.length === 0) return null;
-    return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
-  } catch {
-    return null;
+  // Try the full address first, then progressively simpler versions
+  const parts = address.split(',').map(p => p.trim()).filter(Boolean);
+  
+  // Build candidate queries from most specific to least specific
+  const candidates: string[] = [address];
+  if (parts.length > 2) {
+    // Try last 3 parts (city, state, pincode)
+    candidates.push(parts.slice(-3).join(', '));
+    // Try last 2 parts (city, pincode)
+    candidates.push(parts.slice(-2).join(', '));
+    // Try city + state
+    if (parts.length >= 3) {
+      candidates.push(parts[parts.length - 2] + ', ' + parts[parts.length - 1]);
+    }
+    // Try just the city name (extract from parts)
+    const pincodeMatch = address.match(/\b(\d{6})\b/);
+    if (pincodeMatch) {
+      candidates.push(pincodeMatch[1]);
+    }
   }
+  
+  for (const candidate of candidates) {
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(candidate)}&limit=1`;
+      const res = await fetch(url, { headers: { 'User-Agent': 'GauDhaam/1.0' } });
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+      }
+    } catch {
+      // continue to next candidate
+    }
+  }
+  return null;
 }
 
 // Haversine formula for straight-line distance between two coordinates
