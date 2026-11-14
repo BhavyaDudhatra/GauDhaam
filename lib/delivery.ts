@@ -86,18 +86,19 @@ export async function computeDeliveryCharge(address: string): Promise<{ charge: 
   
   // Use the main branch (isMain: true) for distance calculation
   const mainBranch = branches.find(b => b.isMain === true) || branches[0];
+  
+  // Use stored branch coordinates (admin entered them)
+  const branchCoords = { lat: mainBranch.lat, lng: mainBranch.lng };
   const branchAddress = mainBranch.address || '';
   
-  // Geocode the branch address (source) and user address (destination)
-  let branchCoords = null;
+  // Geocode the user's delivery address (destination)
   let userCoords = null;
   let method = 'pincode-fallback';
   
-  // Try Google Maps first
-  branchCoords = await geocodeGoogle(branchAddress);
+  // Try Google Maps first for user address
   userCoords = await geocodeGoogle(address);
   
-  if (branchCoords && userCoords) {
+  if (userCoords && branchCoords.lat && branchCoords.lng) {
     // Use Distance Matrix API
     const dm = await distanceMatrixGoogle([branchCoords], userCoords);
     const element = dm.rows?.[0]?.elements?.[0];
@@ -108,15 +109,12 @@ export async function computeDeliveryCharge(address: string): Promise<{ charge: 
     }
   }
   
-  // Fallback: Try Nominatim (OpenStreetMap) geocoding
-  if (!branchCoords) {
-    branchCoords = await geocodeNominatim(branchAddress);
-  }
+  // Fallback: Try Nominatim (OpenStreetMap) geocoding for user address
   if (!userCoords) {
     userCoords = await geocodeNominatim(address);
   }
   
-  if (branchCoords && userCoords) {
+  if (userCoords && branchCoords.lat && branchCoords.lng) {
     const distanceKm = haversineDistance(branchCoords.lat, branchCoords.lng, userCoords.lat, userCoords.lng);
     // Apply a road distance factor (typically 1.3-1.5x straight-line distance)
     const roadDistanceKm = distanceKm * 1.4;
