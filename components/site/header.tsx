@@ -50,9 +50,9 @@ export function Header({ user }: { user: SessionUser | null }) {
       </div>
 
       <div className="border-b border-line bg-cream/95 backdrop-blur dark:bg-[#1a1f1a]/95 dark:border-[#2a322a]">
-        <div className="container-gd flex h-16 items-center justify-between gap-3 md:h-20">
+        <div className="container-gd flex h-16 items-center gap-3 md:h-20">
           <Logo />
-          <div className="hidden md:block">
+          <div className="hidden flex-1 items-center justify-center md:flex">
             <SearchBar />
           </div>
           <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Main">
@@ -60,7 +60,7 @@ export function Header({ user }: { user: SessionUser | null }) {
               <Link
                 key={link.label}
                 href={link.href}
-                className={`rounded-full px-3 py-2 text-[13.5px] font-semibold transition-colors ${
+                className={`rounded-full px-2.5 py-2 text-[13px] font-semibold transition-colors whitespace-nowrap ${
                   isActive(link.href)
                     ? "bg-light text-brand-dark dark:bg-[#2a322a] dark:text-[#e8f0e8]"
                     : "text-body hover:bg-light/70 hover:text-brand-dark dark:text-[#b0b0b0] dark:hover:bg-[#2a322a] dark:hover:text-[#e8f0e8]"
@@ -70,15 +70,15 @@ export function Header({ user }: { user: SessionUser | null }) {
               </Link>
             ))}
           </nav>
-          <div className="flex items-center gap-0.5">
+          <div className="flex shrink-0 items-center gap-1">
             <ThemeToggle />
             <Link href={user ? "/account" : "/login"} className="btn btn-ghost btn-sm hidden md:inline-flex">
               <User size={16} />
-              {user ? "Account" : "Sign in"}
+              <span className="hidden lg:inline">{user ? "Account" : "Sign in"}</span>
             </Link>
             <button type="button" onClick={openCart} className="btn btn-ghost btn-sm">
               <ShoppingBag size={16} />
-              <span>Cart</span>
+              <span className="hidden sm:inline">Cart</span>
               {hydrated && count > 0 && (
                 <span className="ml-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-brand px-1 text-[11px] font-semibold text-white">
                   {count}
@@ -94,7 +94,10 @@ export function Header({ user }: { user: SessionUser | null }) {
       </div>
       {menuOpen && (
         <div className="border-b border-line bg-cream lg:hidden dark:bg-[#1a1f1a] dark:border-[#2a322a]">
-          <nav className="container-gd flex flex-col py-2">
+          <div className="container-gd flex flex-col py-2">
+            <div className="mb-2">
+              <SearchBar />
+            </div>
             {headerNavLinks.map((link) => (
               <Link
                 key={link.label}
@@ -109,7 +112,7 @@ export function Header({ user }: { user: SessionUser | null }) {
             <Link href={user ? "/account" : "/login"} className="rounded-xl px-2 py-2 text-[14px] font-semibold text-body">
               {user ? "My account" : "Sign in / Create account"}
             </Link>
-          </nav>
+          </div>
         </div>
       )}
     </header>
