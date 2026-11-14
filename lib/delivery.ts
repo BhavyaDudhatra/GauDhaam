@@ -57,7 +57,7 @@ function pincodeFallbackCharge(pincode: string): number {
   return 400;
 }
 
-export async function computeDeliveryCharge(address: string): Promise<{ charge: number; distanceKm: number; branchId?: string; method: string; baseFee: number; perKmRate: number }> {
+export async function computeDeliveryCharge(address: string): Promise<{ charge: number; distanceKm: number; branchId?: string; method: string; baseFee: number; perKmRate: number; sourceAddress?: string; destAddress?: string }> {
   const { getDb } = await import('@/lib/firebase');
   const db = await getDb();
   
@@ -86,29 +86,42 @@ export async function computeDeliveryCharge(address: string): Promise<{ charge: 
   
   // Use the main branch (isMain: true) for distance calculation
   const mainBranch = branches.find(b => b.isMain === true) || branches[0];
+  const branchAddress = mainBranch.address || '';
+  
+  // Geocode the branch address (source) and user address (destination)
+  let branchCoords = null;
+  let userCoords = null;
+  let method = 'pincode-fallback';
   
   // Try Google Maps first
-  let dest = await geocodeGoogle(address);
-  if (dest) {
-    const origins = [{ lat: mainBranch.lat, lng: mainBranch.lng }];
-    const dm = await distanceMatrixGoogle(origins, dest);
-    
+  branchCoords = await geocodeGoogle(branchAddress);
+  userCoords = await geocodeGoogle(address);
+  
+  if (branchCoords && userCoords) {
+    // Use Distance Matrix API
+    const dm = await distanceMatrixGoogle([branchCoords], userCoords);
     const element = dm.rows?.[0]?.elements?.[0];
     if (element && element.status === 'OK') {
       const distanceKm = element.distance.value / 1000;
       const charge = baseFee + distanceKm * perKmRate;
-      return { charge: Math.round(charge), distanceKm, branchId: mainBranch.id, method: 'google-maps', baseFee, perKmRate };
+      return { charge: Math.round(charge), distanceKm, branchId: mainBranch.id, method: 'google-maps', baseFee, perKmRate, sourceAddress: branchAddress, destAddress: address };
     }
   }
   
-  // Fallback: Try Nominatim (OpenStreetMap) geocoding + Haversine distance
-  dest = await geocodeNominatim(address);
-  if (dest && mainBranch.lat && mainBranch.lng) {
-    const distanceKm = haversineDistance(mainBranch.lat, mainBranch.lng, dest.lat, dest.lng);
+  // Fallback: Try Nominatim (OpenStreetMap) geocoding
+  if (!branchCoords) {
+    branchCoords = await geocodeNominatim(branchAddress);
+  }
+  if (!userCoords) {
+    userCoords = await geocodeNominatim(address);
+  }
+  
+  if (branchCoords && userCoords) {
+    const distanceKm = haversineDistance(branchCoords.lat, branchCoords.lng, userCoords.lat, userCoords.lng);
     // Apply a road distance factor (typically 1.3-1.5x straight-line distance)
     const roadDistanceKm = distanceKm * 1.4;
     const charge = baseFee + roadDistanceKm * perKmRate;
-    return { charge: Math.round(charge), distanceKm: roadDistanceKm, branchId: mainBranch.id, method: 'nominatim-haversine', baseFee, perKmRate };
+    return { charge: Math.round(charge), distanceKm: roadDistanceKm, branchId: mainBranch.id, method: 'nominatim-haversine', baseFee, perKmRate, sourceAddress: branchAddress, destAddress: address };
   }
   
   // Final fallback: pincode-based charges
