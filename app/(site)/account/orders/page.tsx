@@ -4,8 +4,14 @@ import { getSession } from "@/lib/auth";
 import { getStore } from "@/lib/store";
 import { formatINR, formatDate } from "@/lib/money";
 import { OrderStatusBadge } from "@/components/ui/order-status";
+import { FilterSortBar } from "@/components/ui/filter-sort-bar";
 
-export default async function MyOrdersAggregationPage() {
+export default async function MyOrdersAggregationPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; sort?: string; order?: string; type?: string }>;
+}) {
+  const { q, sort, order, type } = await searchParams;
   const session = await getSession();
   if (!session) redirect("/login?next=/account/orders");
 
@@ -13,14 +19,53 @@ export default async function MyOrdersAggregationPage() {
   const user = await store.users.get(session.id);
   if (!user) redirect("/login?next=/account/orders");
 
-  const orders = await store.orders.list({ userId: user.id });
+  let orders = await store.orders.list({ userId: user.id });
   const b2b = await store.b2bOrders.list({ userId: user.id });
   const subscriptions = await store.subscriptions.list({ userId: user.id });
+
+  // Filter by search query
+  if (q) {
+    const lower = q.toLowerCase();
+    orders = orders.filter(
+      (o) =>
+        o.number.toLowerCase().includes(lower) ||
+        o.customerName.toLowerCase().includes(lower),
+    );
+  }
+
+  // Sort
+  if (sort) {
+    const dir = order === "desc" ? -1 : 1;
+    orders.sort((a, b) => {
+      let aVal: any = a[sort as keyof typeof a];
+      let bVal: any = b[sort as keyof typeof b];
+      if (typeof aVal === "string") {
+        aVal = aVal.toLowerCase();
+        bVal = (bVal ?? "").toLowerCase();
+      }
+      if (sort.includes("At")) {
+        aVal = new Date(aVal || 0).getTime();
+        bVal = new Date(bVal || 0).getTime();
+      }
+      if (aVal < bVal) return -1 * dir;
+      if (aVal > bVal) return 1 * dir;
+      return 0;
+    });
+  }
 
   return (
     <div className="container-gd py-10">
       <h1 className="text-[24px] font-bold">My Orders</h1>
       <p className="mt-1 text-[13px] text-body/70">All your purchases, subscriptions and B2B enquiries in one place.</p>
+
+      <FilterSortBar
+        searchPlaceholder="Search orders..."
+        sortOptions={[
+          { value: "createdAt", label: "Date" },
+          { value: "total", label: "Total" },
+          { value: "number", label: "Order #" },
+        ]}
+      />
 
       <div className="mt-6 space-y-8">
         <section>

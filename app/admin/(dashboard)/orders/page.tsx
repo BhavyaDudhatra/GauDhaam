@@ -4,6 +4,7 @@ import { Eye } from "lucide-react";
 import { formatDateTime, formatINR } from "@/lib/money";
 import { OrderStatusBadge, paymentStatusLabel } from "@/components/ui/order-status";
 import { getStore } from "@/lib/store";
+import { FilterSortBar } from "@/components/ui/filter-sort-bar";
 
 export const metadata: Metadata = { title: "Orders · Admin" };
 export const dynamic = "force-dynamic";
@@ -11,13 +12,55 @@ export const dynamic = "force-dynamic";
 export default async function AdminOrdersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ updated?: string; paid?: string }>;
+  searchParams: Promise<{ updated?: string; paid?: string; q?: string; sort?: string; order?: string; status?: string; payment?: string }>;
 }) {
-  const { updated, paid } = await searchParams;
+  const { updated, paid, q, sort, order, status, payment } = await searchParams;
   const store = await getStore();
   let orders = await store.orders.list();
   if (paid === 'true') {
     orders = orders.filter(o => o.payment.status === 'paid');
+  }
+
+  // Filter by search query
+  if (q) {
+    const lower = q.toLowerCase();
+    orders = orders.filter(
+      (o) =>
+        o.number.toLowerCase().includes(lower) ||
+        o.customerName.toLowerCase().includes(lower) ||
+        o.email.toLowerCase().includes(lower) ||
+        o.phone.includes(lower),
+    );
+  }
+
+  // Filter by status
+  if (status && status !== "all") {
+    orders = orders.filter((o) => o.status === status);
+  }
+
+  // Filter by payment status
+  if (payment && payment !== "all") {
+    orders = orders.filter((o) => o.payment?.status === payment);
+  }
+
+  // Sort
+  if (sort) {
+    const dir = order === "desc" ? -1 : 1;
+    orders.sort((a, b) => {
+      let aVal: any = a[sort as keyof typeof a];
+      let bVal: any = b[sort as keyof typeof b];
+      if (typeof aVal === "string") {
+        aVal = aVal.toLowerCase();
+        bVal = (bVal ?? "").toLowerCase();
+      }
+      if (sort.includes("At")) {
+        aVal = new Date(aVal || 0).getTime();
+        bVal = new Date(bVal || 0).getTime();
+      }
+      if (aVal < bVal) return -1 * dir;
+      if (aVal > bVal) return 1 * dir;
+      return 0;
+    });
   }
 
   return (
@@ -34,6 +77,40 @@ export default async function AdminOrdersPage({
           Order updated.
         </p>
       )}
+
+      <FilterSortBar
+        searchPlaceholder="Search orders..."
+        filterOptions={[
+          {
+            key: "status",
+            label: "Status",
+            options: [
+              { value: "pending", label: "Pending" },
+              { value: "paid", label: "Paid" },
+              { value: "packed", label: "Packed" },
+              { value: "shipped", label: "Shipped" },
+              { value: "delivered", label: "Delivered" },
+              { value: "cancelled", label: "Cancelled" },
+            ],
+          },
+          {
+            key: "payment",
+            label: "Payment",
+            options: [
+              { value: "created", label: "Created" },
+              { value: "paid", label: "Paid" },
+              { value: "failed", label: "Failed" },
+              { value: "refunded", label: "Refunded" },
+            ],
+          },
+        ]}
+        sortOptions={[
+          { value: "createdAt", label: "Date" },
+          { value: "total", label: "Total" },
+          { value: "number", label: "Order #" },
+          { value: "customerName", label: "Customer" },
+        ]}
+      />
 
       <div className="card overflow-hidden">
         <div className="overflow-x-auto">

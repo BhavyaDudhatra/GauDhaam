@@ -2,17 +2,55 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getSession } from "@/lib/auth";
 import { getStore } from "@/lib/store";
+import { FilterSortBar } from "@/components/ui/filter-sort-bar";
 import { formatDate } from "@/lib/money";
 import { payB2BOrderAction } from "@/lib/actions/b2b";
 
 export const dynamic = "force-dynamic";
 
-export default async function B2BOrdersPage() {
+export default async function B2BOrdersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; sort?: string; order?: string; status?: string }>;
+}) {
+  const { q, sort, order, status } = await searchParams;
   const session = await getSession();
   if (!session) redirect("/login?next=/b2b/orders");
 
   const store = await getStore();
-  const orders = await store.b2bOrders.list({ userId: session.id });
+  let orders = await store.b2bOrders.list({ userId: session.id });
+
+  if (q) {
+    const lower = q.toLowerCase();
+    orders = orders.filter(
+      (o) =>
+        (o.itemName || "").toLowerCase().includes(lower) ||
+        (o.fullName || "").toLowerCase().includes(lower),
+    );
+  }
+
+  if (status && status !== "all") {
+    orders = orders.filter((o) => o.status === status);
+  }
+
+  if (sort) {
+    const dir = order === "desc" ? -1 : 1;
+    orders.sort((a, b) => {
+      let aVal: any = a[sort as keyof typeof a];
+      let bVal: any = b[sort as keyof typeof b];
+      if (typeof aVal === "string") {
+        aVal = aVal.toLowerCase();
+        bVal = (bVal ?? "").toLowerCase();
+      }
+      if (sort.includes("At")) {
+        aVal = new Date(aVal || 0).getTime();
+        bVal = new Date(bVal || 0).getTime();
+      }
+      if (aVal < bVal) return -1 * dir;
+      if (aVal > bVal) return 1 * dir;
+      return 0;
+    });
+  }
 
   return (
     <div className="container-gd py-10 space-y-6">
@@ -20,6 +58,28 @@ export default async function B2BOrdersPage() {
         <h1 className="text-[24px] font-bold">My B2B Orders</h1>
         <Link href="/b2b" className="btn btn-outline btn-sm">New Request</Link>
       </div>
+
+      <FilterSortBar
+        searchPlaceholder="Search B2B orders..."
+        filterOptions={[
+          {
+            key: "status",
+            label: "Status",
+            options: [
+              { value: "pending", label: "Pending" },
+              { value: "quoted", label: "Quoted" },
+              { value: "confirmed", label: "Confirmed" },
+              { value: "rejected", label: "Rejected" },
+              { value: "completed", label: "Completed" },
+            ],
+          },
+        ]}
+        sortOptions={[
+          { value: "createdAt", label: "Date" },
+          { value: "status", label: "Status" },
+          { value: "itemName", label: "Item" },
+        ]}
+      />
 
       <div className="grid gap-4">
         {orders.map(o => (

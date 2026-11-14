@@ -4,14 +4,55 @@ import { Plus } from "lucide-react";
 import { Img } from "@/components/ui/Img";
 import { deleteServiceAction, toggleServiceAction } from "@/lib/actions/admin";
 import { getStore } from "@/lib/store";
+import { FilterSortBar } from "@/components/ui/filter-sort-bar";
 import { normalizeDriveLink } from "@/lib/drive-utils";
 
 export const metadata: Metadata = { title: "Services · Admin" };
 export const dynamic = "force-dynamic";
 
-export default async function AdminServicesPage() {
+export default async function AdminServicesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ saved?: string; q?: string; sort?: string; order?: string; status?: string }>;
+}) {
+  const { saved, q, sort, order, status } = await searchParams;
   const store = await getStore();
-  const services = await store.services.list({ includeInactive: true });
+  let services = await store.services.list({ includeInactive: true });
+
+  if (q) {
+    const lower = q.toLowerCase();
+    services = services.filter(
+      (s) =>
+        s.name.toLowerCase().includes(lower) ||
+        s.tagline.toLowerCase().includes(lower) ||
+        s.description.toLowerCase().includes(lower),
+    );
+  }
+
+  if (status === "visible") {
+    services = services.filter((s) => s.active);
+  } else if (status === "hidden") {
+    services = services.filter((s) => !s.active);
+  }
+
+  if (sort) {
+    const dir = order === "desc" ? -1 : 1;
+    services.sort((a, b) => {
+      let aVal: any = a[sort as keyof typeof a];
+      let bVal: any = b[sort as keyof typeof b];
+      if (typeof aVal === "string") {
+        aVal = aVal.toLowerCase();
+        bVal = (bVal ?? "").toLowerCase();
+      }
+      if (sort.includes("At")) {
+        aVal = new Date(aVal || 0).getTime();
+        bVal = new Date(bVal || 0).getTime();
+      }
+      if (aVal < bVal) return -1 * dir;
+      if (aVal > bVal) return 1 * dir;
+      return 0;
+    });
+  }
 
   return (
     <div className="space-y-5">
@@ -27,6 +68,26 @@ export default async function AdminServicesPage() {
           New service
         </Link>
       </div>
+
+      <FilterSortBar
+        searchPlaceholder="Search services..."
+        filterOptions={[
+          {
+            key: "status",
+            label: "Status",
+            options: [
+              { value: "visible", label: "Visible" },
+              { value: "hidden", label: "Hidden" },
+            ],
+          },
+        ]}
+        sortOptions={[
+          { value: "name", label: "Name" },
+          { value: "sort", label: "Sort order" },
+          { value: "createdAt", label: "Date added" },
+          { value: "active", label: "Status" },
+        ]}
+      />
 
       <div className="card overflow-hidden">
         <div className="overflow-x-auto">

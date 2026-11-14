@@ -3,13 +3,53 @@ import { Building2 } from "lucide-react";
 import { updateB2BOrderAction } from "@/lib/actions/b2b";
 import { formatDate, formatINR } from "@/lib/money";
 import { getStore } from "@/lib/store";
+import { FilterSortBar } from "@/components/ui/filter-sort-bar";
 
 export const metadata: Metadata = { title: "B2B Orders · Admin" };
 export const dynamic = "force-dynamic";
 
-export default async function AdminB2BPage() {
+export default async function AdminB2BPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; sort?: string; order?: string; status?: string }>;
+}) {
+  const { q, sort, order, status } = await searchParams;
   const store = await getStore();
-  const orders = await store.b2bOrders.list();
+  let orders = await store.b2bOrders.list();
+
+  if (q) {
+    const lower = q.toLowerCase();
+    orders = orders.filter(
+      (o) =>
+        o.fullName.toLowerCase().includes(lower) ||
+        o.itemName?.toLowerCase().includes(lower) ||
+        o.phone.includes(lower),
+    );
+  }
+
+  if (status && status !== "all") {
+    orders = orders.filter((o) => o.status === status);
+  }
+
+  if (sort) {
+    const dir = order === "desc" ? -1 : 1;
+    orders.sort((a, b) => {
+      let aVal: any = a[sort as keyof typeof a];
+      let bVal: any = b[sort as keyof typeof b];
+      if (typeof aVal === "string") {
+        aVal = aVal.toLowerCase();
+        bVal = (bVal ?? "").toLowerCase();
+      }
+      if (sort.includes("At")) {
+        aVal = new Date(aVal || 0).getTime();
+        bVal = new Date(bVal || 0).getTime();
+      }
+      if (aVal < bVal) return -1 * dir;
+      if (aVal > bVal) return 1 * dir;
+      return 0;
+    });
+  }
+
   const open = orders.filter((order) => order.status === "pending").length;
 
   return (
@@ -20,6 +60,28 @@ export default async function AdminB2BPage() {
           {orders.length} inquiries · {open} awaiting action
         </p>
       </div>
+
+      <FilterSortBar
+        searchPlaceholder="Search B2B orders..."
+        filterOptions={[
+          {
+            key: "status",
+            label: "Status",
+            options: [
+              { value: "pending", label: "Pending" },
+              { value: "quoted", label: "Quoted" },
+              { value: "confirmed", label: "Confirmed" },
+              { value: "rejected", label: "Rejected" },
+              { value: "completed", label: "Completed" },
+            ],
+          },
+        ]}
+        sortOptions={[
+          { value: "createdAt", label: "Date" },
+          { value: "fullName", label: "Name" },
+          { value: "status", label: "Status" },
+        ]}
+      />
 
       <div className="card overflow-hidden">
         <div className="overflow-x-auto">

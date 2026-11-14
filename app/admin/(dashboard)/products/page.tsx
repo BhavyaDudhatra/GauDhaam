@@ -6,6 +6,7 @@ import { formatINR } from "@/lib/money";
 import { activeVariants, priceRange, variantStock } from "@/lib/pricing";
 import { getStore } from "@/lib/store";
 import { Img } from "@/components/ui/Img";
+import { FilterSortBar } from "@/components/ui/filter-sort-bar";
 
 export const metadata: Metadata = { title: "Products · Admin" };
 export const dynamic = "force-dynamic";
@@ -13,11 +14,60 @@ export const dynamic = "force-dynamic";
 export default async function AdminProductsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ saved?: string }>;
+  searchParams: Promise<{ saved?: string; q?: string; sort?: string; order?: string; category?: string; status?: string }>;
 }) {
-  const { saved } = await searchParams;
+  const { saved, q, sort, order, category, status } = await searchParams;
   const store = await getStore();
-  const products = await store.products.list();
+  let products = await store.products.list();
+
+  // Filter by search query
+  if (q) {
+    const lower = q.toLowerCase();
+    products = products.filter(
+      (p) =>
+        p.name.toLowerCase().includes(lower) ||
+        p.category.toLowerCase().includes(lower) ||
+        p.shortDescription.toLowerCase().includes(lower),
+    );
+  }
+
+  // Filter by category
+  if (category && category !== "all") {
+    products = products.filter((p) => p.category.toLowerCase() === category.toLowerCase());
+  }
+
+  // Filter by status
+  if (status === "visible") {
+    products = products.filter((p) => p.available);
+  } else if (status === "hidden") {
+    products = products.filter((p) => !p.available);
+  }
+
+  // Sort
+  if (sort) {
+    const dir = order === "desc" ? -1 : 1;
+    products.sort((a, b) => {
+      let aVal: any = a[sort as keyof typeof a];
+      let bVal: any = b[sort as keyof typeof b];
+      if (sort === "price") {
+        aVal = Math.min(...a.variants.map((v) => v.price));
+        bVal = Math.min(...b.variants.map((v) => v.price));
+      }
+      if (typeof aVal === "string") {
+        aVal = aVal.toLowerCase();
+        bVal = (bVal ?? "").toLowerCase();
+      }
+      if (sort.includes("At")) {
+        aVal = new Date(aVal || 0).getTime();
+        bVal = new Date(bVal || 0).getTime();
+      }
+      if (aVal < bVal) return -1 * dir;
+      if (aVal > bVal) return 1 * dir;
+      return 0;
+    });
+  }
+
+  const categories = Array.from(new Set(products.map((p) => p.category).filter(Boolean))).sort();
 
   return (
     <div className="space-y-5">
@@ -39,6 +89,31 @@ export default async function AdminProductsPage({
           Product saved.
         </p>
       )}
+
+      <FilterSortBar
+        searchPlaceholder="Search products..."
+        filterOptions={[
+          {
+            key: "category",
+            label: "Category",
+            options: categories.map((c) => ({ value: c, label: c })),
+          },
+          {
+            key: "status",
+            label: "Status",
+            options: [
+              { value: "visible", label: "Visible" },
+              { value: "hidden", label: "Hidden" },
+            ],
+          },
+        ]}
+        sortOptions={[
+          { value: "name", label: "Name" },
+          { value: "price", label: "Price" },
+          { value: "createdAt", label: "Date added" },
+          { value: "available", label: "Status" },
+        ]}
+      />
 
       <div className="card overflow-hidden">
         <div className="overflow-x-auto">

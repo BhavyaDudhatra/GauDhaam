@@ -7,6 +7,7 @@ import {
 } from "@/lib/actions/admin";
 import { formatDate, formatINR } from "@/lib/money";
 import { getStore } from "@/lib/store";
+import { FilterSortBar } from "@/components/ui/filter-sort-bar";
 
 export const metadata: Metadata = { title: "Coupons · Admin" };
 export const dynamic = "force-dynamic";
@@ -14,11 +15,45 @@ export const dynamic = "force-dynamic";
 export default async function AdminCouponsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ saved?: string }>;
+  searchParams: Promise<{ saved?: string; q?: string; sort?: string; order?: string; status?: string }>;
 }) {
-  const { saved } = await searchParams;
+  const { saved, q, sort, order, status } = await searchParams;
   const store = await getStore();
-  const coupons = await store.coupons.list();
+  let coupons = await store.coupons.list();
+
+  if (q) {
+    const lower = q.toLowerCase();
+    coupons = coupons.filter(
+      (c) =>
+        c.code.toLowerCase().includes(lower) ||
+        (c.description || "").toLowerCase().includes(lower),
+    );
+  }
+
+  if (status === "active") {
+    coupons = coupons.filter((c) => c.active);
+  } else if (status === "paused") {
+    coupons = coupons.filter((c) => !c.active);
+  }
+
+  if (sort) {
+    const dir = order === "desc" ? -1 : 1;
+    coupons.sort((a, b) => {
+      let aVal: any = a[sort as keyof typeof a];
+      let bVal: any = b[sort as keyof typeof b];
+      if (typeof aVal === "string") {
+        aVal = aVal.toLowerCase();
+        bVal = (bVal ?? "").toLowerCase();
+      }
+      if (sort.includes("At")) {
+        aVal = new Date(aVal || 0).getTime();
+        bVal = new Date(bVal || 0).getTime();
+      }
+      if (aVal < bVal) return -1 * dir;
+      if (aVal > bVal) return 1 * dir;
+      return 0;
+    });
+  }
 
   return (
     <div className="space-y-5">
@@ -40,6 +75,26 @@ export default async function AdminCouponsPage({
           Coupon saved.
         </p>
       )}
+
+      <FilterSortBar
+        searchPlaceholder="Search coupons..."
+        filterOptions={[
+          {
+            key: "status",
+            label: "Status",
+            options: [
+              { value: "active", label: "Active" },
+              { value: "paused", label: "Paused" },
+            ],
+          },
+        ]}
+        sortOptions={[
+          { value: "code", label: "Code" },
+          { value: "value", label: "Discount" },
+          { value: "createdAt", label: "Date created" },
+          { value: "active", label: "Status" },
+        ]}
+      />
 
       <div className="card overflow-hidden">
         <div className="overflow-x-auto">
