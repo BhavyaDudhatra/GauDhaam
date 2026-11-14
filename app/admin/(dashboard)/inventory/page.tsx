@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getStore } from "@/lib/store";
 import { Img } from "@/components/ui/Img";
+import { StockEditor } from "@/components/admin/stock-editor";
 
 export const metadata: Metadata = { title: "Inventory · Admin" };
 export const dynamic = "force-dynamic";
@@ -127,8 +128,7 @@ export default async function InventoryPage() {
               <tr>
                 <th className="px-3 py-2 text-left">Product</th>
                 <th className="px-3 py-2 text-left">Variant</th>
-                <th className="px-3 py-2 text-right">Price</th>
-                <th className="px-3 py-2 text-right">Stock</th>
+                <th className="px-3 py-2 text-left" colSpan={2}>Stock / Price (editable)</th>
                 <th className="px-3 py-2 text-center">Status</th>
               </tr>
             </thead>
@@ -143,9 +143,8 @@ export default async function InventoryPage() {
                       </Link>
                     </td>
                     <td className="px-3 py-2 text-body">{v.variantLabel}</td>
-                    <td className="px-3 py-2 text-right">₹{v.price}</td>
-                    <td className={`px-3 py-2 text-right font-semibold ${v.stock === 0 ? "text-red-700" : v.stock <= 5 ? "text-amber-700" : "text-body"}`}>
-                      {v.stock}
+                    <td className="px-3 py-2" colSpan={2}>
+                      <StockEditor productId={v.productId} variantId={v.variantId} currentStock={v.stock} currentPrice={v.price} />
                     </td>
                     <td className="px-3 py-2 text-center">
                       <span className={`badge ${v.available && v.active ? "badge-green" : "badge-brown"}`}>

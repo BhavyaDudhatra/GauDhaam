@@ -19,6 +19,7 @@ import { getSession } from "@/lib/auth";
 import { getStore } from "@/lib/store";
 import { site } from "@/lib/site";
 import { submitFeedbackAction } from "@/lib/actions/feedback";
+import { cancelOrderAction } from "@/lib/actions/admin";
 import { StarRating } from "@/components/ui/star-rating";
 import { Img } from "@/components/ui/Img";
 
@@ -106,6 +107,14 @@ export default async function OrderPage({
               {paymentStatusLabel(order.payment?.status)}
             </span>
             <span className="badge badge-neutral">{order.number}</span>
+            {session && order.userId === session.id && order.status !== "shipped" && order.status !== "delivered" && order.status !== "cancelled" && (
+              <form action={cancelOrderAction}>
+                <input type="hidden" name="id" value={order.id} />
+                <button type="submit" className="btn btn-outline btn-sm text-red-600">
+                  Cancel order
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </section>
@@ -242,7 +251,7 @@ export default async function OrderPage({
                     ) : (
                       <p className="text-[12px] text-body/70 mt-1">No reviews yet.</p>
                     )}
-                    <form action={async (formData: FormData) => { await submitFeedbackAction(formData); }} className="mt-3 grid gap-2 sm:grid-cols-2">
+                    <form action={submitFeedbackAction} className="mt-3 grid gap-2 sm:grid-cols-2">
                       <input type="hidden" name="productId" value={item.productId} />
                       <input type="hidden" name="productName" value={item.name} />
                       <div className="field">

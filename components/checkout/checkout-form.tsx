@@ -800,22 +800,11 @@ export function CheckoutForm({
                     {fulfillment === "self" ? "Free (self pickup)" : deliveryChargeLoading ? "Calculating…" : formatINR(shipping)}
                   </dd>
                 </div>
-                {fulfillment === "delivery" && !deliveryChargeLoading && (
+                {fulfillment === "delivery" && !deliveryChargeLoading && deliveryCharge > 0 && (
                   <div className="rounded-lg bg-cream/60 px-3 py-2 text-[11px] text-body/70 space-y-0.5">
-                    <p className="font-semibold text-brand-dark text-[11.5px]">Delivery charge breakdown:</p>
-                    <p>Distance from nearest branch: {deliveryDistance > 0 ? `${deliveryDistance.toFixed(1)} km` : "N/A"}</p>
-                    <p>Base fee: {formatINR(deliveryBaseFee)}</p>
-                    <p>Per km rate: {formatINR(deliveryPerKmRate)} × {deliveryDistance > 0 ? deliveryDistance.toFixed(1) : "0"} km = {formatINR(Math.round(deliveryPerKmRate * (deliveryDistance > 0 ? deliveryDistance : 0)))}</p>
-                    <p className="font-semibold text-brand-dark">
-                      Total delivery charge: {formatINR(deliveryCharge)}
+                    <p className="text-[10px] text-amber-600 italic">
+                      Delivery charge will be calculated based on distance between your address and the main branch.
                     </p>
-                    {deliveryMethod !== "google-maps" && deliveryMethod !== "" && (
-                      <p className="text-[10px] text-amber-600 italic">
-                        {deliveryMethod === "pincode-fallback"
-                          ? "(Estimated based on pincode — Google Maps not available for exact distance)"
-                          : "(Estimated using OpenStreetMap — Google Maps not available for exact distance)"}
-                      </p>
-                    )}
                   </div>
                 )}
                 {discount > 0 && (

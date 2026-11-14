@@ -217,7 +217,6 @@ export async function updateSubscriptionStatusAction(formData: FormData) {
 }
 
 export async function requestQuantityChangeAction(
-  _previous: FormState,
   formData: FormData,
 ): Promise<FormState> {
   const session = await getSession();

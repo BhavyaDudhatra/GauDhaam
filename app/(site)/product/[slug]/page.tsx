@@ -188,7 +188,7 @@ export default async function ProductPage({ params }: PageProps) {
               </li>
               <li className="flex items-center gap-2">
                 <Package size={16} className="shrink-0 text-brand" />
-                <span>Dispatched in 1â€“2 days</span>
+                <span>Dispatched in 1–2 days</span>
               </li>
             </ul>
           </div>
@@ -277,7 +277,7 @@ export default async function ProductPage({ params }: PageProps) {
         <div className="container-gd">
           <h2 className="text-[18px] font-semibold">Reviews</h2>
           {session && hasPurchasedDelivered && (
-            <form action={async (formData: FormData) => { await submitFeedbackAction(formData); }} className="mt-4 card p-4 space-y-3">
+            <form action={submitFeedbackAction} className="mt-4 card p-4 space-y-3">
               <input type="hidden" name="productId" value={product.id} />
               <input type="hidden" name="productName" value={product.name} />
               <div className="field">
@@ -302,7 +302,7 @@ export default async function ProductPage({ params }: PageProps) {
                   <div className="flex items-center gap-2">
                     <span className="text-[13px] font-semibold">{f.userName}</span>
                     <span className="text-[11px] text-body/60">Â· {new Date(f.createdAt).toLocaleDateString()}</span>
-                    <span className="ml-auto text-[12px]">{"â˜…".repeat(f.rating)}{"â˜†".repeat(5-f.rating)}</span>
+                     <span className="ml-auto text-[12px]">{"★".repeat(f.rating)}{"☆".repeat(5-f.rating)}</span>
                   </div>
                   <p className="mt-1 text-[13px] font-semibold">{f.title}</p>
                   <p className="mt-1 text-[13px] text-body/80">{f.comment}</p>

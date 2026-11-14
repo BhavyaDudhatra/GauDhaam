@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireAdmin } from "@/lib/auth";
+import { requireAdmin, getSession } from "@/lib/auth";
 import { getStore } from "@/lib/store";
 import { orderStatuses } from "@/lib/site";
 import { slugify } from "@/lib/slug";
@@ -419,13 +419,36 @@ export async function updateOrderAction(formData: FormData) {
   redirect(`/admin/orders/${id}?updated=1`);
 }
 
-export async function markMessageReadAction(formData: FormData) {
-  await requireAdmin();
+export async function cancelOrderAction(formData: FormData): Promise<void> {
+  const session = await getSession();
+  if (!session) return;
   const id = clean(formData.get("id"), 80);
   if (!id) return;
+
   const store = await getStore();
-  await store.messages.markRead(id);
-  revalidatePath("/admin/messages");
+  const order = await store.orders.get(id);
+  if (!order || order.userId !== session.id) return;
+
+  // Only allow cancellation before shipped
+  if (order.status === "shipped" || order.status === "delivered" || order.status === "cancelled") {
+    return;
+  }
+
+  await store.orders.update(id, { status: "cancelled" });
+
+  // Send cancellation email
+  if (order.email) {
+    try {
+      const { sendOrderStatusEmail } = await import("@/lib/email");
+      await sendOrderStatusEmail(order.email, order.number, "cancelled");
+    } catch (e) {
+      console.error("Failed to send cancellation email:", e);
+    }
+  }
+
+  revalidatePath("/account");
+  revalidatePath("/account/orders");
+  revalidatePath(`/order/${id}`);
 }
 
 export async function deleteMessageAction(formData: FormData) {

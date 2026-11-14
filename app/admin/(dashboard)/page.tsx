@@ -157,7 +157,7 @@ export default async function AdminDashboardPage() {
             </Link>
           </div>
           <div className="divide-y divide-line">
-            {orders.slice(0, 6).map((order) => (
+            {orders.slice(0, 3).map((order) => (
               <Link
                 key={order.id}
                 href={`/admin/orders/${order.id}`}
@@ -186,6 +186,13 @@ export default async function AdminDashboardPage() {
               <p className="px-5 py-8 text-center text-[13px] text-body">
                 No orders yet.
               </p>
+            )}
+            {orders.length > 3 && (
+              <div className="px-5 py-3 text-center border-t border-line">
+                <Link href="/admin/orders" className="text-[12.5px] font-semibold text-brand hover:underline">
+                  View all {orders.length} orders →
+                </Link>
+              </div>
             )}
           </div>
         </div>

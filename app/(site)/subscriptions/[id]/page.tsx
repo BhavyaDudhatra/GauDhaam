@@ -195,7 +195,7 @@ export default async function SubscriptionDetailPage({
               ) : null}
             </p>
             {subscription.status !== "cancelled" && !subscription.requestedQty && (
-              <form action={async (formData: FormData) => { await requestQuantityChangeAction(null as any, formData); }} className="mt-3 flex items-end gap-2">
+              <form action={requestQuantityChangeAction} className="mt-3 flex items-end gap-2">
                 <input type="hidden" name="id" value={subscription.id} />
                 <div>
                   <label className="text-[10.5px] font-semibold uppercase tracking-[0.08em] text-body/60">New quantity</label>
