@@ -24,15 +24,28 @@ export default async function AdminDashboardPage() {
   const pendingOrders = orders.filter(
     (order) => order.payment?.status === "created" && order.status === "pending",
   ).length;
+  const deliveredOrders = orders.filter((order) => order.status === "delivered").length;
+  const cancelledOrders = orders.filter((order) => order.status === "cancelled").length;
+  const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
+  const avgOrderValue = orders.length > 0 ? Math.round(totalRevenue / orders.length) : 0;
+
+  // B2B stats
+  const b2bOrders = await store.b2bOrders.list();
+  const pendingB2B = b2bOrders.filter((o) => o.status === "pending").length;
+  const completedB2B = b2bOrders.filter((o) => o.status === "completed").length;
 
   const cards = [
     { label: "Revenue (paid)", value: formatINR(revenue), icon: ShoppingCart, href: "/admin/revenue" },
+    { label: "Total orders", value: orders.length, href: "/admin/orders", icon: ShoppingCart, note: `${pendingOrders} awaiting payment` },
+    { label: "Delivered", value: deliveredOrders, href: "/admin/orders", icon: Package },
+    { label: "Cancelled", value: cancelledOrders, href: "/admin/orders", icon: Package },
+    { label: "Avg order value", value: formatINR(avgOrderValue), icon: ShoppingCart, href: "/admin/revenue" },
     { label: "Products", value: products.length, href: "/admin/products", icon: Box },
     { label: "Services", value: services.length, href: "/admin/services", icon: Package },
-    { label: "Orders", value: orders.length, href: "/admin/orders", icon: ShoppingCart, note: `${pendingOrders} awaiting payment` },
     { label: "Users", value: users.length, href: "/admin/users", icon: Users },
     { label: "Feedback", value: feedback.length, href: "/admin/feedback", icon: MessageSquare },
     { label: "Coupons", value: coupons.length, href: "/admin/coupons", icon: Gift },
+    { label: "B2B orders", value: b2bOrders.length, href: "/admin/b2b", icon: Gift, note: `${pendingB2B} pending, ${completedB2B} completed` },
   ];
 
   return (

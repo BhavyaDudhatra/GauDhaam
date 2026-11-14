@@ -64,5 +64,19 @@ export async function POST(request: Request) {
   }
 
   await store.orders.markPaid(order.id, razorpayPaymentId);
+
+  // Send order confirmation email
+  try {
+    const { sendOrderConfirmationEmail } = await import("@/lib/email");
+    const items = order.items.map((item) => ({
+      name: item.name,
+      qty: item.qty,
+      price: item.price,
+    }));
+    await sendOrderConfirmationEmail(order.email, order.number, order.total, items);
+  } catch (e) {
+    console.error("Failed to send order confirmation email:", e);
+  }
+
   return NextResponse.json({ ok: true, orderNumber: order.number });
 }

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { rateLimit } from "@/lib/rate-limit";
 import { getSession } from "@/lib/auth";
 import { site } from "@/lib/site";
 import { getStore } from "@/lib/store";
@@ -29,6 +30,12 @@ type IncomingItem = {
 };
 
 export async function POST(request: Request) {
+  const ip = request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown";
+  const { allowed } = rateLimit(ip);
+  if (!allowed) {
+    return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+  }
+
   let payload: Record<string, unknown>;
   try {
     payload = (await request.json()) as Record<string, unknown>;

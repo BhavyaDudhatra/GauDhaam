@@ -403,6 +403,16 @@ export async function updateOrderAction(formData: FormData) {
     },
   });
 
+  // Send status change email if status changed
+  if (existing.status !== status && existing.email) {
+    try {
+      const { sendOrderStatusEmail } = await import("@/lib/email");
+      await sendOrderStatusEmail(existing.email, existing.number, status);
+    } catch (e) {
+      console.error("Failed to send status email:", e);
+    }
+  }
+
   revalidatePath("/admin/orders");
   revalidatePath(`/admin/orders/${id}`);
   revalidatePath(`/order/${id}`);

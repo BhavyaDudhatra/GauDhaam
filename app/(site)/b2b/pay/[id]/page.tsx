@@ -63,7 +63,18 @@ export default async function B2BPayPage({ params }: { params: Promise<{ id: str
                       description: "B2B Order ${id}",
                       order_id: "${razorpayOrderId}",
                       handler: function(response){
-                        window.location.href = '/b2b/orders?paid=1';
+                        fetch('/api/b2b/verify', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            b2bOrderId: "${id}",
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature,
+                          }),
+                        }).then(function() {
+                          window.location.href = '/b2b/orders?paid=1';
+                        });
                       },
                       prefill: {},
                       theme: { color: "#496B45" }
