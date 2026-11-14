@@ -3,17 +3,26 @@ const GOOGLE_API_KEY = process.env.GOOGLE_MAPS_API_KEY || 'AIzaSyDJR8t41dcVSIz9J
 async function geocodeGoogle(address: string) {
   // Try full address first, then progressively simpler versions
   const parts = address.split(',').map(p => p.trim()).filter(Boolean);
-  const candidates: string[] = [address];
+  const candidates: string[] = [];
+  if (address.toLowerCase().includes('india')) {
+    candidates.push(address);
+  } else {
+    candidates.push(address + ', India');
+  }
   if (parts.length > 2) {
-    candidates.push(parts.slice(-3).join(', '));
-    candidates.push(parts.slice(-2).join(', '));
+    const last3 = parts.slice(-3).join(', ');
+    candidates.push(last3.includes('India') ? last3 : last3 + ', India');
+    const last2 = parts.slice(-2).join(', ');
+    candidates.push(last2.includes('India') ? last2 : last2 + ', India');
   }
   const pincodeMatch = address.match(/\b(\d{6})\b/);
   if (pincodeMatch) {
-    candidates.push(pincodeMatch[1]);
+    candidates.push(pincodeMatch[1] + ', India');
   }
   
-  for (const candidate of candidates) {
+  const unique = [...new Set(candidates)];
+  
+  for (const candidate of unique) {
     try {
       const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(candidate)}&key=${GOOGLE_API_KEY}`;
       const res = await fetch(url);
@@ -47,30 +56,43 @@ async function geocodeNominatim(address: string) {
   const parts = address.split(',').map(p => p.trim()).filter(Boolean);
   
   // Build candidate queries from most specific to least specific
-  const candidates: string[] = [address];
+  // Always append ", India" to ensure Indian results
+  const candidates: string[] = [];
+  if (address.toLowerCase().includes('india')) {
+    candidates.push(address);
+  } else {
+    candidates.push(address + ', India');
+  }
   if (parts.length > 2) {
-    // Try last 3 parts (city, state, pincode)
-    candidates.push(parts.slice(-3).join(', '));
-    // Try last 2 parts (city, pincode)
-    candidates.push(parts.slice(-2).join(', '));
-    // Try city + state
-    if (parts.length >= 3) {
-      candidates.push(parts[parts.length - 2] + ', ' + parts[parts.length - 1]);
-    }
-    // Try just the city name (extract from parts)
-    const pincodeMatch = address.match(/\b(\d{6})\b/);
-    if (pincodeMatch) {
-      candidates.push(pincodeMatch[1]);
-    }
+    // Try last 3 parts (area, city, state/pincode) + India
+    const last3 = parts.slice(-3).join(', ');
+    candidates.push(last3.includes('India') ? last3 : last3 + ', India');
+    // Try last 2 parts (city, state/pincode) + India
+    const last2 = parts.slice(-2).join(', ');
+    candidates.push(last2.includes('India') ? last2 : last2 + ', India');
+  }
+  // Try city name only (extract city from parts - usually second-to-last before pincode)
+  const pincodeMatch = address.match(/\b(\d{6})\b/);
+  if (pincodeMatch) {
+    // Use pincode + India
+    candidates.push(pincodeMatch[1] + ', India');
   }
   
-  for (const candidate of candidates) {
+  // Remove duplicates
+  const unique = [...new Set(candidates)];
+  
+  for (const candidate of unique) {
     try {
       const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(candidate)}&limit=1`;
       const res = await fetch(url, { headers: { 'User-Agent': 'GauDhaam/1.0' } });
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
-        return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+        // Verify the result is in India (lat between 6-38, lng between 68-98)
+        const lat = parseFloat(data[0].lat);
+        const lng = parseFloat(data[0].lon);
+        if (lat >= 6 && lat <= 38 && lng >= 68 && lng <= 98) {
+          return { lat, lng };
+        }
       }
     } catch {
       // continue to next candidate
