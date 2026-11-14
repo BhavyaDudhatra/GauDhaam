@@ -778,9 +778,11 @@ export function CheckoutForm({
                     <p className="font-semibold text-brand-dark">
                       Total delivery charge: {formatINR(deliveryCharge)}
                     </p>
-                    {deliveryMethod === "pincode-fallback" && (
+                    {deliveryMethod !== "google-maps" && deliveryMethod !== "" && (
                       <p className="text-[10px] text-amber-600 italic">
-                        (Estimated based on pincode — Google Maps not available for exact distance)
+                        {deliveryMethod === "pincode-fallback"
+                          ? "(Estimated based on pincode — Google Maps not available for exact distance)"
+                          : "(Estimated using OpenStreetMap — Google Maps not available for exact distance)"}
                       </p>
                     )}
                   </div>
