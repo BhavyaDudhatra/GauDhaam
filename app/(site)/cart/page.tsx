@@ -11,7 +11,7 @@ import { Img } from "@/components/ui/Img";
 export default function CartPage() {
   const { lines, hydrated, subtotal, setQty, removeItem, count } = useCart();
 
-  const shipping = shippingFor(subtotal, site.freeShippingAbove, site.shippingFee);
+  const shipping = shippingFor(subtotal, site.shippingFee);
 
   return (
     <>

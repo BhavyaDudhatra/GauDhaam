@@ -31,7 +31,7 @@ export function discountPercent(price: number, mrp: number | null) {
   return Math.round(((mrp - price) / mrp) * 100);
 }
 
-export function shippingFor(subtotal: number, freeAbove: number, fee: number) {
+export function shippingFor(subtotal: number, fee: number) {
   if (subtotal <= 0) return 0;
-  return subtotal >= freeAbove ? 0 : fee;
+  return fee;
 }
