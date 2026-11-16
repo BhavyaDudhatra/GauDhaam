@@ -9,10 +9,13 @@ const MAX_AGE = 60 * 60 * 24 * 30;
 type TokenPayload = SessionUser & { exp: number };
 
 function secret() {
-  return (
-    process.env.AUTH_SECRET ||
-    "gaudhaam-development-secret-change-this-in-production"
-  );
+  const s = process.env.AUTH_SECRET;
+  if (!s || s === "gaudhaam-development-secret-change-this-in-production") {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("AUTH_SECRET must be set in production.");
+    }
+  }
+  return s || "gaudhaam-development-secret-change-this-in-production";
 }
 
 function encode(input: string) {

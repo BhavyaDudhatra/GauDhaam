@@ -27,3 +27,19 @@ export function toInt(value: unknown, fallback = 0) {
 export function toBool(value: unknown) {
   return value === "on" || value === "true" || value === "1";
 }
+
+export function sanitizeHtml(value: string): string {
+  // Basic HTML sanitization - strip tags and escape special chars
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;")
+    .replace(/\//g, "&#x2F;");
+}
+
+export function sanitizeInput(value: unknown, max = 500): string {
+  const cleaned = clean(value, max);
+  return sanitizeHtml(cleaned);
+}
