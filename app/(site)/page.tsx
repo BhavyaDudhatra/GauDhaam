@@ -73,7 +73,7 @@ export default async function HomePage() {
           <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <li className="flex items-center gap-2.5 rounded-2xl border border-line bg-white/80 px-3.5 py-2.5 text-[12.5px] backdrop-blur">
               <Truck size={16} className="text-brand" />
-              Free delivery over ₹999
+              
             </li>
             <li className="flex items-center gap-2.5 rounded-2xl border border-line bg-white/80 px-3.5 py-2.5 text-[12.5px] backdrop-blur">
               <ShieldCheck size={16} className="text-brand" />

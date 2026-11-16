@@ -180,7 +180,7 @@ export default async function ProductPage({ params }: PageProps) {
             <ul className="mt-6 grid gap-2.5 rounded-card border border-line bg-white/70 p-4 text-[12.5px] sm:grid-cols-3 sm:gap-3">
               <li className="flex items-center gap-2">
                 <Truck size={16} className="shrink-0 text-brand" />
-                <span>Free delivery over â‚¹999</span>
+                <span></span>
               </li>
               <li className="flex items-center gap-2">
                 <ShieldCheck size={16} className="shrink-0 text-brand" />

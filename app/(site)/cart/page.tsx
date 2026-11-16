@@ -12,7 +12,6 @@ export default function CartPage() {
   const { lines, hydrated, subtotal, setQty, removeItem, count } = useCart();
 
   const shipping = shippingFor(subtotal, site.freeShippingAbove, site.shippingFee);
-  const remaining = 0; // No free shipping threshold
 
   return (
     <>

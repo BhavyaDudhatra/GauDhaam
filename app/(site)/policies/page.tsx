@@ -12,7 +12,7 @@ const policies = [
     title: "Shipping & delivery",
     href: "/policies/shipping",
     icon: Truck,
-    text: "Delivery timelines, free shipping and tracking.",
+    text: "Delivery timelines, shipping charges and tracking.",
   },
   {
     title: "Returns & refunds",
