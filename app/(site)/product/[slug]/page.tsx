@@ -306,6 +306,19 @@ export default async function ProductPage({ params }: PageProps) {
                   </div>
                   <p className="mt-1 text-[13px] font-semibold">{f.title}</p>
                   <p className="mt-1 text-[13px] text-body/80">{f.comment}</p>
+                {f.reply && (
+                  <div className="mt-3 rounded-xl border border-line bg-cream/50 p-3.5">
+                    <div className="flex items-center gap-1.5 text-[12px] font-semibold text-brand-dark">
+                      Reply from {f.repliedBy ?? "GauDhaam"}
+                    </div>
+                    <p className="mt-1 text-[12.5px] leading-relaxed">{f.reply}</p>
+                    {f.repliedAt && (
+                      <p className="mt-1 text-[11px] text-body/70">
+                        {new Date(f.repliedAt).toLocaleDateString()}
+                      </p>
+                    )}
+                  </div>
+                )}
                 </div>
               ))}
             </div>
