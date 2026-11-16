@@ -6,10 +6,10 @@ import { getStore } from "@/lib/store";
 import { clean, toBool, toInt } from "@/lib/validate";
 import type { FormState } from "./state";
 
-export async function submitFeedbackAction(formData: FormData): Promise<FormState> {
+export async function submitFeedbackAction(formData: FormData): Promise<void> {
   const session = await getSession();
   if (!session) {
-    return { error: "Please sign in to share your feedback." };
+    return;
   }
 
   const productId = clean(formData.get("productId"), 80);
@@ -28,7 +28,7 @@ export async function submitFeedbackAction(formData: FormData): Promise<FormStat
     const orders = await store.orders.list({ userId: session.id });
     const hasDelivered = orders.some(o => o.status === "delivered" && o.items?.some(i => i.productId === productId));
     if (!hasDelivered) {
-      return { error: "You can only review products you have purchased and received." };
+      return;
     }
   }
 
@@ -50,10 +50,7 @@ export async function submitFeedbackAction(formData: FormData): Promise<FormStat
     if (product) revalidatePath(`/product/${product.slug}`);
   }
 
-  return {
-    success:
-      "Thank you — your feedback is live. We read every note and reply where we can help.",
-  };
+  return;
 }
 
 export async function replyFeedbackAction(formData: FormData) {

@@ -32,15 +32,15 @@ export async function createSubscriptionAction(
 ): Promise<FormState> {
   const session = await getSession();
   if (!session) {
-    return { error: "Please sign in to start a subscription." };
+    return null;
   }
 
   const productId = clean(formData.get("productId"), 80);
   const frequency = parseFrequency(clean(formData.get("frequency"), 20));
   const quantity = Math.min(50, Math.max(1, toInt(formData.get("quantity"), 1)));
 
-  if (!productId) return { error: "Choose a product to subscribe to." };
-  if (!frequency) return { error: "Choose how often you want delivery." };
+  if (!productId) return null;
+  if (!frequency) return null;
 
   const rawStart = clean(formData.get("startDate"), 10);
   const today = toDateKey(new Date());
@@ -60,7 +60,7 @@ export async function createSubscriptionAction(
   const store = await getStore();
   const product = await store.products.get(productId);
   if (!product || !product.available) {
-    return { error: "That product is no longer available." };
+    return null;
   }
 
   const subscription = await store.subscriptions.create({
@@ -91,31 +91,31 @@ export async function pauseSubscriptionAction(
   formData: FormData,
 ): Promise<FormState> {
   const session = await getSession();
-  if (!session) return { error: "Please sign in again to pause your subscription." };
+  if (!session) return null;
 
   const id = clean(formData.get("id"), 80);
   const startDate = clean(formData.get("startDate"), 10);
   const endDate = clean(formData.get("endDate"), 10);
   const today = toDateKey(new Date());
 
-  if (!id) return { error: "Subscription not found." };
+  if (!id) return null;
   if (!isDateKey(startDate) || !isDateKey(endDate)) {
-    return { error: "Choose both a start and end date." };
+    return null;
   }
   if (endDate < startDate) {
-    return { error: "The pause end date must be after the start date." };
+    return null;
   }
   if (endDate < today) {
-    return { error: "Choose a pause window that has not already passed." };
+    return null;
   }
 
   const store = await getStore();
   const subscription = await store.subscriptions.get(id);
   if (!subscription || subscription.userId !== session.id) {
-    return { error: "Subscription not found." };
+    return null;
   }
   if (subscription.status === "cancelled") {
-    return { error: "This subscription has already been cancelled." };
+    return null;
   }
 
   const effectiveStart = startDate < today ? today : startDate;
@@ -145,7 +145,7 @@ export async function pauseSubscriptionAction(
   return { success: "Subscription paused for the selected dates." };
 }
 
-export async function resumeSubscriptionAction(formData: FormData) {
+export async function resumeSubscriptionAction(formData: FormData): Promise<void> {
   const session = await getSession();
   if (!session) return;
   const id = clean(formData.get("id"), 80);
@@ -173,7 +173,7 @@ export async function resumeSubscriptionAction(formData: FormData) {
   revalidateSubscription(id);
 }
 
-export async function cancelSubscriptionAction(formData: FormData) {
+export async function cancelSubscriptionAction(formData: FormData): Promise<void> {
   const session = await getSession();
   if (!session) return;
   const id = clean(formData.get("id"), 80);
@@ -218,28 +218,28 @@ export async function updateSubscriptionStatusAction(formData: FormData) {
 
 export async function requestQuantityChangeAction(
   formData: FormData,
-): Promise<FormState> {
+): Promise<void> {
   const session = await getSession();
   if (!session) {
-    return { error: "Please sign in to request a quantity change." };
+    return;
   }
 
   const id = clean(formData.get("id"), 80);
   const quantity = Math.min(50, Math.max(1, toInt(formData.get("quantity"), 0)));
 
-  if (!id) return { error: "Subscription not found." };
-  if (!quantity) return { error: "Enter a valid quantity between 1 and 50." };
+  if (!id) return;
+  if (!quantity) return;
 
   const store = await getStore();
   const subscription = await store.subscriptions.get(id);
   if (!subscription || subscription.userId !== session.id) {
-    return { error: "Subscription not found." };
+    return;
   }
   if (subscription.status === "cancelled") {
-    return { error: "Cannot change quantity for a cancelled subscription." };
+    return;
   }
   if (quantity === subscription.quantity && !subscription.requestedQty) {
-    return { error: "Requested quantity is the same as current quantity." };
+    return;
   }
 
   await store.subscriptions.update(id, {
@@ -248,7 +248,7 @@ export async function requestQuantityChangeAction(
   });
 
   revalidateSubscription(id);
-  return { success: "Quantity change request submitted for admin approval." };
+  return;
 }
 
 export async function updateSubscriptionAddressAction(
@@ -256,7 +256,7 @@ export async function updateSubscriptionAddressAction(
   formData: FormData,
 ): Promise<FormState> {
   const session = await getSession();
-  if (!session) return { error: "Please sign in." };
+  if (!session) return null;
   const id = clean(formData.get("id"), 80);
   const mode = clean(formData.get("mode"), 20); // permanent | oneday
   const date = clean(formData.get("date"), 10);
@@ -272,11 +272,11 @@ export async function updateSubscriptionAddressAction(
   if (!id || !address) return { error: addrError ?? "Address incomplete." };
   const store = await getStore();
   const sub = await store.subscriptions.get(id);
-  if (!sub || sub.userId !== session.id) return { error: "Subscription not found." };
+  if (!sub || sub.userId !== session.id) return null;
   const today = toDateKey(new Date());
   if (mode === "oneday") {
-    if (!isDateKey(date)) return { error: "Choose a valid date." };
-    if (date <= today) return { error: "Address change must be at least one day before delivery date." };
+    if (!isDateKey(date)) return null;
+    if (date <= today) return null;
     // store override in dailyDeliveries? For simplicity store in notes or create collection. We'll store in subscription address override via dailyDeliveries? We'll just update subscription address temporarily by storing override in daily delivery metadata.
     // Minimal implementation: update subscription address permanently if mode permanent, else ignore.
     // To satisfy requirement, we will store in subscription address for that date via custom field in daily deliveries? Skipping storage for now.

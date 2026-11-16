@@ -451,15 +451,6 @@ export async function cancelOrderAction(formData: FormData): Promise<void> {
   revalidatePath(`/order/${id}`);
 }
 
-export async function deleteMessageAction(formData: FormData) {
-  await requireAdmin();
-  const id = clean(formData.get("id"), 80);
-  if (!id) return;
-  const store = await getStore();
-  await store.messages.remove(id);
-  revalidatePath("/admin/messages");
-}
-
 export async function deleteUser(formData: FormData) {
   const session = await requireAdmin();
   const id = clean(formData.get("id"), 80);
@@ -475,6 +466,24 @@ export async function deleteUser(formData: FormData) {
 
   await store.users.remove(id);
   revalidatePath("/admin/users");
+}
+
+export async function markMessageReadAction(formData: FormData) {
+  await requireAdmin();
+  const id = clean(formData.get("id"), 80);
+  if (!id) return;
+  const store = await getStore();
+  await store.messages.markRead(id);
+  revalidatePath("/admin/messages");
+}
+
+export async function deleteMessageAction(formData: FormData) {
+  await requireAdmin();
+  const id = clean(formData.get("id"), 80);
+  if (!id) return;
+  const store = await getStore();
+  await store.messages.remove(id);
+  revalidatePath("/admin/messages");
 }
 
 export async function createGalleryItemAction(formData: FormData) {
