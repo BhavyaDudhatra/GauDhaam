@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Check, ChevronRight, Leaf, Package, ShieldCheck, Truck } from "lucide-react";
+import { Check, ChevronRight, Leaf, Package, ShieldCheck } from "lucide-react";
 import { ProductDetail } from "@/components/product/product-detail";
 import { ProductCard } from "@/components/product/product-card";
 import { SocialShare } from "@/components/product/social-share";
@@ -178,10 +178,6 @@ export default async function ProductPage({ params }: PageProps) {
             </div>
 
             <ul className="mt-6 grid gap-2.5 rounded-card border border-line bg-white/70 p-4 text-[12.5px] sm:grid-cols-3 sm:gap-3">
-              <li className="flex items-center gap-2">
-                <Truck size={16} className="shrink-0 text-brand" />
-                <span></span>
-              </li>
               <li className="flex items-center gap-2">
                 <ShieldCheck size={16} className="shrink-0 text-brand" />
                 <span>Secure Razorpay payment</span>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Leaf, ShieldCheck, Sparkles, Truck } from "lucide-react";
+import { ArrowRight, Leaf, ShieldCheck, Sparkles } from "lucide-react";
 import { ProductCard } from "@/components/product/product-card";
 import { getStore } from "@/lib/store";
 import { getDb } from "@/lib/firebase";
@@ -71,10 +71,6 @@ export default async function HomePage() {
             </Link>
           </div>
           <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <li className="flex items-center gap-2.5 rounded-2xl border border-line bg-white/80 px-3.5 py-2.5 text-[12.5px] backdrop-blur">
-              <Truck size={16} className="text-brand" />
-              
-            </li>
             <li className="flex items-center gap-2.5 rounded-2xl border border-line bg-white/80 px-3.5 py-2.5 text-[12.5px] backdrop-blur">
               <ShieldCheck size={16} className="text-brand" />
               Secure Razorpay payment
