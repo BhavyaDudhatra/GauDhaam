@@ -1,0 +1,36 @@
+import { NextResponse } from "next/server";
+import { getDb } from "@/lib/firebase";
+import { requireAdmin } from "@/lib/auth";
+
+export async function POST(request: Request) {
+  await requireAdmin();
+  const form = await request.formData();
+  const id = String(form.get('id') || '').trim();
+  const name = String(form.get('name') || '').trim();
+  const address = String(form.get('address') || '').trim();
+  const lat = parseFloat(String(form.get('lat') || '0'));
+  const lng = parseFloat(String(form.get('lng') || '0'));
+  const phone = String(form.get('phone') || '').trim();
+  const isMain = String(form.get('isMain') || 'false') === 'true';
+
+  if (!id || !name || !address || isNaN(lat) || isNaN(lng)) {
+    return NextResponse.json({ error: 'required fields missing' }, { status: 400 });
+  }
+
+  const db = await getDb();
+  if (!db) {
+    return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
+  }
+
+  await db.collection('branches').doc(id).update({
+    name,
+    address,
+    lat,
+    lng,
+    phone,
+    isMain,
+    updatedAt: new Date().toISOString(),
+  });
+
+  return NextResponse.redirect(new URL('/admin/branches', request.url), 303);
+}
