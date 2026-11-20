@@ -1,4 +1,5 @@
 import { getSession } from "@/lib/auth";
+import { getStore } from "@/lib/store";
 import { redirect } from "next/navigation";
 import { AdminHeader } from "@/components/admin/admin-header";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
@@ -10,6 +11,12 @@ export default async function AdminRootLayout({
 }) {
   const session = await getSession();
   if (!session || session.role !== "admin") {
+    redirect("/admin/login");
+  }
+  // Verify user exists in store
+  const store = await getStore();
+  const user = await store.users.get(session.id);
+  if (!user || user.role !== "admin") {
     redirect("/admin/login");
   }
 
