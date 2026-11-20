@@ -35,11 +35,29 @@ function getAuth() {
   throw new Error("No Google Drive credentials available.");
 }
 
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Accept",
+    },
+  });
+}
+
 export async function GET(request: Request) {
   const url = new URL(request.url);
-  const id = url.searchParams.get("id");
+  let id = url.searchParams.get("id");
+  const urlParam = url.searchParams.get("url");
+  if (!id && urlParam) {
+    // extract id from drive url
+    const m = urlParam.match(/\/file\/d\/([^/?#]+)/) || urlParam.match(/[?&]id=([^&]+)/) || urlParam.match(/lh3\.googleusercontent\.com\/d\/([^/?#]+)/);
+    if (m) id = m[1];
+    else if (!urlParam.includes("://") && urlParam.length >= 20) id = urlParam;
+  }
   if (!id) {
-    return NextResponse.json({ error: "Missing file id." }, { status: 400 });
+    return NextResponse.json({ error: "Missing file id." }, { status: 400, headers: { "Access-Control-Allow-Origin": "*" } });
   }
 
   try {
@@ -71,11 +89,12 @@ export async function GET(request: Request) {
       status: 200,
       headers: {
         "Content-Type": mimeType,
-        "Cache-Control": "public, max-age=31536000, immutable",
+        "Cache-Control": "public, max-age=3600",
+        "Access-Control-Allow-Origin": "*",
       },
     });
   } catch (error) {
     console.error("Image proxy error:", error);
-    return NextResponse.json({ error: "Failed to fetch image." }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch image." }, { status: 500, headers: { "Access-Control-Allow-Origin": "*" } });
   }
 }

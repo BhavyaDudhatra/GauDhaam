@@ -58,10 +58,10 @@ export default async function AdminSubscriptionsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
-              {subscriptions.map((subscription) => {
+              {subscriptions.map((subscription, index) => {
                 const user = usersById.get(subscription.userId);
                 return (
-                  <tr key={subscription.id}>
+                  <tr key={`${subscription.id}-${index}`}>
                     <td className="px-4 py-3">
                       <p className="font-semibold text-brand-dark">
                         {user?.name ?? subscription.address.name}
